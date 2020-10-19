@@ -31,7 +31,21 @@
         <spring-format.version>0.0.19</spring-format.version>
 
     </properties>
-
+<developers>
+	<developer>
+<id>vicdiacor</id>
+<name>Vicente</name>
+<email>vicdiacor@us.alumn.es</email>
+<url>http://www.tmht.com/vicdiacor</url>
+<roles>
+<role>leader</role>
+</roles>
+<properties>
+<picUrl>
+</picUrl>
+</properties>
+</developer>
+</developers>
     <dependencies>
         <!-- Spring and Spring Boot dependencies -->
         <dependency>
