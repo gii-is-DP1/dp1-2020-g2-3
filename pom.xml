@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.samples</groupId>
-    <artifactId>spring-petclinic</artifactId>
+    <artifactId>G2-03</artifactId>
     <version>2.2.0.BUILD-SNAPSHOT</version>
 
     <parent>
@@ -12,7 +12,7 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.2.4.RELEASE</version>
     </parent>
-    <name>petclinic</name>
+    <name>G2-03</name>
 
     <properties>
 
@@ -53,7 +53,12 @@
  			<role>Team member</role>
 			</roles>
  			</developer>
+
  			<developer>
+
+ 	
+
+
  			<id>josmacpor</id>
  			<name>Jose Antonio</name>
  			<email>josmacpor@alum.us.es</email>
@@ -61,7 +66,10 @@
  				<role>Team member</role>
 			</roles>
  		</developer>
- 	</developers>
+
+  </developers>
+
+
     <dependencies>
         <!-- Spring and Spring Boot dependencies -->
         <dependency>
