@@ -42,6 +42,17 @@
  			</developer>
  	</developers>
 
+<developers>
+ 		<developer>
+ 			<id>josmacpor</id>
+ 			<name>Jose Antonio</name>
+ 			<email>josmacpor@alum.us.es</email>
+ 			<roles>
+ 				<role>Team member</role>
+			</roles>
+ 		</developer>
+</developers>
+
     <dependencies>
         <!-- Spring and Spring Boot dependencies -->
         <dependency>
