@@ -40,6 +40,14 @@
  			<role>Team member</role>
 			</roles>
  			</developer>
+ 		<developer>
+ 			<id>manrivlla</id>
+ 			<name>Manuel</name>
+ 			<email>manolo.rivas.llamas@gmail.com</email>
+ 			<roles>
+ 			<role>Team member</role>
+			</roles>
+ 			</developer>
  	</developers>
 
     <dependencies>
