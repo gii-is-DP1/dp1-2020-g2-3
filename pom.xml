@@ -83,6 +83,15 @@
  				<role>Team member</role>
 			</roles>
  		</developer>
+ 		
+ 		<developer>
+ 			<id>ivaherrod1</id>
+ 			<name>Iván</name>
+ 			<email>ivaherrod1@alum.us.es</email>
+ 			<roles>
+ 				<role>Team member</role>
+			</roles>
+ 		</developer>
 
   </developers>
 
