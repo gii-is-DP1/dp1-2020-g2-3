@@ -18,7 +18,7 @@ INSERT INTO authorities(id,username,authority) VALUES (5,'joscuegal1','owner');
 INSERT INTO users(username,password,enabled) VALUES ('manrivlla','manrivlla',TRUE);
 INSERT INTO authorities(id,username,authority) VALUES (6,'manrivlla','owner');
 -- One owner user, named owner1 with passwor 0wn3r
-INSERT INTO users(username,password,enabled) VALUES ('vicdiacor','0wn3r',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('vicdiacor','qwerty123',TRUE);
 INSERT INTO authorities(id,username,authority) VALUES (7,'vicdiacor','owner');
 
 INSERT INTO vets VALUES (1, 'James', 'Carter');
@@ -87,3 +87,10 @@ INSERT INTO visits(id,pet_id,visit_date,description) VALUES (2, 8, '2013-01-02',
 INSERT INTO visits(id,pet_id,visit_date,description) VALUES (3, 8, '2013-01-03', 'neutered');
 INSERT INTO visits(id,pet_id,visit_date,description) VALUES (4, 7, '2013-01-04', 'spayed');
 
+INSERT INTO tipo_Trabajador VALUES (1,'Administrador');
+INSERT INTO tipo_Trabajador VALUES (2,'Taxista');
+
+INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,contraseña,tipo_trabajador_id) VALUES (1,'80090030P','Rodolfo','García Ordóñez','alex@gmail.com',632587419,'qwerty123',2);
+INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,contraseña,tipo_trabajador_id) VALUES (2,'90065864L','Roberta','Maestre','maestre@gmail.com',635874921,'qwerty123',1);
+
+INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (1,'Toyota','Verso',5, 2000,1);
