@@ -32,6 +32,7 @@
 
     </properties>
 
+
 <developers>
  		<developer>
  			<id>josmacpor</id>
@@ -41,6 +42,21 @@
  				<role>Team member</role>
 			</roles>
  		</developer>
+
+<developers>
+	<developer>
+<id>vicdiacor</id>
+<name>Vicente</name>
+<email>vicwork44@gmail.com</email>
+<url>http://www.tmht.com/vicdiacor</url>
+<roles>
+<role>leader</role>
+</roles>
+<properties>
+<picUrl>
+</picUrl>
+</properties>
+</developer>
 </developers>
 
     <dependencies>
