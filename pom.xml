@@ -33,7 +33,51 @@
     </properties>
 
 <developers>
+
+	<developer>
+<id>vicdiacor</id>
+<name>Vicente</name>
+<email>vicwork44@gmail.com</email>
+<url>http://www.tmht.com/vicdiacor</url>
+<roles>
+<role>leader</role>
+</roles>
+<properties>
+<picUrl>
+</picUrl>
+</properties>
+</developer>
+
  		<developer>
+ 			<id>elenolcar</id>
+ 			<name>Elena</name>
+ 			<email>Black_Star_freak@hotmail.com</email>
+ 			<roles>
+ 			<role>Team member</role>
+			</roles>
+ 			</developer>
+      
+      <developer>
+ 			<id>joscuegal1</id>
+ 			<name>Jose Manuel</name>
+ 			<email>jmvisoalcor@gmail.com</email>
+ 			<roles>
+ 				<role>Team member</role>
+			</roles>
+			</developer>
+			
+			<developer>
+ 			<id>manrivlla</id>
+ 			<name>Manuel</name>
+ 			<email>manolo.rivas.llamas@gmail.com</email>
+ 			<roles>
+ 			<role>Team member</role>
+			</roles>
+ 			</developer>
+		
+  
+ 
+ 			<developer>
  			<id>josmacpor</id>
  			<name>Jose Antonio</name>
  			<email>josmacpor@alum.us.es</email>
@@ -41,7 +85,9 @@
  				<role>Team member</role>
 			</roles>
  		</developer>
-</developers>
+
+  </developers>
+
 
     <dependencies>
         <!-- Spring and Spring Boot dependencies -->
