@@ -33,10 +33,15 @@ public class AutomovilService {
 	}
 	
 	@Transactional()
-	public void delete(Automovil auto) {
+	public void delete(Automovil auto)  {
 		
 		autoRepo.delete(auto);
 		
+	}
+	@Transactional()
+	public void save(Automovil auto)  {
+		
+		autoRepo.save(auto);
 	}
 	
 }
