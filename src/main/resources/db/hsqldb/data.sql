@@ -91,6 +91,9 @@ INSERT INTO tipo_Trabajador VALUES (1,'Administrador');
 INSERT INTO tipo_Trabajador VALUES (2,'Taxista');
 
 INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,contraseña,tipo_trabajador_id) VALUES (1,'80090030P','Rodolfo','García Ordóñez','alex@gmail.com',632587419,'qwerty123',2);
-INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,contraseña,tipo_trabajador_id) VALUES (2,'90065864L','Roberta','Maestre','maestre@gmail.com',635874921,'qwerty123',1);
+INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,contraseña,tipo_trabajador_id) VALUES (2,'90065864L','Roberta','Maestre López','maestre@gmail.com',635874921,'qwerty123',1);
+INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,contraseña,tipo_trabajador_id) VALUES (3,'90063524P','Pepa','Castillo Díaz','pepa@gmail.com',635214789,'qwerty123',2);
 
 INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (1,'Toyota','Verso',5, 2000,1);
+INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (2,'Seat','Alhambra',7, 40000,2);
+INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (3,'Ford','Fiesta',5, 20000,3);
