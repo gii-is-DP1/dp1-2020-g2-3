@@ -42,9 +42,7 @@ public class AutomovilController {
 			
 			modelMap.addAttribute("message", "Automóvil no encontrado");
 		}
-		Iterable<Automovil> automoviles= autoService.findAll(); //PROVISIONAL PARA QUE CUANDO SE REGRESE AL LISTADO SE MUESTRE 
-		modelMap.addAttribute("automoviles", automoviles); //PROVISIONAL
-		return vista;
+		return listadoAutomoviles(modelMap);
 	}
 
 }
