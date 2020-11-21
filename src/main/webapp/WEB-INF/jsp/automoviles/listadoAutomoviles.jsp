@@ -8,7 +8,7 @@
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
 <petclinic:layout pageName="automoviles">
-    <h2>Automóviles</h2>
+    <h2>Listado de Automóviles</h2>
 
     <table id="automovilesTable" class="table table-striped">
         <thead>
@@ -17,7 +17,10 @@
             <th style="width: 150px;">Marca</th>
             <th style="width: 200px;">Modelo</th>
             <th style="width: 120px">Número de Plazas</th>
-            <th style="width: 120px">Kilómetros Recorridos</th>            
+            <th style="width: 120px">Kilómetros Recorridos</th>
+            <th style="width: 120px">Editar</th>
+            <th style="width: 120px">Eliminar</th>            
+                      
         </tr>
         </thead>
         <tbody>
@@ -44,6 +47,14 @@
                 <td>
                     <c:out value="${automovil.kmRecorridos}"/>
                 </td>
+                <td>
+                <a class="editAutomovil" href=""> <img alt="" id="edit" src="/resources/images/edit.png" style="width: 45px"></a>
+                </td>
+                <td>
+                <spring:url value="/automoviles/delete/{autoId}" var="autoUrl">
+                <spring:param name="autoId" value="${automovil.id}"/>
+                </spring:url>
+				<a class="deleteAutomovil" href="${fn:escapeXml(autoUrl)}"> <img alt="" id="delete" src="/resources/images/delete.png" style="width: 45px"></a>
               </tr>
         </c:forEach>
         </tbody>

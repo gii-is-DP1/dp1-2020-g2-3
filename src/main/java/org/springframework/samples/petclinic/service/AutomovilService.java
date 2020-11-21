@@ -1,6 +1,9 @@
 package org.springframework.samples.petclinic.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.repository.AutomovilRepository;
 import org.springframework.stereotype.Service;
@@ -24,5 +27,16 @@ public class AutomovilService {
 		 return autoRepo.findAll();
 	}
 	
+	@Transactional(readOnly = true)
+	public Optional<Automovil> findAutomovilById(int id) throws DataAccessException {
+		return autoRepo.findById(id);
+	}
+	
+	@Transactional()
+	public void delete(Automovil auto) {
+		
+		autoRepo.delete(auto);
+		
+	}
 	
 }
