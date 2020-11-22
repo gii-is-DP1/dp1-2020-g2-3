@@ -27,6 +27,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 @Data
 @Entity
 @Table(name = "Trabajador")
@@ -51,7 +52,7 @@ public class Trabajador extends BaseEntity {
 	
 	@Column(name = "telefono")
 	@Digits(fraction = 0, integer = 10)
-	@NotEmpty
+	@NotNull
 	private  Integer telefono;
 	
 	@Column(name = "contraseña")

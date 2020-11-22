@@ -48,13 +48,16 @@
                     <c:out value="${automovil.kmRecorridos}"/>
                 </td>
                 <td>
-                <a class="editAutomovil" href=""> <img alt="" id="edit" src="/resources/images/edit.png" style="width: 45px"></a>
-                </td>
-                <td>
-                <spring:url value="/automoviles/delete/{autoId}" var="autoUrl">
+                <spring:url value="/automoviles/edit/{autoId}" var="autoEditUrl">
                 <spring:param name="autoId" value="${automovil.id}"/>
                 </spring:url>
-				<a class="deleteAutomovil" href="${fn:escapeXml(autoUrl)}"> <img alt="" id="delete" src="/resources/images/delete.png" style="width: 45px"></a>
+                <a class="editAutomovil" href="${fn:escapeXml(autoEditUrl)}"> <img alt="" id="edit" src="/resources/images/edit.png" style="width: 45px"></a>
+                </td>
+                <td>
+                <spring:url value="/automoviles/delete/{autoId}" var="autoDeleteUrl">
+                <spring:param name="autoId" value="${automovil.id}"/>
+                </spring:url>
+				<a class="deleteAutomovil" href="${fn:escapeXml(autoDeleteUrl)}"> <img alt="" id="delete" src="/resources/images/delete.png" style="width: 45px"></a>
               </tr>
         </c:forEach>
         </tbody>
