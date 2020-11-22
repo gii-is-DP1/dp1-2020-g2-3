@@ -7,8 +7,10 @@ import javax.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.model.Automovil;
+import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.service.AutomovilService;
 import org.springframework.samples.petclinic.service.OwnerService;
+import org.springframework.samples.petclinic.service.TrabajadorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -23,10 +25,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AutomovilController {
 
 	private final  AutomovilService autoService;
-	
+	private final TrabajadorService trabService;
 	@Autowired
-	public AutomovilController(AutomovilService autoService) {
+	public AutomovilController(AutomovilService autoService,TrabajadorService trabService) {
 		this.autoService = autoService;
+		this.trabService = trabService;
+
 	}
 	
 	@GetMapping("/listado")
@@ -39,7 +43,6 @@ public class AutomovilController {
 	
 	@GetMapping(value="/delete/{autoId}")
 	public String borrarAutomovil(@PathVariable("autoId") int autoId,ModelMap modelMap) {
-		//String vista= "automoviles/listadoAutomoviles";
 		Optional<Automovil> automovil=autoService.findAutomovilById(autoId);
 		if (automovil.isPresent()) {
 			autoService.delete(automovil.get()); 
@@ -56,6 +59,8 @@ public class AutomovilController {
 		Optional<Automovil> automovil=autoService.findAutomovilById(autoId);
 		if(automovil.isPresent()) {
 			modelMap.addAttribute("automovil",automovil.get());
+			Iterable<Trabajador> trabajadores=trabService.findAll();
+			modelMap.addAttribute("trabajadores", trabajadores);
 			return "automoviles/updateAutomovilForm";
 		}else {
 			modelMap.addAttribute("message","No se ha encontrado el automóvil a editar");
@@ -64,11 +69,13 @@ public class AutomovilController {
 	} 
 	
 	@PostMapping("/edit/{autoId}")
-	public String editAutomovil(@PathVariable("autoId") int id, @Valid Automovil modifiedAutomovil, BindingResult binding, ModelMap modelMap) {
+	public String editAutomovil(@PathVariable("autoId") int id, @Valid Automovil modifiedAutomovil,@RequestParam("trabajador") int idTrabajador, BindingResult binding, ModelMap modelMap) {
 		Optional<Automovil> automovil=autoService.findAutomovilById(id);
+		
 		if(binding.hasErrors()) {			
 			return "automoviles/updateAutomovilForm";
 		}else {
+			modifiedAutomovil.setTrabajador(trabService.findById(idTrabajador).get());
 			BeanUtils.copyProperties(modifiedAutomovil, automovil.get(), "id");
 			autoService.save(automovil.get());
 			modelMap.addAttribute("message","Automóvil actualizado correctamente");
