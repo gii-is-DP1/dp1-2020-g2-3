@@ -69,13 +69,13 @@ public class AutomovilController {
 	} 
 	
 	@PostMapping("/edit/{autoId}")
-	public String editAutomovil(@PathVariable("autoId") int id, @Valid Automovil modifiedAutomovil,@RequestParam("trabajador") int idTrabajador, BindingResult binding, ModelMap modelMap) {
+	public String editAutomovil(@PathVariable("autoId") int id, @Valid Automovil modifiedAutomovil, BindingResult binding, ModelMap modelMap) {
 		Optional<Automovil> automovil=autoService.findAutomovilById(id);
 		
 		if(binding.hasErrors()) {			
 			return "automoviles/updateAutomovilForm";
 		}else {
-			modifiedAutomovil.setTrabajador(trabService.findById(idTrabajador).get());
+			
 			BeanUtils.copyProperties(modifiedAutomovil, automovil.get(), "id");
 			autoService.save(automovil.get());
 			modelMap.addAttribute("message","Automóvil actualizado correctamente");
