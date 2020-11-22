@@ -12,8 +12,8 @@ public interface ClienteRepository extends Repository<Cliente, Integer>{
 
 	void save(Cliente cliente) throws DataAccessException;
 	
-	@Query("SELECT DISTINCT cliente FROM Cliente cliente WHERE cliente.nombre LIKE :nombre%")
-	public Collection<Cliente> findByNombre(@Param("nombre") String nombre);
+	@Query("SELECT cliente FROM Cliente cliente WHERE cliente.lastName LIKE :lastName%")
+	public Collection<Cliente> findByNombre(@Param("lastName") String nombre);
 	
 	@Query("SELECT cliente FROM Cliente cliente WHERE cliente.id = :id")
 	public Cliente findById(@Param("id") int id);

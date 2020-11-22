@@ -68,15 +68,15 @@ public class ClienteController {
 	public String processFindForm(Cliente cliente, BindingResult result, Map<String, Object> model) {
 
 		// allow parameterless GET request for /clientes to return all records
-		if (cliente.getNombre() == null) {
-			cliente.setNombre(""); // empty string signifies broadest possible search
+		if (cliente.getFirstName() == null) {
+			cliente.setFirstName(""); // empty string signifies broadest possible search
 		}
 
 		// find clientes by nombre
-		Collection<Cliente> results = this.clienteService.findClienteByNombre(cliente.getNombre());
+		Collection<Cliente> results = this.clienteService.findClienteByNombre(cliente.getLastName());
 		if (results.isEmpty()) {
-			// no owners found
-			result.rejectValue("nombre", "notFound", "not found");
+			// no clients found
+			result.rejectValue("lastName", "notFound", "not found");
 			return "clientes/findClientes";
 		}
 		else if (results.size() == 1) {

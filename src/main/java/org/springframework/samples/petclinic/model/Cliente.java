@@ -18,12 +18,6 @@ public class Cliente extends Person{
 	@NotEmpty
 	private String dni;
 	
-	@NotEmpty
-	private String nombre;
-	
-	@NotEmpty
-	private String apellidos;
-	
 	@Email
 	private String email;
 	
@@ -42,22 +36,6 @@ public class Cliente extends Person{
 
 	public void setDni(String dni) {
 		this.dni = dni;
-	}
-
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-
-	public String getApellidos() {
-		return apellidos;
-	}
-
-	public void setApellidos(String apellidos) {
-		this.apellidos = apellidos;
 	}
 
 	public String getEmail() {
@@ -86,7 +64,7 @@ public class Cliente extends Person{
 
 	@Override
 	public String toString() {
-		return "Cliente [dni=" + dni + ", nombre=" + nombre + ", apellidos=" + apellidos + ", email=" + email
+		return "Cliente [dni=" + dni + ", nombre=" + firstName + ", apellidos=" + lastName + ", email=" + email
 				+ ", telefono=" + telefono + ", user=" + user + "]";
 	}
 	

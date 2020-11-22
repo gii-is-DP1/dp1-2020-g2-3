@@ -12,7 +12,7 @@
     <table class="table table-striped">
         <tr>
             <th>Nombre</th>
-            <td><b><c:out value="${cliente.nombre} ${cliente.apellidos}"/></b></td>
+            <td><b><c:out value="${cliente.firstName} ${cliente.lastName}"/></b></td>
         </tr>
         <tr>
             <th>DNI</th>
