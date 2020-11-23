@@ -62,4 +62,7 @@
         </c:forEach>
         </tbody>
     </table>
+    <p>
+    	<a href="/automoviles/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Añadir automóvil</a>
+    </p>
 </petclinic:layout>

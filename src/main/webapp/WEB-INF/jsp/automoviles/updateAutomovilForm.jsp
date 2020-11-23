@@ -23,7 +23,14 @@
     	        </c:forEach>
 		</select>
 
-             <input type="hidden" name="id" id="id" value="${automovil.id}"/>                    
-             <button class="btn btn-default" type="submit">Actualizar automóvil</button>
+             <input type="hidden" name="id" id="id" value="${automovil.id}"/>
+             <c:choose>
+                    <c:when test="${automovil['new']}">
+                        <button class="btn btn-default" type="submit">Añadir automóvil</button>
+                    </c:when>
+                    <c:otherwise>
+                        <button class="btn btn-default" type="submit">Actualizar automóvil</button>
+                    </c:otherwise>
+                </c:choose>
     </form:form>
 </petclinic:layout>

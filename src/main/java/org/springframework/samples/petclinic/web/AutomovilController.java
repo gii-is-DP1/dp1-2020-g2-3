@@ -82,5 +82,23 @@ public class AutomovilController {
 			return listadoAutomoviles(modelMap);
 		}
 	}
+	
+	@GetMapping("/new")
+	public String editNewAutomovil(ModelMap modelMap) {
+		modelMap.addAttribute("automovil",new Automovil());
+		modelMap.addAttribute("trabajadores", trabService.findAll());
+		return "automoviles/updateAutomovilForm";
+	} 
+	
+	@PostMapping("/new")
+	public String saveNewAutomovil(@Valid Automovil automovil, BindingResult binding, ModelMap modelMap) {
+		if(binding.hasErrors()) {			
+			return "automoviles/updateAutomovilForm";
+		}else {
+			autoService.save(automovil);
+			modelMap.addAttribute("message","Automóvil creado correctamente");
+			return listadoAutomoviles(modelMap);
+		}
+	}
 
 }
