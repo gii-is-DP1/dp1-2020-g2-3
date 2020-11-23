@@ -104,3 +104,7 @@ INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,contr
 INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (1,'Toyota','Verso',5, 2000,1);
 INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (2,'Seat','Alhambra',7, 40000,2);
 INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (3,'Ford','Fiesta',5, 20000,3);
+
+INSERT INTO talleres(id,name,ubicacion,telefono) VALUES (1,'Talleres Manolito','calle sol', 698585858);
+
+INSERT INTO servicios(id,name,fecha,precio,trabajador_id,automovil_id,talleres_id,descripcion) VALUES (1,'Arreglo luna','2013-01-04', 70.50, 1, 1, 1, 'arreglar luna');
