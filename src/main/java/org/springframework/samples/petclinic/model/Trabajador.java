@@ -7,9 +7,10 @@ import javax.persistence.Table;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "trabajadores")
+@Table(name = "trabajador")
 public class Trabajador extends BaseEntity {
 	
 	// Falta añadir restricciones simples y poner  DNI como clave primaria en lugar de extender a BaseEntity y tener un id.
@@ -39,11 +40,9 @@ public class Trabajador extends BaseEntity {
 	private  String contraseña;
 	
 	
-	
-	
-//	@ManyToOne
-//	@JoinColumn(name = "tipo_trabajador_id",referencedColumnName="id")
-//	private  TipoTrabajador tipoTrabajador;
+	@ManyToOne
+	@JoinColumn(name = "tipo_trabajador_id",referencedColumnName="id")
+	private  TipoTrabajador tipoTrabajador;
 	
 //	@OneToMany(cascade = CascadeType.ALL, mappedBy = "trabajador") //Este mappedBy no lo entiendo
 //	private Set<Automovil> automoviles;
