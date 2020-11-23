@@ -31,7 +31,7 @@ public class Trabajador extends BaseEntity {
 	
 	@Column(name = "telefono")
 	@Digits(fraction = 0, integer = 10)
-	@NotEmpty
+	@NotNull
 	private  Integer telefono;
 	
 	@Column(name = "contraseña")

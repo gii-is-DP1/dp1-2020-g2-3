@@ -90,6 +90,7 @@ INSERT INTO visits(id,pet_id,visit_date,description) VALUES (4, 7, '2013-01-04',
 INSERT INTO tipo_Trabajador VALUES (1,'Administrador');
 INSERT INTO tipo_Trabajador VALUES (2,'Taxista');
 
+
 INSERT INTO Trabajadores(id,DNI,nombre,apellidos,correo_Electronico,telefono,contraseña) VALUES (1,'80090030P','Rodolfo','García Ordóñez','alex@gmail.com',632587419,'qwerty123');
 INSERT INTO Trabajadores(id,DNI,nombre,apellidos,correo_Electronico,telefono,contraseña) VALUES (2,'90065864L','Roberta','Maestre','maestre@gmail.com',635874921,'qwerty123');
 INSERT INTO Trabajadores(id,DNI,nombre,apellidos,correo_Electronico,telefono,contraseña) VALUES (3,'80550030C','Paco','Pérez González','paco@gmail.com',632583419,'qwerty123');
@@ -99,4 +100,7 @@ INSERT INTO Trabajadores(id,DNI,nombre,apellidos,correo_Electronico,telefono,con
 INSERT INTO Trabajadores(id,DNI,nombre,apellidos,correo_Electronico,telefono,contraseña) VALUES (7,'80220030G','Eduardo','García Suarez','eduardo@gmail.com',655587419,'qwerty123');
 INSERT INTO Trabajadores(id,DNI,nombre,apellidos,correo_Electronico,telefono,contraseña) VALUES (8,'90115864J','Maria','Rodríguez','maria@gmail.com',635871121,'qwerty123');
 
+
 INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (1,'Toyota','Verso',5, 2000,1);
+INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (2,'Seat','Alhambra',7, 40000,2);
+INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (3,'Ford','Fiesta',5, 20000,3);

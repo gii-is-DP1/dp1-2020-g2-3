@@ -24,6 +24,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 @Data
 @Entity
 @Table(name = "Automovil")
@@ -43,11 +44,11 @@ public class Automovil extends BaseEntity {
 	
 	@Column(name = "num_Plazas")
 	@Digits(fraction = 0, integer = 7)
-	@NotEmpty
+	@NotNull
 	private  Integer numPlazas;
 	
 	@Column(name = "km_Recorridos")
-	@NotEmpty
+	@NotNull
 	private  Double kmRecorridos;
 	
 	@ManyToOne
