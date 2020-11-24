@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 public class AutomovilServiceTest {
@@ -26,6 +27,7 @@ public class AutomovilServiceTest {
 	}
 	
 	@Test
+	@Transactional
 	public void deleteTest() {
 		
 		Long numAutomoviles=autoService.automovilCount();

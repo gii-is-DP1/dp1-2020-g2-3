@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.service.AutomovilService;
@@ -45,8 +46,15 @@ public class AutomovilController {
 	public String borrarAutomovil(@PathVariable("autoId") int autoId,ModelMap modelMap) {
 		Optional<Automovil> automovil=autoService.findAutomovilById(autoId);
 		if (automovil.isPresent()) {
-			autoService.delete(automovil.get()); 
-			modelMap.addAttribute("message", "Automóvil borrado correctamente");
+			try {
+				
+				autoService.delete(automovil.get()); 
+				modelMap.addAttribute("message", "Automóvil borrado correctamente");
+			}catch(DataAccessException exception) {
+				
+				modelMap.addAttribute("message", "No se puede eliminar un automóvil que haya realizado un servicio o viaje");
+			}
+			
 		}else {
 			
 			modelMap.addAttribute("message", "Automóvil no encontrado");
