@@ -20,8 +20,8 @@ public class TrabajadorServiceTest {
 	@Test
 	public void findByIdTest() {
 		
-		Optional<Trabajador> trabajador= trabService.findById(1);
-		assertEquals(trabajador.get().getId(),1);
+		Trabajador trabajador= trabService.findById(1);
+		assertEquals(trabajador.getId(),1);
 	}
 
 }

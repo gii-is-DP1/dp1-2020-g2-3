@@ -30,7 +30,7 @@ public class TrabajadorService {
 	
 	
 	@Transactional(readOnly = true)
-	public Optional<Trabajador> findById(int id) throws DataAccessException {
+	public Trabajador findById(int id) throws DataAccessException {
 		return trabRepo.findById(id);
 	}
 	
