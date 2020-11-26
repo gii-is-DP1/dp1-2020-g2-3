@@ -20,12 +20,11 @@ import lombok.Data;
 @Table(name = "trabajador")
 public class Trabajador extends BaseEntity {
 	
-	// Falta añadir restricciones simples y poner  DNI como clave primaria en lugar de extender a BaseEntity y tener un id.
 	@Column(name = "DNI")
 	@NotEmpty
 	private String DNI;
 	
-	@Column(name = "nombre")
+	@Column(name = "nombre") //Hacer que extienda a Person 
 	@NotEmpty
 	private  String nombre;
 	
