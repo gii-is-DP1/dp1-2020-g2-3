@@ -34,9 +34,7 @@ public class AutomovilService {
 	
 	@Transactional()
 	public void delete(Automovil auto) throws DataAccessException  {
-		
-		autoRepo.delete(auto);
-		
+			autoRepo.delete(auto);
 	}
 	@Transactional()
 	public void save(Automovil auto)  {

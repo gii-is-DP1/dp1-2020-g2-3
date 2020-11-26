@@ -80,7 +80,10 @@ public class AutomovilController {
 	public String editAutomovil(@PathVariable("autoId") int id, @Valid Automovil modifiedAutomovil, BindingResult binding, ModelMap modelMap) {
 		Optional<Automovil> automovil=autoService.findAutomovilById(id);
 		
-		if(binding.hasErrors()) {			
+		if(binding.hasErrors()) {
+			modelMap.put("automovil", modifiedAutomovil);
+			Iterable<Trabajador> trabajadores=trabService.findAll();
+			modelMap.addAttribute("trabajadores", trabajadores);
 			return "automoviles/updateAutomovilForm";
 		}else {
 			
@@ -100,7 +103,10 @@ public class AutomovilController {
 	
 	@PostMapping("/new")
 	public String saveNewAutomovil(@Valid Automovil automovil, BindingResult binding, ModelMap modelMap) {
-		if(binding.hasErrors()) {			
+		if(binding.hasErrors()) {
+			modelMap.put("automovil", automovil);
+			Iterable<Trabajador> trabajadores=trabService.findAll();
+			modelMap.addAttribute("trabajadores", trabajadores);
 			return "automoviles/updateAutomovilForm";
 		}else {
 			autoService.save(automovil);
