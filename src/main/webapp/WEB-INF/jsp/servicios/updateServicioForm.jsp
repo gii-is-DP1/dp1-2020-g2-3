@@ -68,15 +68,7 @@
 		
 		
 		
-			     <!-- Lo pongo de forma manual porque el form:select de Spring da error -->
-		<!--  	     
-		 <label for="trabajador">Trabajador:</label>
-		<select name="trabajador" id="trabajador">
-				 <c:forEach items="${trabajadores}" var="trabajador">
-				 <option value="${trabajador.id}">${trabajador.nombre} <p> </p> ${trabajador.apellidos}</option>
-    	        </c:forEach>
-		</select>
-			-->
+
              <input type="hidden" name="id" id="id" value="${servicio.id}"/>
              <c:choose>
                     <c:when test="${servicio['new']}">
