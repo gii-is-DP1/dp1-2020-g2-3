@@ -20,6 +20,8 @@
             <th>Automóvil</th>
             <th>Taller</th>
             <th>Descripción</th>
+            <th>Editar</th>
+            <th>Eliminar</th>   
         </tr>
         </thead>
         <tbody>
@@ -42,7 +44,9 @@
                      <c:out value="${servicio.trabajador.DNI}"/>
                 </td>
                 <td>
-                    <c:out value="${servicio.automovil.id}"/>
+                    <c:out value="${servicio.automovil.marca}"/>
+                      <p> </p>
+                     <c:out value="${servicio.automovil.modelo}"/>
                 </td>
                 <td>
                     <c:out value="${servicio.taller.name}"/>

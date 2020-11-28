@@ -129,6 +129,8 @@ public class ServicioController {
 	public String NewServicio(ModelMap modelMap) {
 		modelMap.addAttribute("servicio",new Servicio());
 		modelMap.addAttribute("trabajadores", trabService.findAll());
+		modelMap.addAttribute("automoviles", autoService.findAll());
+		modelMap.addAttribute("talleres", tallerService.findAll());
 		return "servicios/updateServicioForm";
 	} 
 	

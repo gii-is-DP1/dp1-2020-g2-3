@@ -32,6 +32,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.support.MutableSortDefinition;
 import org.springframework.beans.support.PropertyComparator;
@@ -51,23 +52,23 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class Servicio extends NamedEntity{
 
 	@Column(name = "fecha")
-	@NotEmpty
+	@NotNull
 	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private LocalDate fecha;
 	
 	@Column(name = "precio")
-	@NotEmpty
+	@NotNull
 	private Double precio;
 
 	@ManyToOne
 	@JoinColumn(name = "trabajador_id",referencedColumnName="id") //Cuando la clave primaria de Trabajador sea DNI habrá que referenciarlo aquí en lugar del id como está ahora.
 	private Trabajador trabajador;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne
     @JoinColumn(name = "automovil_id", referencedColumnName = "id")
 	private Automovil automovil;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne
     @JoinColumn(name = "talleres_id", referencedColumnName = "id")
 	private Taller taller;
 	
