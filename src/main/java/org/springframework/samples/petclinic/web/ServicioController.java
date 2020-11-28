@@ -26,11 +26,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Servicio;
+import org.springframework.samples.petclinic.model.Taller;
 import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.AutomovilService;
 import org.springframework.samples.petclinic.service.OwnerService;
 import org.springframework.samples.petclinic.service.ServicioService;
+import org.springframework.samples.petclinic.service.TallerService;
 import org.springframework.samples.petclinic.service.TrabajadorService;
 import org.springframework.samples.petclinic.service.VetService;
 import org.springframework.samples.petclinic.service.UserService;
@@ -49,10 +51,14 @@ public class ServicioController {
 
 	private final  ServicioService servicioService;
 	private final TrabajadorService trabService;
+	private final AutomovilService autoService;
+	private final TallerService tallerService;
 	@Autowired
-	public ServicioController(ServicioService servicioService,TrabajadorService trabService) {
+	public ServicioController(ServicioService servicioService,TrabajadorService trabService, AutomovilService autoService, TallerService tallerService) {
 		this.servicioService = servicioService;
 		this.trabService = trabService;
+		this.autoService = autoService;
+		this.tallerService = tallerService;
 
 	}
 
@@ -85,18 +91,29 @@ public class ServicioController {
 			modelMap.addAttribute("servicio",servicio.get());
 			Iterable<Trabajador> trabajadores=trabService.findAll();
 			modelMap.addAttribute("trabajadores", trabajadores);
-			return "servicio/updateServicioForm";
+			Iterable<Automovil> automoviles=autoService.findAll();
+			modelMap.addAttribute("automoviles", automoviles);
+			Iterable<Taller> talleres=tallerService.findAll();
+			modelMap.addAttribute("talleres", talleres);
+			return "servicios/updateServicioForm";
 		}else {
 			modelMap.addAttribute("message","No se ha encontrado el servicio a editar");
 			return listadoServicios(modelMap);
 		}
 	} 
 	
-	@PostMapping("/edit/{ServicioId}")
+	@PostMapping("/edit/{servicioId}")
 	public String editServicio(@PathVariable("servicioId") int id, @Valid Servicio modifiedServicio, BindingResult binding, ModelMap modelMap) {
 		Optional<Servicio> servicio=servicioService.findServicioById(id);
 		
 		if(binding.hasErrors()) {			
+			modelMap.put("servicio", modifiedServicio);
+			Iterable<Trabajador> trabajadores=trabService.findAll();
+			modelMap.addAttribute("trabajadores", trabajadores);
+			Iterable<Automovil> automoviles=autoService.findAll();
+			modelMap.addAttribute("automoviles", automoviles);
+			Iterable<Taller> talleres=tallerService.findAll();
+			modelMap.addAttribute("talleres", talleres);
 			return "servicios/updateServicioForm";
 		}else {
 			
@@ -112,6 +129,8 @@ public class ServicioController {
 	public String NewServicio(ModelMap modelMap) {
 		modelMap.addAttribute("servicio",new Servicio());
 		modelMap.addAttribute("trabajadores", trabService.findAll());
+		modelMap.addAttribute("automoviles", autoService.findAll());
+		modelMap.addAttribute("talleres", tallerService.findAll());
 		return "servicios/updateServicioForm";
 	} 
 	
