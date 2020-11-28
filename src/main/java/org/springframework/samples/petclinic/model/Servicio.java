@@ -61,7 +61,7 @@ public class Servicio extends NamedEntity{
 
 	@ManyToOne
 	@JoinColumn(name = "trabajador_id",referencedColumnName="id") //Cuando la clave primaria de Trabajador sea DNI habrá que referenciarlo aquí en lugar del id como está ahora.
-	private Trabajador solicitante;
+	private Trabajador trabajador;
 	
 	@OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "automovil_id", referencedColumnName = "id")
@@ -91,12 +91,12 @@ public class Servicio extends NamedEntity{
 		this.precio = precio;
 	}
 
-	public Trabajador getSolicitante() {
-		return solicitante;
+	public Trabajador getTrabajador() {
+		return trabajador;
 	}
 
-	public void setSolicitante(Trabajador solicitante) {
-		this.solicitante = solicitante;
+	public void setTrabajador(Trabajador trabajador) {
+		this.trabajador = trabajador;
 	}
 
 	public Automovil getAutomovil() {
@@ -125,7 +125,7 @@ public class Servicio extends NamedEntity{
 
 	@Override
 	public String toString() {
-		return "Servicio [fecha=" + fecha + ", precio=" + precio + ", solicitante=" + solicitante + ", automovil="
+		return "Servicio [fecha=" + fecha + ", precio=" + precio + ", trabajador=" + trabajador + ", automovil="
 				+ automovil + ", taller=" + taller + ", descripcion=" + descripcion + "]";
 	}
 	

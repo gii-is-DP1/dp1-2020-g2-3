@@ -138,4 +138,4 @@ INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VA
 
 INSERT INTO talleres(id,name,ubicacion,telefono) VALUES (1,'Talleres Manolito','calle sol', 698585858);
 
-INSERT INTO servicios(id,name,fecha,precio,trabajador_id,automovil_id,talleres_id,descripcion) VALUES (1,'Arreglo luna','2013-01-04', 70.50, 1, 1, 1, 'arreglar luna');
+INSERT INTO servicios(id,name,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion) VALUES (1,'Arreglo luna','2013-01-04', 70.50, 1, 1, 1, 'arreglar luna');

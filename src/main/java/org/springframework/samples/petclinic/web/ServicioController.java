@@ -85,18 +85,21 @@ public class ServicioController {
 			modelMap.addAttribute("servicio",servicio.get());
 			Iterable<Trabajador> trabajadores=trabService.findAll();
 			modelMap.addAttribute("trabajadores", trabajadores);
-			return "servicio/updateServicioForm";
+			return "servicios/updateServicioForm";
 		}else {
 			modelMap.addAttribute("message","No se ha encontrado el servicio a editar");
 			return listadoServicios(modelMap);
 		}
 	} 
 	
-	@PostMapping("/edit/{ServicioId}")
+	@PostMapping("/edit/{servicioId}")
 	public String editServicio(@PathVariable("servicioId") int id, @Valid Servicio modifiedServicio, BindingResult binding, ModelMap modelMap) {
 		Optional<Servicio> servicio=servicioService.findServicioById(id);
 		
 		if(binding.hasErrors()) {			
+			modelMap.put("servicio", modifiedServicio);
+			Iterable<Trabajador> trabajadores=trabService.findAll();
+			modelMap.addAttribute("trabajadores", trabajadores);
 			return "servicios/updateServicioForm";
 		}else {
 			
