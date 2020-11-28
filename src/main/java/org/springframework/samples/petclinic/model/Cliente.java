@@ -18,6 +18,7 @@ public class Cliente extends Person{
 	@NotEmpty
 	private String dni;
 	
+	@Column(name = "email")
 	@Email
 	private String email;
 	

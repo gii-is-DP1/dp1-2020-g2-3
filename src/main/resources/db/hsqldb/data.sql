@@ -1,6 +1,6 @@
 -- One admin user, named admin1 with passwor 4dm1n and authority admin
-INSERT INTO users(username,password,enabled) VALUES ('admin1','4dm1n',TRUE);
-INSERT INTO authorities(id,username,authority) VALUES (1,'admin1','admin');
+INSERT INTO users(username,password,enabled) VALUES ('admin','admin',TRUE);
+INSERT INTO authorities(id,username,authority) VALUES (1,'admin','admin');
 -- One owner user, named owner1 with passwor 0wn3r
 INSERT INTO users(username,password,enabled) VALUES ('owner1','0wn3r',TRUE);
 INSERT INTO authorities(id,username,authority) VALUES (2,'owner1','owner');
@@ -120,6 +120,10 @@ INSERT INTO authorities(id,username,authority) VALUES (14,'eduardo1','owner');
 
 INSERT INTO users(username,password,enabled) VALUES ('maria1','qwerty123',TRUE);
 INSERT INTO authorities(id,username,authority) VALUES (15,'maria1','owner');
+
+INSERT INTO users(username,password,enabled) VALUES ('cliente1','cliente1',TRUE);
+INSERT INTO authorities(id,username,authority) VALUES (16,'cliente1','owner');
+INSERT INTO clientes(first_name,last_name,dni,email,telephone,username)VALUES('cliente1', 'cliente1','80097910K','cliente@gmail.com',659874123,'cliente1');
 
 
 INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,tipo_trabajador_id,username) VALUES (1,'80090030P','Rodolfo','García Ordóñez','rodolfo@gmail.com',632587419,1,'rodolfo1');

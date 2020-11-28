@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.model.Cliente;
 import org.springframework.samples.petclinic.model.Owner;
@@ -101,12 +102,14 @@ public class ClienteController {
 	@PostMapping(value = "/clientes/{clienteId}/edit")
 	public String processUpdateClienteForm(@Valid Cliente cliente, BindingResult result,
 			@PathVariable("clienteId") int clienteId) {
+		Cliente clienteAntiguo= clienteService.findClienteById(clienteId);
 		if (result.hasErrors()) {
 			return VIEWS_CLIENTE_CREATE_OR_UPDATE_FORM;
 		}
 		else {
-			cliente.setId(clienteId);
-			this.clienteService.saveCliente(cliente);
+			
+			BeanUtils.copyProperties(cliente, clienteAntiguo, "id");
+			clienteService.saveCliente(clienteAntiguo);
 			return "redirect:/clientes/{clienteId}";
 		}
 	}
