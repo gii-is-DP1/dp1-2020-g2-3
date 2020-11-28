@@ -31,9 +31,6 @@
                     </c:otherwise>
                 </c:choose>
 				 
-				 <option value="${trabajador.id}" >
-				 ${trabajador.nombre} <p> </p> ${trabajador.apellidos}</option>
-				 
     	        </c:forEach>
 		</select>
 
