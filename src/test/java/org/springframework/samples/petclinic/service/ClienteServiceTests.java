@@ -1,6 +1,10 @@
 package org.springframework.samples.petclinic.service;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -11,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
-public class ClienteServiceTest {
+public class ClienteServiceTests {
 
 	@Autowired
 	ClienteService clienteService;
@@ -29,7 +33,7 @@ public class ClienteServiceTest {
 		Cliente cliente = clienteService.findClienteById(1);
 		
 		String telefono = cliente.getTelefono();
-		String nuevoTelefono="655001259";
+		String nuevoTelefono="659874123";
 		cliente.setTelefono(nuevoTelefono);
 		clienteService.saveCliente(cliente);
 		
