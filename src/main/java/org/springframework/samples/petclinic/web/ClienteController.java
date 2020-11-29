@@ -14,6 +14,7 @@ import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -90,6 +91,14 @@ public class ClienteController {
 			model.put("selections", results);
 			return "clientes/clientesList";
 		}
+	}
+	
+	@GetMapping("/clientes/listado")
+	public String listadoClientes(ModelMap model) {
+		String vista="clientes/clientesList";
+		Iterable<Cliente> clientes = clienteService.findAll();
+		model.addAttribute("selections",clientes);
+		return vista;
 	}
 
 	@GetMapping(value = "/clientes/{clienteId}/edit")

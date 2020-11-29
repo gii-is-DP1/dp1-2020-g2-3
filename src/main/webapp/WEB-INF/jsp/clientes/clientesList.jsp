@@ -12,8 +12,9 @@
         <thead>
         <tr>
             <th style="width: 150px;">Nombre</th>
-            <th style="width: 200px;">Apellidos</th>
-            <th style="width: 120px">Telephone</th>
+            <th style="width: 200px;">DNI</th>
+            <th style="width: 120px">Email</th>
+            <th style="width: 120px">Telefono</th>
         </tr>
         </thead>
         <tbody>
@@ -23,7 +24,7 @@
                     <spring:url value="/clientes/{clienteId}" var="clienteUrl">
                         <spring:param name="clienteId" value="${cliente.id}"/>
                     </spring:url>
-                    <a href="${fn:escapeXml(clienteUrl)}"><c:out value="${cliente.nombre} ${cliente.apellidos}"/></a>
+                    <a href="${fn:escapeXml(clienteUrl)}"><c:out value="${cliente.firstName} ${cliente.lastName}"/></a>
                 </td>
                 <td>
                     <c:out value="${cliente.dni}"/>

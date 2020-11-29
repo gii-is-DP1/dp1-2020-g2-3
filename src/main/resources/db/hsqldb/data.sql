@@ -125,6 +125,9 @@ INSERT INTO users(username,password,enabled) VALUES ('cliente1','cliente1',TRUE)
 INSERT INTO authorities(id,username,authority) VALUES (16,'cliente1','owner');
 INSERT INTO clientes(first_name,last_name,dni,email,telephone,username)VALUES('cliente1', 'cliente1','80097910K','cliente@gmail.com',659874123,'cliente1');
 
+INSERT INTO users(username,password,enabled) VALUES ('manuel84','manuel84',TRUE);
+INSERT INTO authorities(id,username,authority) VALUES (17,'manuel84','cliente');
+INSERT INTO clientes(id,first_name,last_name,DNI,email,telephone,username) VALUES(4,'Manuel','Perez Barrasa','29666111L','manuel@gmail.com',666555789,'manuel84');
 
 INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,tipo_trabajador_id,username) VALUES (1,'80090030P','Rodolfo','García Ordóñez','rodolfo@gmail.com',632587419,1,'rodolfo1');
 INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,tipo_trabajador_id,username) VALUES (2,'90065864L','Roberta','Maestre','maestre@gmail.com',635874921,2,'roberta1');
@@ -134,7 +137,6 @@ INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,tipo_
 INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,tipo_trabajador_id,username) VALUES (6,'90995864H','Sara','Jimenez','sara@gmail.com',635871121,2,'sara1');
 INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,tipo_trabajador_id,username) VALUES (7,'80220030G','Eduardo','García Suarez','eduardo@gmail.com',655587419,2,'eduardo1');
 INSERT INTO Trabajador(id,DNI,nombre,apellidos,correo_Electronico,telefono,tipo_trabajador_id,username) VALUES (8,'90115864J','Maria','Rodríguez','maria@gmail.com',635871121,2,'maria1');
-
 
 INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (1,'Toyota','Verso',5, 2000,1);
 INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos,trabajador_id) VALUES (2,'Seat','Alhambra',7, 40000,2);

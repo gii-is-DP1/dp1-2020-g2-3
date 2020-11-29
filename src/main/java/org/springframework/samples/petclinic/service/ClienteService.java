@@ -39,6 +39,11 @@ public class ClienteService {
 	}
 	
 	@Transactional
+	public Iterable<Cliente> findAll(){
+		return clienteRepository.findAll();
+	}
+	
+	@Transactional
 	public void saveCliente(Cliente cliente) throws DataAccessException {
 		//creating owner
 		clienteRepository.save(cliente);		
