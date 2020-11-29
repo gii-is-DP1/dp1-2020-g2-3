@@ -16,7 +16,6 @@
             <th style="width: 200px;">Apellidos</th>
             <th style="width: 200px;">Correo Electronico</th>
             <th style="width: 200px;">Telefono</th>
-            <th style="width: 120px">Contraseña</th>
         </tr>
         </thead>
         <tbody>
@@ -36,9 +35,6 @@
                 </td>
                  <td>
                     <c:out value="${trabajador.telefono}"/>
-                </td>
-                 <td>
-                    <c:out value="${trabajador.contraseña}"/>
                 </td>
             </tr>
         </c:forEach>

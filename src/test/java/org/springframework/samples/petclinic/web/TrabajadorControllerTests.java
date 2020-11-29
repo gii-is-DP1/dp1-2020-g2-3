@@ -51,7 +51,6 @@ public class TrabajadorControllerTests {
 		charles.setApellidos("Pérez García");
 		charles.setCorreoElectronico("charles@gmail.es");
 		charles.setTelefono(608555102);
-		charles.setContraseña("qwerty123");
 		given(this.trabajadorService.findById(TEST_TRABAJADOR_ID)).willReturn(charles);
 
 	}
