@@ -22,9 +22,13 @@ import java.util.List;
 import java.util.Set;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 @Data
 @Entity
 @Table(name = "Automovil")
@@ -32,10 +36,12 @@ public class Automovil extends BaseEntity {
 	
 	// Falta añadir restricciones simples
 	
-	@Column(name = "marca")    
+	@Column(name = "marca")
+	@Size(min = 1, max =25)
 	@NotEmpty
 	private String marca;
-
+	
+	@Size(min = 1, max =40)
 	@Column(name = "modelo")
 	@NotEmpty
 	private  String modelo;
@@ -43,10 +49,14 @@ public class Automovil extends BaseEntity {
 	
 	
 	@Column(name = "num_Plazas")
-	@Digits(fraction = 0, integer = 7)
+	@Digits(fraction = 0, integer = 1)
+	@Max(7)
+	@Min(1)
 	@NotNull
 	private  Integer numPlazas;
 	
+	@Min(0)
+	@Digits(fraction=2,integer=6)
 	@Column(name = "km_Recorridos")
 	@NotNull
 	private  Double kmRecorridos;

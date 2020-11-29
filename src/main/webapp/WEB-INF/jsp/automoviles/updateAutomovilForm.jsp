@@ -14,12 +14,23 @@
             <petclinic:inputField label="Número de plazas" name="numPlazas"/>
             <petclinic:inputField label="Kilómetros recorridos" name="kmRecorridos"/>
           
-			     <!-- Lo pongo de forma manual porque el form:select de Spring da error -->
 			     
+	 <!--  El trabajador correspondiente aparecerá seleccionado por defecto-->
+	 
 		 <label for="trabajador">Trabajador:</label>
 		<select name="trabajador" id="trabajador">
 				 <c:forEach items="${trabajadores}" var="trabajador">
-				 <option value="${trabajador.id}">${trabajador.nombre} <p> </p> ${trabajador.apellidos}</option>
+				  <c:choose>
+                    <c:when test="${trabajador.id == automovil.trabajador.id}">
+                        <option value="${trabajador.id}" selected >
+				 ${trabajador.nombre} <p> </p> ${trabajador.apellidos}</option>
+                    </c:when>
+                    <c:otherwise>
+                    <option value="${trabajador.id}"  >
+				 ${trabajador.nombre} <p> </p> ${trabajador.apellidos}</option>
+                    </c:otherwise>
+                </c:choose>
+				 
     	        </c:forEach>
 		</select>
 
