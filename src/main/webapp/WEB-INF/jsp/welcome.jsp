@@ -13,7 +13,7 @@
     <p><h2> Group ${group}</h2></p>
     <p><ul>
     <c:forEach items="${persons}" var="person">
-    <li>${person.lastName} , ${person.firstName} </li>
+    <li>${person.apellidos} , ${person.nombre} </li>
     </c:forEach>    
     </ul>
     </p>

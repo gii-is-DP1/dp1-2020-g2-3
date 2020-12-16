@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.web;
 
 import java.util.Collection;
+
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -8,7 +9,6 @@ import javax.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.model.Cliente;
-import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.UserService;
@@ -70,15 +70,15 @@ public class ClienteController {
 	public String processFindForm(Cliente cliente, BindingResult result, Map<String, Object> model) {
 
 		// allow parameterless GET request for /clientes to return all records
-		if (cliente.getFirstName() == null) {
-			cliente.setFirstName(""); // empty string signifies broadest possible search
+		if (cliente.getNombre() == null) {
+			cliente.setApellidos(""); // empty string signifies broadest possible search
 		}
 
 		// find clientes by nombre
-		Collection<Cliente> results = this.clienteService.findClienteByNombre(cliente.getLastName());
+		Collection<Cliente> results = this.clienteService.findClienteByNombre(cliente.getApellidos());
 		if (results.isEmpty()) {
 			// no clients found
-			result.rejectValue("lastName", "notFound", "not found");
+			result.rejectValue("apellidos", "notFound", "not found");
 			return "clientes/findClientes";
 		}
 		else if (results.size() == 1) {

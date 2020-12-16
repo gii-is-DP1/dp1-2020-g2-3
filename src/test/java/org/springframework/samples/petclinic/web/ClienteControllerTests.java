@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.web;
 
 import static org.hamcrest.Matchers.hasProperty;
+
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -20,7 +21,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
 import org.springframework.samples.petclinic.model.Cliente;
-import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.UserService;
@@ -57,8 +57,8 @@ public class ClienteControllerTests {
 
 		lucas = new Cliente();
 		lucas.setId(TEST_CLIENTE_ID);
-		lucas.setFirstName("Lucas");
-		lucas.setLastName("Perez");
+		lucas.setNombre("Lucas");
+		lucas.setApellidos("Perez");
 		lucas.setDni("42562345H");
 		lucas.setEmail("lucas@gmail.com");
 		lucas.setTelefono("608555103");
@@ -76,7 +76,7 @@ public class ClienteControllerTests {
 	@WithMockUser(value = "spring")
     @Test
     void testProcessCreationFormSuccess() throws Exception {
-		mockMvc.perform(post("/clientes/new").param("firstName", "Joe").param("lastName", "Bloggs")
+		mockMvc.perform(post("/clientes/new").param("nombre", "Joe").param("apellidos", "Bloggs")
 							.with(csrf())
 							.param("dni", "42424242F")
 							.param("email", "joe@gmail.com")
@@ -89,8 +89,8 @@ public class ClienteControllerTests {
     void testProcessCreationFormHasErrors() throws Exception {
 		mockMvc.perform(post("/clientes/new")
 						.with(csrf())
-						.param("firstName", "Joe")
-						.param("lastName", "Bloggs")
+						.param("nombre", "Joe")
+						.param("apellidos", "Bloggs")
 						.param("dni", "42424211L")
 						.param("email", "joe@gmail.com"))
 			.andExpect(status().isOk())
@@ -116,9 +116,9 @@ public class ClienteControllerTests {
 	@WithMockUser(value = "spring")
     @Test
     void testProcessFindFormByLastName() throws Exception {
-		given(this.clienteService.findClienteByNombre(lucas.getLastName())).willReturn(Lists.newArrayList(lucas));
+		given(this.clienteService.findClienteByNombre(lucas.getApellidos())).willReturn(Lists.newArrayList(lucas));
 
-		mockMvc.perform(get("/clientes").param("lastName", "Perez")).andExpect(status().is3xxRedirection())
+		mockMvc.perform(get("/clientes").param("apellidos", "Perez")).andExpect(status().is3xxRedirection())
 			.andExpect(view().name("redirect:/clientes/" + TEST_CLIENTE_ID));
 	}
 
@@ -126,8 +126,8 @@ public class ClienteControllerTests {
     @Test
     void testProcessFindFormNoClientesFound() throws Exception {
     	mockMvc.perform(get("/clientes").param("lastName", "Unknown Surname")).andExpect(status().isOk())
-				.andExpect(model().attributeHasFieldErrors("cliente", "lastName"))
-				.andExpect(model().attributeHasFieldErrorCode("cliente", "lastName", "notFound"))
+				.andExpect(model().attributeHasFieldErrors("cliente", "apellidos"))
+				.andExpect(model().attributeHasFieldErrorCode("cliente", "apellidos", "notFound"))
 				.andExpect(view().name("clientes/findClientes"));
     }
 
@@ -136,8 +136,8 @@ public class ClienteControllerTests {
 void testInitUpdateClienteForm() throws Exception {
 	mockMvc.perform(get("/clientes/{clienteId}/edit", TEST_CLIENTE_ID)).andExpect(status().isOk())
 			.andExpect(model().attributeExists("cliente"))
-			.andExpect(model().attribute("cliente", hasProperty("lastName", is("Perez"))))
-			.andExpect(model().attribute("cliente", hasProperty("firstName", is("Lucas"))))
+			.andExpect(model().attribute("cliente", hasProperty("apellidos", is("Perez"))))
+			.andExpect(model().attribute("cliente", hasProperty("nombre", is("Lucas"))))
 			.andExpect(model().attribute("cliente", hasProperty("dni", is("42562345H"))))
 			.andExpect(model().attribute("cliente", hasProperty("email", is("lucas@gmail.com"))))
 			.andExpect(model().attribute("cliente", hasProperty("telefono", is("608555103"))))
@@ -149,8 +149,8 @@ void testInitUpdateClienteForm() throws Exception {
     void testProcessUpdateClienteFormSuccess() throws Exception {
     	mockMvc.perform(post("/clientes/{clienteId}/edit", TEST_CLIENTE_ID)
 						.with(csrf())
-						.param("firstName", "Joe")
-						.param("lastName", "Bloggs")
+						.param("nombre", "Joe")
+						.param("apellidos", "Bloggs")
 						.param("dni", "11111111L")
 						.param("email", "joe@gmail.com")
 						.param("telefono", "01616291589"))
@@ -163,8 +163,8 @@ void testInitUpdateClienteForm() throws Exception {
     void testProcessUpdateClienteFormHasErrors() throws Exception {
     	mockMvc.perform(post("/clientes/{clienteId}/edit", TEST_CLIENTE_ID)
 						.with(csrf())
-						.param("firstName", "Joe")
-						.param("lastName", "Bloggs")
+						.param("nombre", "Joe")
+						.param("apellidos", "Bloggs")
 						.param("dni", "11111111L")
 						.param("email", "joe@gmail.com"))
 			.andExpect(status().isOk())
@@ -177,8 +177,8 @@ void testInitUpdateClienteForm() throws Exception {
     @Test
     void testShowCliente() throws Exception {
     	mockMvc.perform(get("/clientes/{clienteId}", TEST_CLIENTE_ID)).andExpect(status().isOk())
-			.andExpect(model().attribute("cliente", hasProperty("lastName", is("Perez"))))
-			.andExpect(model().attribute("cliente", hasProperty("firstName", is("Lucas"))))
+			.andExpect(model().attribute("cliente", hasProperty("apellidos", is("Perez"))))
+			.andExpect(model().attribute("cliente", hasProperty("nombre", is("Lucas"))))
 			.andExpect(model().attribute("cliente", hasProperty("dni", is("42562345H"))))
 			.andExpect(model().attribute("cliente", hasProperty("email", is("lucas@gmail.com"))))
 			.andExpect(model().attribute("cliente", hasProperty("telefono", is("608555103"))))

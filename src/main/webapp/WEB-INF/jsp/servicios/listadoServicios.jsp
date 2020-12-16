@@ -41,7 +41,7 @@
                     <p> </p>
                      <c:out value="${servicio.trabajador.apellidos}"/>
                      <p> </p>
-                     <c:out value="${servicio.trabajador.DNI}"/>
+                     <c:out value="${servicio.trabajador.dni}"/>
                 </td>
                 <td>
                     <c:out value="${servicio.automovil.marca}"/>

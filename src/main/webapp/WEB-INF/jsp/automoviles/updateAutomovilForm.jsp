@@ -17,22 +17,6 @@
 			     
 	 <!--  El trabajador correspondiente aparecerá seleccionado por defecto-->
 	 
-		 <label for="trabajador">Trabajador:</label>
-		<select name="trabajador" id="trabajador">
-				 <c:forEach items="${trabajadores}" var="trabajador">
-				  <c:choose>
-                    <c:when test="${trabajador.id == automovil.trabajador.id}">
-                        <option value="${trabajador.id}" selected >
-				 ${trabajador.nombre} <p> </p> ${trabajador.apellidos}</option>
-                    </c:when>
-                    <c:otherwise>
-                    <option value="${trabajador.id}"  >
-				 ${trabajador.nombre} <p> </p> ${trabajador.apellidos}</option>
-                    </c:otherwise>
-                </c:choose>
-				 
-    	        </c:forEach>
-		</select>
 
              <input type="hidden" name="id" id="id" value="${automovil.id}"/>
              <c:choose>
