@@ -66,3 +66,20 @@ INSERT INTO talleres(id,name,ubicacion,telefono) VALUES (2,'Chapa y pintura Rami
 
 INSERT INTO servicios(id,name,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion) VALUES (1,'Revisión aceite','2013-01-04', 70.50, 1, 1, 1, 'Revisión periódica aceite y filtros');
 INSERT INTO servicios(id,name,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion) VALUES (2,'Arreglo luna','2013-01-04', 50.00, 3, 2, 2, 'Arreglar picotazo parabrisas');
+
+INSERT INTO Estado_Reserva(id,name)VALUES(1,'Solicitada');
+INSERT INTO Estado_Reserva(id,name)VALUES(2,'Aceptada');
+INSERT INTO Estado_Reserva(id,name)VALUES(3,'Rechazada');
+INSERT INTO Estado_Reserva(id,name)VALUES(4,'Completada');
+INSERT INTO Estado_Reserva(id,name)VALUES(5,'Incompleta');
+
+
+INSERT INTO Ruta(id,origen_cliente,destino_cliente,num_Km_Totales,horas_Estimadas_Cliente)VALUES(1,'Zahínos','Badajoz',144.6,2.23);
+
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(1,'Zahínos','Badajoz',72.3,1.15);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(2,'Badajoz','Zahínos',72.3,1.08);
+
+INSERT INTO Ruta_Trayecto(id,ruta_id,trayecto_id)VALUES(1,1,1);
+INSERT INTO Ruta_Trayecto(id,ruta_id,trayecto_id)VALUES(2,1,2);
+
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id)VALUES(1,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1);
