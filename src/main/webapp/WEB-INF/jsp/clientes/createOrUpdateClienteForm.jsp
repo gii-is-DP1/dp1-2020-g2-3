@@ -8,13 +8,13 @@
 
 <petclinic:layout pageName="clientes">
     <h2>
-        <c:if test="${cliente['new']}">New </c:if> Cliente
+        <c:if test="${cliente['new']}">Registro </c:if> Cliente
     </h2>
     <form:form modelAttribute="cliente" class="form-horizontal" id="add-cliente-form">
         <div class="form-group has-feedback">
             <petclinic:inputField label="DNI" name="dni"/>
-            <petclinic:inputField label="Nombre" name="firstName"/>
-            <petclinic:inputField label="Apellidos" name="lastName"/>
+            <petclinic:inputField label="Nombre" name="nombre"/>
+            <petclinic:inputField label="Apellidos" name="apellidos"/>
             <petclinic:inputField label="Email" name="email"/>
             <petclinic:inputField label="Telefono" name="telefono"/>
             <petclinic:inputField label="Username" name="user.username"/>
@@ -24,10 +24,10 @@
             <div class="col-sm-offset-2 col-sm-10">
                 <c:choose>
                     <c:when test="${cliente['new']}">
-                        <button class="btn btn-default" type="submit">Add Cliente</button>
+                        <button class="btn btn-default" type="submit">Registrar</button>
                     </c:when>
                     <c:otherwise>
-                        <button class="btn btn-default" type="submit">Update Cliente</button>
+                        <button class="btn btn-default" type="submit">Actualizar Cliente</button>
                     </c:otherwise>
                 </c:choose>
             </div>

@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.web;
 
 import static org.mockito.BDDMockito.given;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,7 +16,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
-import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.service.TrabajadorService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
@@ -46,10 +46,10 @@ public class TrabajadorControllerTests {
 
 		charles = new Trabajador();
 		charles.setId(TEST_TRABAJADOR_ID);
-		charles.setDNI("41234567L");
+		charles.setDni("41234567L");
 		charles.setNombre("Charles");
 		charles.setApellidos("Pérez García");
-		charles.setCorreoElectronico("charles@gmail.es");
+		charles.setEmail("charles@gmail.es");
 		charles.setTelefono(608555102);
 		given(this.trabajadorService.findById(TEST_TRABAJADOR_ID)).willReturn(charles);
 

@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic.web;
 
 import java.util.Optional;
 
+
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
@@ -10,7 +11,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.service.AutomovilService;
-import org.springframework.samples.petclinic.service.OwnerService;
 import org.springframework.samples.petclinic.service.TrabajadorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -67,8 +67,6 @@ public class AutomovilController {
 		Optional<Automovil> automovil=autoService.findAutomovilById(autoId);
 		if(automovil.isPresent()) {
 			modelMap.addAttribute("automovil",automovil.get());
-			Iterable<Trabajador> trabajadores=trabService.findAll();
-			modelMap.addAttribute("trabajadores", trabajadores);
 			return "automoviles/updateAutomovilForm";
 		}else {
 			modelMap.addAttribute("message","No se ha encontrado el automóvil a editar");
@@ -82,8 +80,6 @@ public class AutomovilController {
 		
 		if(binding.hasErrors()) {
 			modelMap.put("automovil", modifiedAutomovil);
-			Iterable<Trabajador> trabajadores=trabService.findAll();
-			modelMap.addAttribute("trabajadores", trabajadores);
 			return "automoviles/updateAutomovilForm";
 		}else {
 			
@@ -97,7 +93,6 @@ public class AutomovilController {
 	@GetMapping("/new")
 	public String editNewAutomovil(ModelMap modelMap) {
 		modelMap.addAttribute("automovil",new Automovil());
-		modelMap.addAttribute("trabajadores", trabService.findAll());
 		return "automoviles/updateAutomovilForm";
 	} 
 	
@@ -105,8 +100,6 @@ public class AutomovilController {
 	public String saveNewAutomovil(@Valid Automovil automovil, BindingResult binding, ModelMap modelMap) {
 		if(binding.hasErrors()) {
 			modelMap.put("automovil", automovil);
-			Iterable<Trabajador> trabajadores=trabService.findAll();
-			modelMap.addAttribute("trabajadores", trabajadores);
 			return "automoviles/updateAutomovilForm";
 		}else {
 			autoService.save(automovil);
