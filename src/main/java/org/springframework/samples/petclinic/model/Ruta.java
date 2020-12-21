@@ -10,6 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -54,8 +55,10 @@ public class Ruta extends BaseEntity {
 	@Column(name = "horas_Estimadas_Cliente")
 	@NotNull
 	private  Double horasEstimadasCliente;
-
-
+	
+	@ManyToMany
+	List<Trayecto> trayectos;
+	
 	@Override
 	public String toString() {
 		return "Ruta [origenCliente=" + origenCliente + ", destinoCliente=" + destinoCliente + ", numKmTotales="

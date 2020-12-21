@@ -54,27 +54,24 @@ public class Reserva extends BaseEntity {
 
 	@Column(name = "fecha_Llegada")
 	@Temporal(TemporalType.DATE)
-	@NotNull
+	
 	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private Date fechaLlegada;
 
 	@Column(name = "hora_Salida")
 	@Temporal(TemporalType.TIME)
 	@DateTimeFormat(pattern = "HH:mm")
-	@NotNull
 	private Date horaSalida;
 	
 	@Column(name = "hora_Llegada")
 	@Temporal(TemporalType.TIME)
 	@DateTimeFormat(pattern = "HH:mm")
-	@NotNull
 	private Date horaLlegada;
 	
 	
 	@Min(0)
 	@Digits(fraction=2,integer=3)
 	@Column(name = "horas_Espera")
-	@NotNull
 	private  Double horasEspera;
 	
 	
@@ -99,6 +96,33 @@ public class Reserva extends BaseEntity {
 	private  EstadoReserva estadoReserva;
 	
 	//Meter relación reserva recursiva en caso de implementar compartir viajes
+	@Min(0)
+	@Digits(fraction=2,integer=5)
+	@Column(name = "precio_Total")
+	
+	private  Double precioTotal;
+	
+	@Min(0)
+	@Digits(fraction=2,integer=5)
+	@Column(name = "precio_Distancia")
+	
+	private  Double precioDistancia;
+	
+	
+	@Min(0)
+	@Digits(fraction=2,integer=5)
+	@Column(name = "precio_Espera")
+	private  Double precioEspera;
+	
+	@Min(0)
+	@Digits(fraction=2,integer=5)
+	@Column(name = "precio_IVA_Repercutivo")
+	private  Double precioIVA;
+	
+	@Min(0)
+	@Digits(fraction=2,integer=5)
+	@Column(name = "base_Imponible")
+	private  Double baseImponible;
 	
 	
 }
