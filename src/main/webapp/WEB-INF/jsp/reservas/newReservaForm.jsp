@@ -13,13 +13,13 @@
         
         <label for="origenCliente">Ciudad Origen:</label>
 		<select name="origenCliente" id="origenCliente">
-				 <c:forEach items="${ciudadesOrigen}" var="ciudadOrigen">
+				 <c:forEach items="${paradas}" var="parada">
 				 <c:choose>
-                    <c:when test="${ciudadOrigen == ruta.origenCliente}">
-                        <option value="${ciudadOrigen}" selected > ${ciudadOrigen}</option>
+                    <c:when test="${parada == ruta.origenCliente}">
+                        <option value="${parada}" selected > ${parada}</option>
                     </c:when>
                     <c:otherwise>
-                        <option value="${ciudadOrigen}"> ${ciudadOrigen}</option>
+                        <option value="${parada}"> ${parada}</option>
                     </c:otherwise>
                	 </c:choose>
     	        </c:forEach>
@@ -31,13 +31,13 @@
 		<c:forEach var="i" begin="0" end="${finBucle}" step="1" varStatus ="status">
 		<label for="trayectos[${i}].origen">Parada ${i}:</label>
 		<select name="trayectos[${i}].origen" id="trayectos[${i}].origen">
-				 <c:forEach items="${ciudadesDestino}" var="ciudadDestino">
+				 <c:forEach items="${paradas}" var="parada">
 				 <c:choose>
-                    <c:when test="${ciudadDestino == ruta.trayectos[i].origen}">
-                        <option value="${ciudadDestino}" selected > ${ciudadDestino}</option>
+                    <c:when test="${parada == ruta.trayectos[i].origen}">
+                        <option value="${parada}" selected > ${parada}</option>
                     </c:when>
                     <c:otherwise>
-                        <option value="${ciudadDestino}"> ${ciudadDestino}</option>
+                        <option value="${parada}"> ${parada}</option>
                     
                     </c:otherwise>
                	 </c:choose>
@@ -52,13 +52,13 @@
 		 <br><br>
         <label for="destinoCliente">Ciudad Destino:</label>
 		<select name="destinoCliente" id="destinoCliente">
-		 	<c:forEach items="${ciudadesDestino}" var="ciudadDestino">
+		 	<c:forEach items="${paradas}" var="parada">
 		 		<c:choose>
-                    <c:when test="${ciudadDestino == ruta.destinoCliente}">
-                        <option value="${ciudadDestino}" selected > ${ciudadDestino}</option>
+                    <c:when test="${parada == ruta.destinoCliente}">
+                        <option value="${parada}" selected > ${parada}</option>
                     </c:when>
                     <c:otherwise>
-                        <option value="${ciudadDestino}"> ${ciudadDestino}</option>
+                        <option value="${parada}"> ${parada}</option>
                     </c:otherwise>
                	 </c:choose>
     		 </c:forEach>
@@ -68,7 +68,7 @@
 		<!--  Poner de tipo DATE, tener en cuenta que html te da el formato dd/MM/yyyy -->
 		
            <label for="fechaSalida">Fecha de salida</label>
-           <input type="text" name="fechaSalida" id="fechaSalida" placeholder="yyyy/MM/dd"/>
+           <input type="date" name="fechaSalida" id="fechaSalida" placeholder="yyyy/MM/dd"/>
               <label for="horaSalida">Hora de salida</label>
            <input type="time" name="horaSalida" id="horaSalida"/>
          <br><br>

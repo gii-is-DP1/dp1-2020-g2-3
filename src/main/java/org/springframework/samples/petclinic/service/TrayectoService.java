@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.service;
 
 import java.util.ArrayList;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,33 +27,11 @@ public class TrayectoService {
 	}
 	
 	@Transactional()
-	public Iterable<String> findCiudadesOrigen()  {
-		Set<String> ciudadesOrigen= new HashSet<String>();
-		Iterator<Trayecto> trayectos= trayectoRepo.findAll().iterator();
+	public Iterable<String> findDistinctParadas(){
+		return trayectoRepo.findDistinctParadas();
 		
-		while(trayectos.hasNext()) {
-			Trayecto trayectoActual=trayectos.next();
-			ciudadesOrigen.add(trayectoActual.getOrigen());
-			
-		}
-		Iterable<String> iterableCiudadesOrigen= ciudadesOrigen;
-		return iterableCiudadesOrigen;
 	}
-	
 
-	@Transactional()
-	public Iterable<String> findCiudadesDestino()  {
-		Set<String> ciudadesDestino = new HashSet<String>();
-		Iterator<Trayecto> trayectos= trayectoRepo.findAll().iterator();
-		
-		while(trayectos.hasNext()) {
-			Trayecto trayectoActual=trayectos.next();
-			ciudadesDestino.add(trayectoActual.getDestino());
-			
-		}
-		Iterable<String> iterableCiudadesDestino= ciudadesDestino;
-		return iterableCiudadesDestino;
-	}
 
 	@Transactional(readOnly = true)
 	public Optional<Trayecto> findTrayectoById(int id) throws DataAccessException {

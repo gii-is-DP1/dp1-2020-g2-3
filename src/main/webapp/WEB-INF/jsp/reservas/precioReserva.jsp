@@ -13,18 +13,26 @@
         
        <h2>Ruta establecida</h2>
        <p> 
-       ${ruta.origenCliente}  --->    
+       
        		<c:forEach items="${ruta.trayectos}" var="trayecto">
-       		${trayecto.origen} -->
+       		${trayecto.origen} --> ${trayecto.destino} <br> </br>
            	</c:forEach>
-       ${ruta.destinoCliente}
+           	
        </p>
        <br>
-       <em>  Nº Kilómetros totales: X <em>
+       <em>  Nº Kilómetros totales: ${ruta.numKmTotales} <em>
        <br>
         <h2>Precio</h2>
-        X euros
+        ${reserva.precioTotal}
+    	Precio/km= 0.41 euros
+        
         <br><br>
+        
+         <h2>Duración del viaje</h2>
+        ${ruta.horasEstimadasCliente} horas
+        
+        <br><br>
+    	   
     	   
      	<button class="btn btn-default"  name="action"> <- Atrás</button> 		 
     	
