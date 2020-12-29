@@ -47,18 +47,18 @@ public class Reserva extends BaseEntity {
 	
 	@Column(name = "fecha_Salida")
 	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern="yyyy-MM-dd")
 	@NotNull
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private Date fechaSalida;
 	
 
 	@Column(name = "fecha_Llegada")
 	@Temporal(TemporalType.DATE)
-	
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
+	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date fechaLlegada;
 
 	@Column(name = "hora_Salida")
+	@NotNull
 	@Temporal(TemporalType.TIME)
 	@DateTimeFormat(pattern = "HH:mm")
 	private Date horaSalida;
@@ -76,10 +76,10 @@ public class Reserva extends BaseEntity {
 	
 	
 	@Column(name = "plazas_Ocupadas")
+	@NotNull
 	@Digits(fraction = 0, integer = 1)
 	@Max(6)
 	@Min(1)
-	@NotNull
 	private  Integer plazas_Ocupadas;
 	
 	//Poner tipoPrivacidad en caso de implementar lo de compartir viajes
@@ -87,7 +87,6 @@ public class Reserva extends BaseEntity {
 
 	@Column(name = "descripcion_Equipaje")
 	@Size(min = 0, max =280)
-	@NotEmpty
 	private String descripcionEquipaje;
 	
 	
@@ -101,6 +100,12 @@ public class Reserva extends BaseEntity {
 	@Column(name = "precio_Total")
 	
 	private  Double precioTotal;
+	
+	@Min(0)
+	@Digits(fraction=2,integer=6)
+	@Column(name = "num_Km_Totales")
+	
+	private  Double numKmTotales;
 	
 	@Min(0)
 	@Digits(fraction=2,integer=5)
