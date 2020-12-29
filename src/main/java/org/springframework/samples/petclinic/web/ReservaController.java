@@ -1,4 +1,6 @@
 package org.springframework.samples.petclinic.web;
+import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +16,7 @@ import org.springframework.samples.petclinic.model.Cliente;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
 import org.springframework.samples.petclinic.model.Trayecto;
+import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.RutaService;
 import org.springframework.samples.petclinic.service.TrayectoService;
@@ -34,19 +37,23 @@ public class ReservaController {
 	private final  ReservaService reservaService;
 	private final  TrayectoService trayectoService;
 	private final RutaService rutaService;
+	private final ClienteService clienteService;
 	
 	@Autowired
-	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService) {
+	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,ClienteService clienteService) {
 		this.reservaService=reservaService;
 		this.trayectoService=trayectoService;
 		this.rutaService=rutaService;
+		this.clienteService=clienteService;
 	}
 	
 	@GetMapping("/new")
 	public String newReserva(ModelMap modelMap) {
-		modelMap.addAttribute("reserva",new Reserva());
-		
-		modelMap.addAttribute("ruta",new Ruta());
+		Reserva nuevaReserva= new Reserva();
+		Date today= new Date();
+		nuevaReserva.setFechaSalida(today);
+		nuevaReserva.setHoraSalida(today);
+		modelMap.addAttribute("reserva",nuevaReserva);
 		Iterable<String> paradas= trayectoService.findDistinctParadas();
 		modelMap.addAttribute("paradas", paradas);
 		modelMap.addAttribute("numCiudadesIntermedias", 0);
@@ -56,16 +63,28 @@ public class ReservaController {
 	
 	
 	@PostMapping("/redirigir")
-	public String redirigir(Reserva reserva,Ruta ruta,ModelMap modelMap,@RequestParam("action") String action,@RequestParam("numCiudadesIntermedias") Integer numCiudadesIntermedias) {
+	public String redirigir(@Valid Reserva reserva,BindingResult binding,ModelMap modelMap,@RequestParam("action") String action,@RequestParam("numCiudadesIntermedias") Integer numCiudadesIntermedias) {
 	
-		
 		//Se decidirá entre añadir una nueva parada al jsp de la reserva, o seguir con la solicitud
+	
+		Iterable<String> paradas= trayectoService.findDistinctParadas();	
 		if(action.equals("continuar")) {
+			//El usuario ha completado el formulario, ahora sí validamos los datos y mostramos los errores
+			if(binding.hasErrors()) {
+				modelMap.put("reserva",reserva);
+				modelMap.put("paradas", paradas);
+				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+				return "reservas/newReservaForm";
+			}else {
+				
+				return mostrarPrecioReserva(reserva,modelMap);
+			}
 			
-			return mostrarPrecioReserva(reserva,ruta,modelMap);
 		}else if(action.equals("addParada")) {
-			
-			return addParada(reserva,ruta,modelMap,numCiudadesIntermedias);
+			//En esta parte no queremos mostrar los erroes del binding, porque el cliente todavía está editando el formulario
+			//Por ello quitamos el binding
+			modelMap.put("org.springframework.validation.BindingResult.reserva", null);
+			return addParada(reserva,modelMap,numCiudadesIntermedias,paradas);
 		}else {
 			
 			return "exception";
@@ -74,36 +93,32 @@ public class ReservaController {
 	}
 	
 	
-	public String addParada(Reserva reserva,Ruta ruta,ModelMap modelMap,@PathVariable("numCiudadesIntermedias") Integer numCiudadesIntermedias) {
+	public String addParada(Reserva reserva,ModelMap modelMap,@PathVariable("numCiudadesIntermedias") Integer numCiudadesIntermedias,Iterable<String> paradas) {
 		
 		
 		modelMap.put("reserva",reserva);
-		Iterable<String> paradas= trayectoService.findDistinctParadas();
 		modelMap.put("paradas", paradas);
 		modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias+1);
 		modelMap.put("finBucle", numCiudadesIntermedias);
-		modelMap.put("ruta", ruta);
-		
-	
 		return "reservas/newReservaForm";
 	}
 	
 	//No tiene url, viene desde /redirigir porque el mismo formulario tiene 2 botones, y "redirigir" llama a un sitio u otro 
 	// dependiendo del botón pulsado
-	public String mostrarPrecioReserva(Reserva reserva,Ruta ruta, ModelMap modelMap) {
+	
+	public String mostrarPrecioReserva(Reserva reserva, ModelMap modelMap) {
 		
-		Ruta nuevaRuta= rutaService.calcularYAsignarTrayectos(ruta);
-		Date fechaHoraLlegada=reservaService.calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
+			
+			Ruta nuevaRuta= rutaService.calcularYAsignarTrayectos(reserva.getRuta());
+			Date fechaHoraLlegada=reservaService.calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
+			Double precioPorKm=0.41; //Esto habría que cambiarlo cuadno estén implementadas las tarifas
+			reserva.setPrecioTotal(reservaService.calcularPrecio(nuevaRuta.getNumKmTotales(), precioPorKm));
+			modelMap.put("ruta", nuevaRuta);
+
+			return "reservas/precioReserva";
+			
 		
-		Double precioPorKm=0.41; //Esto habría que cambiarlo cuadno estén implementadas las tarifas
-		reserva.setPrecioTotal(reservaService.calcularPrecio(nuevaRuta.getNumKmTotales(), precioPorKm));
-		modelMap.put("ruta", nuevaRuta);
 		
-		//Asignar ruta a la reserva y quitar la ruta del modelMap.
-		
-		
-		
-		return "reservas/precioReserva";
 	}
 	
 	

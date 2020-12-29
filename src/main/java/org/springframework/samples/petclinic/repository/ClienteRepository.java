@@ -17,5 +17,8 @@ public interface ClienteRepository extends CrudRepository<Cliente, Integer>{
 	
 	@Query("SELECT cliente FROM Cliente cliente WHERE cliente.id = :id")
 	public Cliente findById(@Param("id") int id);
+	
+	@Query("SELECT cliente.id FROM Cliente cliente WHERE cliente.user.username = ?1")
+	public Integer findIdByUsername(String username);
 
 }

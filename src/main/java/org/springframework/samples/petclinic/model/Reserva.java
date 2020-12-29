@@ -47,16 +47,18 @@ public class Reserva extends BaseEntity {
 	
 	@Column(name = "fecha_Salida")
 	@Temporal(TemporalType.DATE)
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	@DateTimeFormat(pattern="yyyy-MM-dd")
+	@NotNull
 	private Date fechaSalida;
 	
 
 	@Column(name = "fecha_Llegada")
 	@Temporal(TemporalType.DATE)
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date fechaLlegada;
 
 	@Column(name = "hora_Salida")
+	@NotNull
 	@Temporal(TemporalType.TIME)
 	@DateTimeFormat(pattern = "HH:mm")
 	private Date horaSalida;
@@ -74,6 +76,7 @@ public class Reserva extends BaseEntity {
 	
 	
 	@Column(name = "plazas_Ocupadas")
+	@NotNull
 	@Digits(fraction = 0, integer = 1)
 	@Max(6)
 	@Min(1)
