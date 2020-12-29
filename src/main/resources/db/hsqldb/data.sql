@@ -83,3 +83,4 @@ INSERT INTO Ruta_Trayecto(id,ruta_id,trayecto_id)VALUES(1,1,1);
 INSERT INTO Ruta_Trayecto(id,ruta_id,trayecto_id)VALUES(2,1,2);
 
 INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id)VALUES(1,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1);
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id)VALUES(2,4,1,'2020-12-22','2020-12-28','18:00','19:23',0,3,'Llevo una maleta grande',2);
