@@ -63,7 +63,6 @@ public class ReservaService {
 		return fechaSalida;
 	}
 	
-	
 	@Transactional
 	public void delete(Reserva reserva) throws DataAccessException  {
 			reservaRepo.delete(reserva);

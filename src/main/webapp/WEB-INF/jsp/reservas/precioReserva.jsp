@@ -7,36 +7,34 @@
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
 <petclinic:layout pageName="reservas">
-    <form:form modelAttribute="reserva" class="form-horizontal" id="add-reserva-form" action="/new">
+    <form:form modelAttribute="reserva" class="form-horizontal" id="add-reserva-form" action="/reservas/redirigir">
         
         <!-- EN DESARROLLO -->
         
        <h2>Ruta establecida</h2>
        <p> 
-       
-       		<c:forEach items="${ruta.trayectos}" var="trayecto">
+       <input type="hidden" name="reserva" id="reserva" value="${reserva}"/>
+       		<c:forEach items="${reserva.ruta.trayectos}" var="trayecto">
        		${trayecto.origen} --> ${trayecto.destino} <br> </br>
            	</c:forEach>
-           	
        </p>
-       <br>
-       <em>  Nº Kilómetros totales: ${ruta.numKmTotales} <em>
-       <br>
-        <h2>Precio</h2>
-        ${reserva.precioTotal}
-    	Precio/km= 0.41 euros
+       <em>  Nº Kilómetros totales: ${reserva.numKmTotales} <em> 
+       <h2>Fecha de Salida</h2>
+       <p> Fecha: <fmt:formatDate pattern = "yyyy-MM-dd" value = "${reserva.fechaSalida}" /> </p>
+		<p> Hora <fmt:formatDate type = "time" pattern="HH:mm" value = "${reserva.horaSalida}" /> </p>  
+	
+		<h2>Fecha de Llegada</h2>
+
+		<p> Fecha: <fmt:formatDate pattern = "yyyy-MM-dd" value = "${reserva.fechaLlegada}" /> </p>
+		<p> Hora <fmt:formatDate type = "time" pattern="HH:mm" value = "${reserva.horaLlegada}" /> </p>  
+	
+      <p>  Duración del viaje:  ${horasRutaCliente} horas y ${minutosRutaCliente} minutos </p>
+      <h2>Precio Total: </h2>  ${reserva.precioTotal} euros 
         
-        <br><br>
-        
-         <h2>Duración del viaje</h2>
-        ${ruta.horasEstimadasCliente} horas
-        
-        <br><br>
-    	   
-    	   
-     	<button class="btn btn-default"  name="action"> <- Atrás</button> 		 
+        <br><br>   
+     	<button class="btn btn-default" type="submit" name="action" value="atras"> <- Atrás</button> 		 
     	
-		<button class="btn btn-default" type="submit" name="action">Reservar viaje</button> 		 
+		<button class="btn btn-default" type="submit" name="action" value="confirmarReserva">Reservar viaje</button> 		 
     </form:form>    
     
 </petclinic:layout>

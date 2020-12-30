@@ -22,12 +22,24 @@
   		</button> 
 	</div>
 	</c:if>
+	<c:if test="${not empty error}" >
+	<div style="background-color:rgb(255,145,145)" class="alert alert-${not empty messageType ? messageType : 'text'}" role="alert">
+  		<c:out value="${error}"></c:out>
+   		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    		<span aria-hidden="true">&times;</span>
+  		</button> 
+	</div>
+	</c:if>
 
         <jsp:doBody/>
 
         <petclinic:pivotal/>
     </div>
 </div>
+
+
+
+
 <petclinic:footer/>
 <jsp:invoke fragment="customScript" />
 

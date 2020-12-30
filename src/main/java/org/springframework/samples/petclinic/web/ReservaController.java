@@ -20,6 +20,7 @@ import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.RutaService;
 import org.springframework.samples.petclinic.service.TrayectoService;
+import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -65,7 +66,7 @@ public class ReservaController {
 	@PostMapping("/redirigir")
 	public String redirigir(@Valid Reserva reserva,BindingResult binding,ModelMap modelMap,@RequestParam("action") String action,@RequestParam("numCiudadesIntermedias") Integer numCiudadesIntermedias) {
 	
-		//Se decidirá entre añadir una nueva parada al jsp de la reserva, o seguir con la solicitud
+		//Se decidirá entre añadir una nueva parada al jsp de la reserva,calcular su precio, confirmar la reserva o volver al formulario
 	
 		Iterable<String> paradas= trayectoService.findDistinctParadas();	
 		if(action.equals("continuar")) {
@@ -77,7 +78,7 @@ public class ReservaController {
 				return "reservas/newReservaForm";
 			}else {
 				
-				return mostrarPrecioReserva(reserva,modelMap);
+				return mostrarPrecioReserva(reserva,modelMap,paradas,numCiudadesIntermedias);
 			}
 			
 		}else if(action.equals("addParada")) {
@@ -85,6 +86,12 @@ public class ReservaController {
 			//Por ello quitamos el binding
 			modelMap.put("org.springframework.validation.BindingResult.reserva", null);
 			return addParada(reserva,modelMap,numCiudadesIntermedias,paradas);
+		}else if (action.equals("confirmarReserva")) {
+			return "exception";
+			
+		}else if(action.equals("atras")) {
+			return "exception";
+			
 		}else {
 			
 			return "exception";
@@ -106,19 +113,44 @@ public class ReservaController {
 	//No tiene url, viene desde /redirigir porque el mismo formulario tiene 2 botones, y "redirigir" llama a un sitio u otro 
 	// dependiendo del botón pulsado
 	
-	public String mostrarPrecioReserva(Reserva reserva, ModelMap modelMap) {
+	public String mostrarPrecioReserva(Reserva reserva, ModelMap modelMap,Iterable<String> paradas,Integer numCiudadesIntermedias) {
 		
-			
-			Ruta nuevaRuta= rutaService.calcularYAsignarTrayectos(reserva.getRuta());
-			Date fechaHoraLlegada=reservaService.calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
-			Double precioPorKm=0.41; //Esto habría que cambiarlo cuadno estén implementadas las tarifas
-			reserva.setPrecioTotal(reservaService.calcularPrecio(nuevaRuta.getNumKmTotales(), precioPorKm));
-			modelMap.put("ruta", nuevaRuta);
+		
+			try {
+				
+				Ruta nuevaRuta= rutaService.calcularYAsignarTrayectos(reserva.getRuta());
+				reserva.setRuta(nuevaRuta);
+				reserva.setNumKmTotales(nuevaRuta.getNumKmTotales());
+				Date fechaHoraLlegada=reservaService.calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
+				reserva.setFechaLlegada(fechaHoraLlegada);
+				reserva.setHoraLlegada(fechaHoraLlegada);
+				Double precioPorKm=0.41; //Esto habría que cambiarlo cuadno estén implementadas las tarifas
+				reserva.setPrecioTotal(reservaService.calcularPrecio(nuevaRuta.getNumKmTotales(), precioPorKm));
+				modelMap.put("reserva", reserva);
+				modelMap.put("horasRutaCliente", rutaService.calcularHorasRutaCliente(nuevaRuta));
+				modelMap.put("minutosRutaCliente", rutaService.calcularMinutosRutaCliente(nuevaRuta));
+				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+				return "reservas/precioReserva";
+			}catch(DuplicatedParadaException e){
+				modelMap.put("reserva", reserva);
+				modelMap.put("paradas", paradas);
+				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+				//Mostrar el mensaje en rojo mejor porque es una excepción
+				modelMap.addAttribute("error", "El origen y destino deben ser diferentes."
+						+ " (Dos paradas consecutivas tampoco pueden ser iguales)");
 
-			return "reservas/precioReserva";
-			
+				return "reservas/newReservaForm";	
+
+			}			
 		
+	}
+	
+	@PostMapping("/new")
+	public String newReserva(Reserva reserva, ModelMap modelMap,BindingResult binding) {
 		
+		System.out.println(reserva.getNumKmTotales());
+		
+		return "reservas/newReservaForm";
 	}
 	
 	
