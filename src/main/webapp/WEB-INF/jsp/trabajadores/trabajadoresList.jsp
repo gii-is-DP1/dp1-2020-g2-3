@@ -22,7 +22,7 @@
         <c:forEach items="${trabajadores}" var="trabajador">
             <tr>
                 <td>
-                    <c:out value="${trabajador.DNI}"/>
+                    <c:out value="${trabajador.dni}"/>
                 </td>
                 <td>
                     <c:out value="${trabajador.nombre}"/>
@@ -31,7 +31,7 @@
                     <c:out value="${trabajador.apellidos}"/>
                 </td>
                  <td>
-                    <c:out value="${trabajador.correoElectronico}"/>
+                    <c:out value="${trabajador.email}"/>
                 </td>
                  <td>
                     <c:out value="${trabajador.telefono}"/>

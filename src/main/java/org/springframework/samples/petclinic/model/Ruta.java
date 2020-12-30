@@ -10,6 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -31,39 +32,39 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 @Data
 @Entity
-@Table(name = "Automovil")
-public class Automovil extends BaseEntity {
+@Table(name = "Ruta")
+public class Ruta extends BaseEntity {
+
 	
-	// Falta añadir restricciones simples
-	
-	@Column(name = "marca")
-	@Size(min = 1, max =25)
+	@Column(name = "origen_cliente")
 	@NotEmpty
-	private String marca;
+	private String origenCliente;
 	
-	@Size(min = 1, max =40)
-	@Column(name = "modelo")
+	@Column(name = "destino_cliente")
 	@NotEmpty
-	private  String modelo;
-	
-	
-	
-	@Column(name = "num_Plazas")
-	@Digits(fraction = 0, integer = 1)
-	@Max(7)
-	@Min(1)
-	@NotNull
-	private  Integer numPlazas;
+	private String destinoCliente;
 	
 	@Min(0)
 	@Digits(fraction=2,integer=6)
-	@Column(name = "km_Recorridos")
+	@Column(name = "num_Km_Totales")
 	@NotNull
-	private  Double kmRecorridos;
+	private  Double numKmTotales;
+	
+	@Min(0)
+	@Digits(fraction=2,integer=3)
+	@Column(name = "horas_Estimadas_Cliente")
+	@NotNull
+	private  Double horasEstimadasCliente;
+	
+	@ManyToMany
+	List<Trayecto> trayectos;
 	
 	@Override
 	public String toString() {
-		return "Automovil [marca=" + marca + ", modelo=" + modelo + ", numPlazas=" + numPlazas + ", kmRecorridos="
-				+ kmRecorridos + "]";
+		return "Ruta [origenCliente=" + origenCliente + ", destinoCliente=" + destinoCliente + ", numKmTotales="
+				+ numKmTotales + ", horasEstimadasCliente=" + horasEstimadasCliente + "]";
 	}
+	
+	
+	
 }

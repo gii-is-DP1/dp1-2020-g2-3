@@ -13,7 +13,6 @@
     <table id="automovilesTable" class="table table-striped">
         <thead>
         <tr>
-         	<th style="width: 120px">Trabajador</th>
             <th style="width: 150px;">Marca</th>
             <th style="width: 200px;">Modelo</th>
             <th style="width: 120px">Número de Plazas</th>
@@ -26,13 +25,7 @@
         <tbody>
         <c:forEach items="${automoviles}" var="automovil">
             <tr>
-             	<td>
-                    <c:out value="${automovil.trabajador.nombre}"/>
-                    <p> </p>
-                     <c:out value="${automovil.trabajador.apellidos}"/>
-                     <p> </p>
-                     <c:out value="${automovil.trabajador.DNI}"/>
-                </td>
+             
                 <td>
                 
                 	<c:out value= "${automovil.marca}"/>

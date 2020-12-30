@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.model;
 import org.springframework.beans.support.MutableSortDefinition;
+
 import org.springframework.beans.support.PropertyComparator;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -31,39 +32,35 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 @Data
 @Entity
-@Table(name = "Automovil")
-public class Automovil extends BaseEntity {
+@Table(name = "Trayecto")
+public class Trayecto extends BaseEntity {
 	
-	// Falta añadir restricciones simples
-	
-	@Column(name = "marca")
-	@Size(min = 1, max =25)
+
+	@Column(name = "origen")
 	@NotEmpty
-	private String marca;
+	private String origen;
 	
-	@Size(min = 1, max =40)
-	@Column(name = "modelo")
+	@Column(name = "destino")
 	@NotEmpty
-	private  String modelo;
-	
-	
-	
-	@Column(name = "num_Plazas")
-	@Digits(fraction = 0, integer = 1)
-	@Max(7)
-	@Min(1)
-	@NotNull
-	private  Integer numPlazas;
+	private String destino;
 	
 	@Min(0)
 	@Digits(fraction=2,integer=6)
-	@Column(name = "km_Recorridos")
+	@Column(name = "num_Km_Totales")
 	@NotNull
-	private  Double kmRecorridos;
+	private  Double numKmTotales;
 	
+	@Min(0)
+	@Digits(fraction=2,integer=3)
+	@Column(name = "horas_Estimadas")
+	@NotNull
+	private  Double horasEstimadas;
+
+
 	@Override
 	public String toString() {
-		return "Automovil [marca=" + marca + ", modelo=" + modelo + ", numPlazas=" + numPlazas + ", kmRecorridos="
-				+ kmRecorridos + "]";
+		return "Trayecto [origen=" + origen + ", destino=" + destino + ", numKmTotales=" + numKmTotales
+				+ ", horasEstimadas=" + horasEstimadas + "]";
 	}
+	
 }
