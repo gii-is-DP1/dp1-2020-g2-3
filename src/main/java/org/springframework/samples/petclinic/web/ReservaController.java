@@ -97,12 +97,23 @@ public class ReservaController {
 			modelMap.put("org.springframework.validation.BindingResult.reserva", null);
 			return addParada(reserva,modelMap,numCiudadesIntermedias,paradas);
 		}else if (action.equals("confirmarReserva")) {
+			Set<String> authorities= authoService.findAuthoritiesByUsername(p.getName());
 		//Comprobamos otra vez el binding por si se ha intentado modificar manualmente algún atributo desde el jsp
 			if(binding.hasErrors()) {
 				modelMap.put("reserva",reserva);
 				modelMap.put("paradas", paradas);
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+				modelMap.put("finBucle", numCiudadesIntermedias-1);
 				return "reservas/newReservaForm";
+			}else if (authorities.contains("admin") || authorities.contains("taxista")){
+				//Un taxista de la empresa no puede solicitar un viaje
+					modelMap.put("reserva",reserva);
+					modelMap.put("paradas", paradas);
+					modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+					modelMap.put("finBucle", numCiudadesIntermedias-1);
+					modelMap.put("error", "No puedes solicitar una reserva siendo un trabajador de la empresa");
+					return "reservas/newReservaForm";	
+					
 			}else {
 				
 				return confirmarNuevaReserva(reserva,modelMap,paradas,numCiudadesIntermedias,p);
@@ -159,9 +170,7 @@ public class ReservaController {
 				modelMap.put("horasRutaCliente", rutaService.calcularHorasRutaCliente(nuevaRuta));
 				modelMap.put("minutosRutaCliente", rutaService.calcularMinutosRutaCliente(nuevaRuta));
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
-				modelMap.put("finBucle",numCiudadesIntermedias-1);
-				 //EN DESARROLLO: Si es trabajador mostrar un selection de los clientes y si es cliente no
-				
+				modelMap.put("finBucle",numCiudadesIntermedias-1);				
 				return "reservas/precioReserva";
 			}catch(DuplicatedParadaException e){
 				modelMap.put("reserva", reserva);
@@ -179,46 +188,59 @@ public class ReservaController {
 	
 	public String confirmarNuevaReserva(Reserva reserva,ModelMap modelMap,Iterable<String> paradas,Integer numCiudadesIntermedias,Principal p) {
 		try {
-			
-			Ruta nuevaRuta= rutaService.calcularYAsignarTrayectos(reserva.getRuta());
-			reserva.setRuta(nuevaRuta);
-			
-			reserva.setNumKmTotales(nuevaRuta.getNumKmTotales());
-			Date fechaHoraLlegada=reservaService.calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
-			reserva.setFechaLlegada(fechaHoraLlegada);
-			reserva.setHoraLlegada(fechaHoraLlegada);
-			Double precioPorKm=0.41; //Esto habría que cambiarlo cuadno estén implementadas las tarifas
-			Double precioTotal=reservaService.calcularPrecio(nuevaRuta.getNumKmTotales(), precioPorKm);
-			reserva.setPrecioTotal(precioTotal);
-			reserva.setHorasEspera(0.0);
-			reserva.setEstadoReserva(estadoService.findEstadoById(1).get());
-			reserva.setPrecioDistancia(precioTotal); //Cuando se crea el viaje las horas de espera son 0 y el precio total es el de los km recorridos
-			reserva.setPrecioEspera(0.0);
-			
-			Double precioIvaRedondeado= (double)Math.round((0.1*precioTotal)*100)/100; //Esto se cambiará cuando estén implementadas las tarifas
-			reserva.setPrecioIVA(precioIvaRedondeado);
-			Double baseImponibleRedondeada= (double)Math.round((0.9*precioTotal)*100)/100;
-			reserva.setBaseImponible(baseImponibleRedondeada); //Esto se cambiará cunado estén implementadas las tarifas
 			Set<String> authorities= authoService.findAuthoritiesByUsername(p.getName());
 			if (authorities.contains("admin") || authorities.contains("taxista")) { //Se obtiene el cliente como parámetro, es el trabajador el que realiza la reserva
-				
-				//AÑADIR EL CLIENTE DESDE EL FORMULARIO
+				//Un taxista de la empresa no puede solicitar un viaje
+				modelMap.put("reserva",reserva);
+				modelMap.put("paradas", paradas);
+				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+				modelMap.put("finBucle", numCiudadesIntermedias-1);
+				modelMap.put("error", "No puedes solicitar una reserva siendo un trabajador de la empresa");
+				return "reservas/newReservaForm";	
 				
 			}else { //Es un cliente el que realiza la reserva y su entidad se obtiene  desde la sesión iniciada
-				System.out.println("KKKKMMMMM : " + reserva.getRuta().getNumKmTotales());
+				
 				Cliente cliente= clienteService.findClienteByUsername(p.getName());
 				reserva.setCliente(cliente);
+				Ruta nuevaRuta= rutaService.calcularYAsignarTrayectos(reserva.getRuta());
+				Optional<Ruta> rutaExistente= rutaService.findRutaByRuta(nuevaRuta);
+				if(rutaExistente.isPresent()) {
+					System.out.println("Ya existe una ruta similar! Se asignará desde la BD");
+					nuevaRuta= rutaExistente.get();
+					System.out.println("Trayectos de la ruta existente: " + rutaExistente.get().getTrayectos());
+					
+				}else {
+					
+					System.out.println("No existe la ruta, se creará una nueva");
+				}
+			
+				reserva.setRuta(nuevaRuta);
+				
+				reserva.setNumKmTotales(nuevaRuta.getNumKmTotales());
+				Date fechaHoraLlegada=reservaService.calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
+				reserva.setFechaLlegada(fechaHoraLlegada);
+				reserva.setHoraLlegada(fechaHoraLlegada);
+				Double precioPorKm=0.41; //Esto habría que cambiarlo cuadno estén implementadas las tarifas
+				Double precioTotal=reservaService.calcularPrecio(nuevaRuta.getNumKmTotales(), precioPorKm);
+				reserva.setPrecioTotal(precioTotal);
+				reserva.setHorasEspera(0.0);
+				reserva.setEstadoReserva(estadoService.findEstadoById(1).get());
+				reserva.setPrecioDistancia(precioTotal); //Cuando se crea el viaje las horas de espera son 0 y el precio total es el de los km recorridos
+				reserva.setPrecioEspera(0.0);
+				
+				Double precioIvaRedondeado= (double)Math.round((0.1*precioTotal)*100)/100; //Esto se cambiará cuando estén implementadas las tarifas
+				reserva.setPrecioIVA(precioIvaRedondeado);
+				Double baseImponibleRedondeada= (double)Math.round((0.9*precioTotal)*100)/100;
+				reserva.setBaseImponible(baseImponibleRedondeada); //Esto se cambiará cunado estén implementadas las tarifas
+				rutaService.save(reserva.getRuta());
+				reservaService.save(reserva);
+				
+				modelMap.addAttribute("message", "¡Reserva solicitada con éxito!");
+				return newReserva(modelMap);
 				
 			}
 			
-			//ASIGNAR CLIENTE
-			//GUARDAR RESERVA
-			//EN DESARROLLO
-			rutaService.save(reserva.getRuta());
-			reservaService.save(reserva);
 			
-			modelMap.addAttribute("message", "¡Reserva solicitada con éxito!");
-			return newReserva(modelMap);
 			
 		}catch(DuplicatedParadaException e) {
 			modelMap.put("reserva", reserva);
