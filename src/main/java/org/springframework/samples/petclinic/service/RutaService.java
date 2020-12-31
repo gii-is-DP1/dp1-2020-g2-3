@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -112,14 +113,56 @@ public class RutaService {
 				//en este caso no sumamos las horas estimadas porque el cliente no estará en el coche en este trayecto
 
 			}
-			rutaFormulario.setTrayectos(nuevaListaTrayectos);
-			rutaFormulario.setHorasEstimadasCliente(horasEstimadasCliente);
-			rutaFormulario.setNumKmTotales(numKmTotal);
-			return rutaFormulario;
+			Ruta nuevaRuta= new Ruta();
+			double numKmTotalAproximado=Math.round(numKmTotal*100)/100;
+
+			nuevaRuta.setTrayectos(nuevaListaTrayectos);
+			nuevaRuta.setHorasEstimadasCliente(horasEstimadasCliente);
+			nuevaRuta.setNumKmTotales(numKmTotalAproximado);
+			nuevaRuta.setOrigenCliente(rutaFormulario.getOrigenCliente());
+			nuevaRuta.setDestinoCliente(rutaFormulario.getDestinoCliente());
+			return nuevaRuta;
 			
 		}
 	
 	}
+	@Transactional()
+	public Optional<Ruta> findRutaByRuta(Ruta ruta){//Nos intentará devolver una ruta existente en la BD igual que la dada como parámetro 
+													// comparando también sus TRAYECTOS asociados (Relación ManyToMany)
+		List<Trayecto> trayectosRutaParametro= ruta.getTrayectos();
+		Collection<Ruta> rutasPosibles=findRutasByAttributes(ruta.getOrigenCliente(),ruta.getDestinoCliente(),ruta.getNumKmTotales(),ruta.getHorasEstimadasCliente());
+		Optional<Ruta> resultado= Optional.ofNullable(null);
+		
+	if(rutasPosibles.size()!=0 && rutasPosibles!=null) {
+			//Comprobamos si los trayectos de alguna de esas rutas candidatas coinciden con los trayectos de nuestra ruta
+			boolean rutaEncontrada=false;
+		for(Ruta r:rutasPosibles) {
+				List<Trayecto> trayectosPosibleRuta= r.getTrayectos();
+				if(trayectosPosibleRuta.size()==trayectosRutaParametro.size()) {
+					boolean coincidenTodosLosTrayectos=true;
+					int i=0;
+					while(i<trayectosPosibleRuta.size() && coincidenTodosLosTrayectos) { //Si hay algún trayecto que NO coincide la siguiente iteración
+						Trayecto trayectoParametro=trayectosRutaParametro.get(i);			// del bucle no se ejecuta  y se pasa a la siguiente Ruta
+						Trayecto trayectoPosibleRuta= trayectosPosibleRuta.get(i);
+						
+							if(!trayectoParametro.equals(trayectoPosibleRuta)) {
+								coincidenTodosLosTrayectos=false;
+								break;
+							}
+							i++;
+						}
+					if(coincidenTodosLosTrayectos) { //Cuando encontremos una ruta paramos el bucle for
+						
+						rutaEncontrada=true;
+						resultado=Optional.ofNullable(r);
+						break;
+						}
+					}
+			}	
+		}
+		return resultado;	
+	}
+	
 	
 	@Transactional
 	public int calcularHorasRutaCliente(Ruta ruta) {
@@ -140,9 +183,6 @@ public class RutaService {
 		return rutaRepo.findById(id);
 	}
 	
-	
-	
-	
 	@Transactional()
 	public void delete(Ruta ruta) throws DataAccessException  {
 			rutaRepo.delete(ruta);
@@ -152,5 +192,15 @@ public class RutaService {
 		
 		rutaRepo.save(ruta);
 	}
+	
+	@Transactional()
+	public Collection<Ruta> findRutasByAttributes(String origenCliente, String destinoCliente,
+			Double numKmTotales, Double horasEstimadasCliente)  {
+		
+		return rutaRepo.findRutasByAttributes(origenCliente, destinoCliente, numKmTotales, horasEstimadasCliente);
+	}
+	
+	
+	
 	
 }
