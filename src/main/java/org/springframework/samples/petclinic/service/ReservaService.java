@@ -44,7 +44,9 @@ public class ReservaService {
 	public Double calcularPrecio(Double kmTotal, Double precioPorKm) {
 		//precioPorKm realmente habría que buscarlo de la tarifa que se encuentre activa en este momento.
 		
-		return kmTotal*precioPorKm;								
+		Double precioTotal=kmTotal*precioPorKm;	
+		Double precioTotalRedondeado=Math.round(precioTotal*100.0)/100.0;
+		return precioTotalRedondeado;								
 		
 	}
 	@Transactional

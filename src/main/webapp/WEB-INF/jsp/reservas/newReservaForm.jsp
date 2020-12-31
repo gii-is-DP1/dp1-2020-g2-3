@@ -12,6 +12,7 @@
         
          <input type="hidden" name="numCiudadesIntermedias" value="${numCiudadesIntermedias}"/>
         <p> ${usuario}</p>
+       
         <label for="ruta.origenCliente">Ciudad Origen:</label>
 		<select required="true" name="ruta.origenCliente" id="ruta.origenCliente">
 				 <c:forEach items="${paradas}" var="parada">

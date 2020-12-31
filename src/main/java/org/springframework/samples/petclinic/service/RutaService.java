@@ -112,10 +112,15 @@ public class RutaService {
 				//en este caso no sumamos las horas estimadas porque el cliente no estará en el coche en este trayecto
 
 			}
-			rutaFormulario.setTrayectos(nuevaListaTrayectos);
-			rutaFormulario.setHorasEstimadasCliente(horasEstimadasCliente);
-			rutaFormulario.setNumKmTotales(numKmTotal);
-			return rutaFormulario;
+			Ruta nuevaRuta= new Ruta();
+			double numKmTotalAproximado=Math.round(numKmTotal*100)/100;
+
+			nuevaRuta.setTrayectos(nuevaListaTrayectos);
+			nuevaRuta.setHorasEstimadasCliente(horasEstimadasCliente);
+			nuevaRuta.setNumKmTotales(numKmTotalAproximado);
+			nuevaRuta.setOrigenCliente(rutaFormulario.getOrigenCliente());
+			nuevaRuta.setDestinoCliente(rutaFormulario.getDestinoCliente());
+			return nuevaRuta;
 			
 		}
 	
