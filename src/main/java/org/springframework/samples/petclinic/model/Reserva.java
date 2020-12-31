@@ -98,19 +98,16 @@ public class Reserva extends BaseEntity {
 	@Min(0)
 	@Digits(fraction=2,integer=5)
 	@Column(name = "precio_Total")
-	
 	private  Double precioTotal;
 	
 	@Min(0)
 	@Digits(fraction=2,integer=6)
 	@Column(name = "num_Km_Totales")
-	
 	private  Double numKmTotales;
 	
 	@Min(0)
 	@Digits(fraction=2,integer=5)
 	@Column(name = "precio_Distancia")
-	
 	private  Double precioDistancia;
 	
 	
