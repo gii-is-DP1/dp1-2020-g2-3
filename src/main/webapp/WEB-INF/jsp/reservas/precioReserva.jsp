@@ -9,28 +9,50 @@
 <petclinic:layout pageName="reservas">
     <form:form modelAttribute="reserva" class="form-horizontal" id="add-reserva-form" action="/reservas/redirigir">
         
-        <!-- EN DESARROLLO -->
+       
         
        <h2>Ruta establecida</h2>
+      
               <input type="hidden" name="numCiudadesIntermedias" id="numCiudadesIntermedias" value="${numCiudadesIntermedias}"/>
-
-       <p> 
+<c:choose>
+ <c:when test = "${not empty trayectoIdaTaxista}">
+  <!-- Trayecto desde la localidad del taxista (Zahinos) hasta el origen marcado por el cliente-->
+  <div style="float:left">
+ <p style="color:green"  > ${trayectoIdaTaxista.origen} -->  </p> 
+ </div>
+ </c:when>
+</c:choose>
+       
        <input type="hidden" name="ruta.origenCliente" id="ruta.origenCliente" value="${reserva.ruta.origenCliente}"/>
-       <p> ${reserva.ruta.origenCliente} -->  </p>
+       <p style="float:left"> ${reserva.ruta.origenCliente} -->  </p> 
      <c:choose>
-       <c:when test = "${numCiudadesIntermedias>0}">
+       <c:when test = "${numCiudadesIntermedias>0}"> 
        <c:forEach var="i" begin="0" end="${finBucle}" step="1" varStatus ="status">
-       <p> </p>
+       <p style="float:left"> 
+      	   ${reserva.ruta.trayectos[i].origen} --> </p>
        		<input type="hidden" name="ruta.trayectos[${i}].origen" id="ruta.trayectos[${i}].origen" value="${reserva.ruta.trayectos[i].origen}" />
-           	<p> ${reserva.ruta.trayectos[i].origen} -->  </p>
            	</c:forEach>
        </c:when>
      </c:choose>
+    
       <input type="hidden" name="ruta.destinoCliente" id="ruta.destinoCliente" value="${reserva.ruta.destinoCliente}"/>
        
-       <p> ${reserva.ruta.destinoCliente} </p>
+       <p style="float:left"> ${reserva.ruta.destinoCliente} </p>
        
-       <em>  Nº Kilómetros totales: ${reserva.numKmTotales} <em> 
+       <c:choose>
+ <c:when test = "${not empty trayectoVueltaTaxista}">
+  <!-- Trayecto de vuelta del taxista desde el destino del cliente hasta la localidad del taxista, zahinos-->
+
+  <p style="color:green";"float:left"> -->  ${trayectoVueltaTaxista.destino}</p>
+ </c:when>
+</c:choose>
+      
+
+       <em>  Nº Kilómetros totales: ${reserva.numKmTotales} </em>   <br> </br>
+        <p> *Para el cálculo de kilómetros totales se tiene en cuenta el <span style="color:green">  trayecto que realiza el taxista para llegar al origen </span>,
+       así como el de <span style="color:green"> vuelta hasta su localidad (Zahínos) </span></p>
+       <p style="color:green"> **El trayecto en verde no le corresponde al cliente</p>
+           
        <h2>Fecha de Salida</h2>
        <p> Fecha: <fmt:formatDate pattern = "yyyy-MM-dd" value = "${reserva.fechaSalida}" /> </p>
       <input type="hidden" name="fechaSalida"  id="fechaSalida" value="<fmt:formatDate pattern = "yyyy-MM-dd" value = "${reserva.fechaSalida}" />"/>     
