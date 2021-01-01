@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic.web;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import org.springframework.samples.petclinic.service.RutaService;
 import org.springframework.samples.petclinic.service.TrayectoService;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
+import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -62,6 +64,13 @@ public class ReservaController {
 		Reserva nuevaReserva= new Reserva();
 		Date today= new Date();
 		nuevaReserva.setFechaSalida(today);
+		//Mostramos una fecha de salida predeterminada del día de hoy, con 5 minutos más a los actuales en la hora de salida
+		// ya que no se pueden realizar reservas con una fecha anterior al instante actuall
+		 Calendar calendar = Calendar.getInstance();
+	      calendar.setTime(today); 
+	      calendar.add(Calendar.MINUTE, 5); 
+	      today= calendar.getTime(); 
+	      /////////////
 		nuevaReserva.setHoraSalida(today);
 		modelMap.addAttribute("reserva",nuevaReserva);
 		Iterable<String> paradas= trayectoService.findDistinctParadas();
@@ -151,7 +160,7 @@ public class ReservaController {
 		
 		
 			try {
-				
+				reservaService.fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida());
 				Ruta nuevaRuta= rutaService.calcularYAsignarTrayectos(reserva.getRuta());
 				System.out.println("horas estimadas cliente: " + nuevaRuta.getHorasEstimadasCliente());
 				//Esta ruta es solo para calcular el precio, los km totales, fecha estimada de llegada en función
@@ -173,15 +182,27 @@ public class ReservaController {
 				modelMap.put("finBucle",numCiudadesIntermedias-1);				
 				return "reservas/precioReserva";
 			}catch(DuplicatedParadaException e){
+			
 				modelMap.put("reserva", reserva);
 				modelMap.put("paradas", paradas);
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+				modelMap.put("finBucle", numCiudadesIntermedias-1);
 				modelMap.addAttribute("error", "El origen y destino deben ser diferentes."
 						+ " (Dos paradas consecutivas tampoco pueden ser iguales)");
 
 				return "reservas/newReservaForm";	
 
-			}			
+			} catch(FechaSalidaAnteriorActualException e2) {
+			
+				modelMap.put("reserva", reserva);
+				modelMap.put("paradas", paradas);
+				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+				modelMap.put("finBucle", numCiudadesIntermedias-1);
+				modelMap.addAttribute("error", "La fecha y hora de salida no puede ser anterior al instante actual");
+
+				return "reservas/newReservaForm";	
+
+			}
 		
 	}
 	
