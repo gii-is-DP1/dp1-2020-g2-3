@@ -17,6 +17,7 @@ import org.springframework.samples.petclinic.repository.ClienteRepository;
 import org.springframework.samples.petclinic.repository.ReservaRepository;
 import org.springframework.samples.petclinic.repository.RutaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
+import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +69,20 @@ public class ReservaService {
 	@Transactional
 	public void delete(Reserva reserva) throws DataAccessException  {
 			reservaRepo.delete(reserva);
+	}
+	@Transactional
+	public void fechaSalidaAnteriorActual(Date fechaSalida, Date horaSalida) throws FechaSalidaAnteriorActualException  {
+		Date today= new Date();
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
+	
+		if(fechaSalida.compareTo(today)<0) { //Fecha anterior
+			System.out.println("fecha de salida es anterior a la actual, se lanza excepción");
+			throw new FechaSalidaAnteriorActualException();
+		}else {
+			System.out.println("la fecha de salida es posterior o igual a la actual, no se lanza excepción");
+		}
+		
 	}
 	@Transactional
 	public void save(Reserva reserva)  {
