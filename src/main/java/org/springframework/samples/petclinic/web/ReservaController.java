@@ -94,6 +94,7 @@ public class ReservaController {
 				modelMap.put("reserva",reserva);
 				modelMap.put("paradas", paradas);
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+				modelMap.put("finBucle", numCiudadesIntermedias-1);
 				return "reservas/newReservaForm";
 			}else {
 				
