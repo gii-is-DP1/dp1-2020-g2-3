@@ -160,8 +160,14 @@ public class ReservaController {
 		
 		
 			try {
-				reservaService.fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida());
+				reservaService.fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha 
 				Ruta nuevaRuta= rutaService.calcularYAsignarTrayectos(reserva.getRuta());
+				if(!reserva.getRuta().getOrigenCliente().equals("Zahinos")) {
+					modelMap.put("trayectoIdaTaxista", nuevaRuta.getTrayectos().get(0));
+				}
+				if(!reserva.getRuta().getDestinoCliente().equals("Zahinos")) {
+					modelMap.put("trayectoVueltaTaxista", nuevaRuta.getTrayectos().get(nuevaRuta.getTrayectos().size()-1));
+				}
 				System.out.println("horas estimadas cliente: " + nuevaRuta.getHorasEstimadasCliente());
 				//Esta ruta es solo para calcular el precio, los km totales, fecha estimada de llegada en función
 				// de los trayectos que se hayan calculado... 
