@@ -44,18 +44,14 @@ public class ReservaController {
 	private final  ReservaService reservaService;
 	private final  TrayectoService trayectoService;
 	private final RutaService rutaService;
-	private final ClienteService clienteService;
-	private final EstadoReservaService estadoService;
 	private final AuthoritiesService authoService;
 	
 	
 	@Autowired
-	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,ClienteService clienteService,EstadoReservaService estadoService,AuthoritiesService authoService) {
+	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService) {
 		this.reservaService=reservaService;
 		this.trayectoService=trayectoService;
 		this.rutaService=rutaService;
-		this.clienteService=clienteService;
-		this.estadoService=estadoService;
 		this.authoService=authoService;
 	}
 	
@@ -161,30 +157,19 @@ public class ReservaController {
 		
 		
 			try {
-				reservaService.fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha 
-				Ruta nuevaRuta= rutaService.calcularYAsignarTrayectos(reserva.getRuta());
-				if(!reserva.getRuta().getOrigenCliente().equals("Zahinos")) {
-					modelMap.put("trayectoIdaTaxista", nuevaRuta.getTrayectos().get(0));
+				Reserva reservaCalculada= reservaService.calcularReserva(reserva, false); //Reserva con precio,horaEstimada de llegada, km totales...
+				if(!reservaCalculada.getRuta().getOrigenCliente().equals("Zahinos")) {
+					modelMap.put("trayectoIdaTaxista", reservaCalculada.getRuta().getTrayectos().get(0));
 				}
-				if(!reserva.getRuta().getDestinoCliente().equals("Zahinos")) {
-					modelMap.put("trayectoVueltaTaxista", nuevaRuta.getTrayectos().get(nuevaRuta.getTrayectos().size()-1));
+				if(!reservaCalculada.getRuta().getDestinoCliente().equals("Zahinos")) {
+					modelMap.put("trayectoVueltaTaxista", reservaCalculada.getRuta().getTrayectos().get(reservaCalculada.getRuta().getTrayectos().size()-1));
 				}
-				System.out.println("horas estimadas cliente: " + nuevaRuta.getHorasEstimadasCliente());
-				//Esta ruta es solo para calcular el precio, los km totales, fecha estimada de llegada en función
-				// de los trayectos que se hayan calculado... 
 				
-				//La nueva ruta se asignará a la reserva UNA VEZ SE CONFIRME para meterla en la BD
-				
-				
-				reserva.setNumKmTotales(nuevaRuta.getNumKmTotales());
-				Date fechaHoraLlegada=reservaService.calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
-				reserva.setFechaLlegada(fechaHoraLlegada);
-				reserva.setHoraLlegada(fechaHoraLlegada);
-				Double precioPorKm=0.41; //Esto habría que cambiarlo cuadno estén implementadas las tarifas
-				reserva.setPrecioTotal(reservaService.calcularPrecio(nuevaRuta.getNumKmTotales(), precioPorKm));
-				modelMap.put("reserva", reserva);
-				modelMap.put("horasRutaCliente", rutaService.calcularHorasRutaCliente(nuevaRuta));
-				modelMap.put("minutosRutaCliente", rutaService.calcularMinutosRutaCliente(nuevaRuta));
+				List<Trayecto> trayectosIntermedios= reserva.getRuta().getTrayectos(); //Trayectos intermedios, que serán los que tenga la ruta antigua que vino desde el formulario
+				modelMap.put("reserva", reservaCalculada);
+				modelMap.put("trayectosIntermedios", trayectosIntermedios);
+				modelMap.put("horasRutaCliente", rutaService.calcularHorasRutaCliente(reservaCalculada.getRuta()));
+				modelMap.put("minutosRutaCliente", rutaService.calcularMinutosRutaCliente(reservaCalculada.getRuta()));
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
 				modelMap.put("finBucle",numCiudadesIntermedias-1);				
 				return "reservas/precioReserva";
@@ -208,17 +193,14 @@ public class ReservaController {
 				modelMap.addAttribute("error", "La fecha y hora de salida no puede ser anterior al instante actual");
 
 				return "reservas/newReservaForm";	
-
 			}
-		
 	}
 	
 	
 	public String confirmarNuevaReserva(Reserva reserva,ModelMap modelMap,Iterable<String> paradas,Integer numCiudadesIntermedias,Principal p) {
 		try {
 			Set<String> authorities= authoService.findAuthoritiesByUsername(p.getName());
-			if (authorities.contains("admin") || authorities.contains("taxista")) { //Se obtiene el cliente como parámetro, es el trabajador el que realiza la reserva
-				//Un taxista de la empresa no puede solicitar un viaje
+			if (authorities.contains("admin") || authorities.contains("taxista")) { //Un taxista de la empresa no puede solicitar un viaje
 				modelMap.put("reserva",reserva);
 				modelMap.put("paradas", paradas);
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
@@ -227,55 +209,28 @@ public class ReservaController {
 				return "reservas/newReservaForm";	
 				
 			}else { //Es un cliente el que realiza la reserva y su entidad se obtiene  desde la sesión iniciada
-				
-				Cliente cliente= clienteService.findClienteByUsername(p.getName());
-				reserva.setCliente(cliente);
-				Ruta nuevaRuta= rutaService.calcularYAsignarTrayectos(reserva.getRuta());
-				Optional<Ruta> rutaExistente= rutaService.findRutaByRuta(nuevaRuta);
-				if(rutaExistente.isPresent()) {
-					System.out.println("Ya existe una ruta similar! Se asignará desde la BD");
-					nuevaRuta= rutaExistente.get();
-					System.out.println("Trayectos de la ruta existente: " + rutaExistente.get().getTrayectos());
-					
-				}else {
-					
-					System.out.println("No existe la ruta, se creará una nueva");
-				}
-			
-				reserva.setRuta(nuevaRuta);
-				
-				reserva.setNumKmTotales(nuevaRuta.getNumKmTotales());
-				Date fechaHoraLlegada=reservaService.calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
-				reserva.setFechaLlegada(fechaHoraLlegada);
-				reserva.setHoraLlegada(fechaHoraLlegada);
-				Double precioPorKm=0.41; //Esto habría que cambiarlo cuadno estén implementadas las tarifas
-				Double precioTotal=reservaService.calcularPrecio(nuevaRuta.getNumKmTotales(), precioPorKm);
-				reserva.setPrecioTotal(precioTotal);
-				reserva.setHorasEspera(0.0);
-				reserva.setEstadoReserva(estadoService.findEstadoById(1).get());
-				reserva.setPrecioDistancia(precioTotal); //Cuando se crea el viaje las horas de espera son 0 y el precio total es el de los km recorridos
-				reserva.setPrecioEspera(0.0);
-				
-				Double precioIvaRedondeado= (double)Math.round((0.1*precioTotal)*100)/100; //Esto se cambiará cuando estén implementadas las tarifas
-				reserva.setPrecioIVA(precioIvaRedondeado);
-				Double baseImponibleRedondeada= (double)Math.round((0.9*precioTotal)*100)/100;
-				reserva.setBaseImponible(baseImponibleRedondeada); //Esto se cambiará cunado estén implementadas las tarifas
-				rutaService.save(reserva.getRuta());
-				reservaService.save(reserva);
-				
+				reservaService.calcularYConfirmarReserva(reserva,p.getName());
 				modelMap.addAttribute("message", "¡Reserva solicitada con éxito!");
 				return newReserva(modelMap);
 				
 			}
-			
-			
-			
+
 		}catch(DuplicatedParadaException e) {
 			modelMap.put("reserva", reserva);
 			modelMap.put("paradas", paradas);
 			modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
 			modelMap.addAttribute("error", "El origen y destino deben ser diferentes."
 					+ " (Dos paradas consecutivas tampoco pueden ser iguales)");
+
+			return "reservas/newReservaForm";	
+
+		}catch(FechaSalidaAnteriorActualException e2) {
+			
+			modelMap.put("reserva", reserva);
+			modelMap.put("paradas", paradas);
+			modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+			modelMap.put("finBucle", numCiudadesIntermedias-1);
+			modelMap.addAttribute("error", "La fecha y hora de salida no puede ser anterior al instante actual");
 
 			return "reservas/newReservaForm";	
 
