@@ -55,6 +55,16 @@ public class ReservaController {
 		this.authoService=authoService;
 	}
 	
+	@GetMapping(value = "/reservasList")
+	public String listadoReservas(ModelMap modelMap) {
+		String vista="reservas/reservasList";
+		Iterable<Reserva> reservas= reservaService.findAll();
+		modelMap.addAttribute("reserva", reservas);
+		return vista;
+	}
+	
+		
+	
 	@GetMapping("/new")
 	public String newReserva(ModelMap modelMap) {
 		Reserva nuevaReserva= new Reserva();
