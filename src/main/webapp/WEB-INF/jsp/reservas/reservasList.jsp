@@ -60,6 +60,13 @@
                     <c:out value="${reserva.estadoReserva}"/>
                 </td>
             </tr>
+            <td>
+                <spring:url value="/reservas/delete/{reservaId}" var="reservaDeleteUrl">
+                <spring:param name="reservaId" value="${reserva.id}"/>
+                </spring:url>
+				<a class="deleteReserva" href="${fn:escapeXml(servicioDeleteUrl)}"> <img alt="" id="delete" src="/resources/images/delete.png" style="width: 45px"></a>
+          
+            
         </c:forEach>
         </tbody>
     </table>
