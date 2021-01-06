@@ -68,6 +68,10 @@ INSERT INTO talleres(id,name,ubicacion,telefono) VALUES (2,'Chapa y pintura Rami
 INSERT INTO servicios(id,name,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion) VALUES (1,'Revisión aceite','2013-01-04', 70.50, 1, 1, 1, 'Revisión periódica aceite y filtros');
 INSERT INTO servicios(id,name,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion) VALUES (2,'Arreglo luna','2013-01-04', 50.00, 3, 2, 2, 'Arreglar picotazo parabrisas');
 
+INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado) VALUES (1,0.3,10,4,true);
+INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado) VALUES (2,0.5,10,4,false);
+INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado) VALUES (3,0.7,10,6,false);
+
 INSERT INTO Estado_Reserva(id,name)VALUES(1,'Solicitada');
 INSERT INTO Estado_Reserva(id,name)VALUES(2,'Aceptada');
 INSERT INTO Estado_Reserva(id,name)VALUES(3,'Rechazada');
@@ -75,13 +79,24 @@ INSERT INTO Estado_Reserva(id,name)VALUES(4,'Completada');
 INSERT INTO Estado_Reserva(id,name)VALUES(5,'Incompleta');
 
 
-INSERT INTO Ruta(id,origen_cliente,destino_cliente,num_Km_Totales,horas_Estimadas_Cliente)VALUES(1,'Zahínos','Badajoz',144.6,2.23);
+INSERT INTO Ruta(id,origen_cliente,destino_cliente,num_Km_Totales,horas_Estimadas_Cliente)VALUES(1,'Zahinos','Badajoz',144.6,2.23);
 
-INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(1,'Zahínos','Badajoz',72.3,1.15);
-INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(2,'Badajoz','Zahínos',72.3,1.08);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(1,'Zahinos','Badajoz',72.3,1.15);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(2,'Badajoz','Zahinos',72.3,1.08);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(3,'Zahinos','Jerez de los Caballeros',19.1,0.28);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(4,'Jerez de los Caballeros','Zahinos',19.1,0.27);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(5,'Zahinos','Oliva de la Frontera',10.9,0.22);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(6,'Oliva de la Frontera','Zahinos',10.9,0.22);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(7,'Oliva de la Frontera','Jerez de los Caballeros',16.9,0.27);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(8,'Jerez de los Caballeros','Oliva de la Frontera',17,0.25);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(9,'Oliva de la Frontera','Badajoz',90.5,1.25);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(10,'Badajoz','Oliva de la Frontera',90.7,1.22);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(11,'Jerez de los Caballeros','Badajoz',74.8,1);
+INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(12,'Badajoz','Jerez de los Caballeros',73.7,1.03);
 
-INSERT INTO Ruta_Trayecto(id,ruta_id,trayecto_id)VALUES(1,1,1);
-INSERT INTO Ruta_Trayecto(id,ruta_id,trayecto_id)VALUES(2,1,2);
+INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id)VALUES(1,1);
+INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id)VALUES(1,2);
 
-INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id)VALUES(1,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1);
-INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id)VALUES(2,4,1,'2020-12-22','2020-12-28','18:00','19:23',0,3,'Llevo una maleta grande',2);
+
+
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,precio_Distancia,precio_Espera,precio_IVA_Repercutivo,base_Imponible)VALUES(1,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1,59.29,59.29,0,5.92,53.36);

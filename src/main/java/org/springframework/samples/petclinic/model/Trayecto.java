@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.model;
 import org.springframework.beans.support.MutableSortDefinition;
+
 import org.springframework.beans.support.PropertyComparator;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -55,7 +56,15 @@ public class Trayecto extends BaseEntity {
 	@NotNull
 	private  Double horasEstimadas;
 
-
+	public static Trayecto nuevoTrayecto(String origen,String destino,Double numKmTotales,Double horasEstimadas) {
+    	Trayecto t= new Trayecto();
+    	t.setOrigen(origen);
+    	t.setDestino(destino);
+    	t.setHorasEstimadas(horasEstimadas);
+    	t.setNumKmTotales(numKmTotales);
+    	return t;
+    }
+	
 	@Override
 	public String toString() {
 		return "Trayecto [origen=" + origen + ", destino=" + destino + ", numKmTotales=" + numKmTotales
