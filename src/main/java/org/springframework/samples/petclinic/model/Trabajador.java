@@ -40,9 +40,6 @@ public class Trabajador extends Person {
 	@JoinColumn(name = "tipo_trabajador_id",referencedColumnName="id")
 	private  TipoTrabajador tipoTrabajador;
 	
-	@OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "contrato_id", referencedColumnName = "id")
-	private Contrato contrato;
 	
 
 	@Override

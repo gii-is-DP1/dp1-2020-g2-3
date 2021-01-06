@@ -1,24 +1,40 @@
 package org.springframework.samples.petclinic.model;
+import org.springframework.beans.support.MutableSortDefinition;
+import org.springframework.beans.support.PropertyComparator;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import lombok.Data;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
+@Data
 @Entity
-@Table(name = "reserva")
+@Table(name = "Reserva")
 public class Reserva extends BaseEntity {
 	
 	@ManyToOne
@@ -77,106 +93,6 @@ public class Reserva extends BaseEntity {
 	@ManyToOne
 	@JoinColumn(name = "estado_Reserva_id",referencedColumnName="id")
 	private  EstadoReserva estadoReserva;
-
-
-	public Cliente getCliente() {
-		return cliente;
-	}
-
-
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
-	}
-
-
-	public Ruta getRuta() {
-		return ruta;
-	}
-
-
-	public void setRuta(Ruta ruta) {
-		this.ruta = ruta;
-	}
-
-
-	public Date getFechaSalida() {
-		return fechaSalida;
-	}
-
-
-	public void setFechaSalida(Date fechaSalida) {
-		this.fechaSalida = fechaSalida;
-	}
-
-
-	public Date getFechaLlegada() {
-		return fechaLlegada;
-	}
-
-
-	public void setFechaLlegada(Date fechaLlegada) {
-		this.fechaLlegada = fechaLlegada;
-	}
-
-
-	public Date getHoraSalida() {
-		return horaSalida;
-	}
-
-
-	public void setHoraSalida(Date horaSalida) {
-		this.horaSalida = horaSalida;
-	}
-
-
-	public Date getHoraLlegada() {
-		return horaLlegada;
-	}
-
-
-	public void setHoraLlegada(Date horaLlegada) {
-		this.horaLlegada = horaLlegada;
-	}
-
-
-	public Double getHorasEspera() {
-		return horasEspera;
-	}
-
-
-	public void setHorasEspera(Double horasEspera) {
-		this.horasEspera = horasEspera;
-	}
-
-
-	public Integer getPlazas_Ocupadas() {
-		return plazas_Ocupadas;
-	}
-
-
-	public void setPlazas_Ocupadas(Integer plazas_Ocupadas) {
-		this.plazas_Ocupadas = plazas_Ocupadas;
-	}
-
-
-	public String getDescripcionEquipaje() {
-		return descripcionEquipaje;
-	}
-
-
-	public void setDescripcionEquipaje(String descripcionEquipaje) {
-		this.descripcionEquipaje = descripcionEquipaje;
-	}
-
-
-	public EstadoReserva getEstadoReserva() {
-		return estadoReserva;
-	}
-
-
-	public void setEstadoReserva(EstadoReserva estadoReserva) {
-		this.estadoReserva = estadoReserva;
-	}
 	
 	//Meter relación reserva recursiva en caso de implementar compartir viajes
 	@Min(0)
@@ -209,7 +125,6 @@ public class Reserva extends BaseEntity {
 	@Digits(fraction=2,integer=5)
 	@Column(name = "base_Imponible")
 	private  Double baseImponible;
-	
 	
 	
 }

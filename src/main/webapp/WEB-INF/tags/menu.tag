@@ -33,12 +33,7 @@
 					<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
 					<span>Clientes</span>
 				</petclinic:menuItem>
-				
-				<petclinic:menuItem active="${name eq 'reservas'}" url="/reservas/reservasList"
-					title="reservas">
-					<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-					<span>Reservas</span>
-				</petclinic:menuItem>
+
 				
 				<petclinic:menuItem active="${name eq 'automoviles'}" url="/automoviles/listado"
 					title="Automoviles">
