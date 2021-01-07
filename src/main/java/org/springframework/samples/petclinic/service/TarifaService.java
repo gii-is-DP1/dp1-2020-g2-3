@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TarifaService {
 	@Autowired
 	private TarifaRepository tariRep;
+	private Tarifa tarifa;
 	
 	@Transactional
 	public long tarifaCount() {
@@ -22,6 +23,17 @@ public class TarifaService {
 	@Transactional
 	public Iterable<Tarifa> findAll(){
 		 return tariRep.findAll();
+	}
+	
+	@Transactional
+	public Iterable<Tarifa> findByOriginal(){
+		 return tariRep.findByOriginal();
+	}
+	
+	@Transactional
+	public void saveTarifa(Tarifa tarifa) throws DataAccessException {
+		tarifa.setOriginal(true);
+		tariRep.save(tarifa);
 	}
 	
 	@Transactional(readOnly = true)

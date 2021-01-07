@@ -12,7 +12,13 @@
             <petclinic:inputField label="Precio por kilómetro" name="precioPorKm"/>
             <petclinic:inputField label="Porcentaje IVA Repercutido" name="porcentajeIvaRepercutido"/>
             <petclinic:inputField label="Precio de espera por hora" name="precioEsperaPorHora"/>
-            <petclinic:inputField label="Activado" name="activado"/>
+            <p>Activado:<br>
+
+    <input type="radio" name="activado" value="true"> True<br>
+
+    <input type="radio" name="activado" value="false" checked> False
+
+  </p>
 	 
 
              <input type="hidden" name="id" id="id" value="${tarifa.id}"/>

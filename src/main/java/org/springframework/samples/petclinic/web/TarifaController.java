@@ -30,7 +30,7 @@ public class TarifaController {
 		@GetMapping("/listado")
 		public String listadoTarifas(ModelMap modelMap) {
 			String vista="tarifas/listadoTarifas";
-			Iterable<Tarifa> tarifas= tariService.findAll();
+			Iterable<Tarifa> tarifas= tariService.findByOriginal();
 			modelMap.addAttribute("tarifas", tarifas);
 			return vista;
 		}
@@ -90,6 +90,7 @@ public class TarifaController {
 				return "tarifas/updateTarifaForm";
 			}else {
 				tariService.save(tarifa);
+				tariService.saveTarifa(tarifa);
 				modelMap.addAttribute("message","Tarifa creada correctamente");
 				return listadoTarifas(modelMap);
 			}
