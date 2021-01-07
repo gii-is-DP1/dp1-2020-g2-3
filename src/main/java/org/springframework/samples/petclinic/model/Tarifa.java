@@ -27,6 +27,9 @@ public class Tarifa extends NamedEntity{
 	@Column(name = "activado")
 	private Boolean activado;
 	
+	@Column(name = "original")
+	private Boolean original;
+	
 	public Double getPrecioPorKm() {
 		return precioPorKm;
 	}
@@ -57,6 +60,14 @@ public class Tarifa extends NamedEntity{
 
 	public void setActivado(Boolean activado) {
 		this.activado = activado;
+	}
+	
+	public Boolean getOriginal() {
+		return original;
+	}
+
+	public void setOriginal(Boolean original) {
+		this.original = original;
 	}
 	
 	
