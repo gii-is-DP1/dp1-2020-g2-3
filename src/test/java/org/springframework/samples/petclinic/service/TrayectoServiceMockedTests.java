@@ -317,6 +317,7 @@ class TrayectoServiceMockedTests {
 		Ruta rutaConTrayectosCalculados=trayectoService.calcularYAsignarTrayectos(rutaFormulario);
 
     	//ASSERT
+		
     	assertEquals(rutaConTrayectosCalculados.getNumKmTotales(),numKmTotalAproximado);
     	assertEquals(rutaConTrayectosCalculados.getHorasEstimadasCliente(),horasEstimadasCliente);
       
