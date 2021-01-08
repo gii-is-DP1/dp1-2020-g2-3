@@ -26,6 +26,7 @@ import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.util.EntityUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import aj.org.objectweb.asm.ClassTooLargeException;
 
@@ -44,18 +45,9 @@ class TrayectoServiceMockedTests {
 
     }
 
-    /*
-    static Stream<Ruta> diferentesRutasSinParadas1() {
-    	
-    	Ruta ruta1=nuevaRutaFormulario("Badajoz","Jerez de los Caballeros",new ArrayList<String>());
-    	Ruta ruta2=nuevaRutaFormulario("Jerez de los Caballeros","Oliva de la Frontera",new ArrayList<String>());
-    	Ruta ruta3=nuevaRutaFormulario("Oliva de la Frontera","Badajoz",new ArrayList<String>());
-    
-        return Stream.of(ruta1,ruta2,ruta3);
-    }
-    */
   
     @Test
+    @Transactional
     @DisplayName("calcular y asignar los diferentes trayectos de una ruta sin paradas intermedias cuyo origen y destino ES DIFERENTE a Zahinos")
     void calcularTrayectosRutaSinParadasTest1() throws DuplicatedParadaException {
    
@@ -70,20 +62,20 @@ class TrayectoServiceMockedTests {
     		Ruta rutaConTrayectosCalculados=trayectoService.calcularYAsignarTrayectos(rutaFormulario);
     	/*	Trayectos que se tienen que crear:
     	 
-    		Zahínos --> Origen ;;;;  Origen ---> Destino ;;;;  Destino --> >Zahínos */
+    		Zahinos --> Badajoz ;;;;  Badajoz ---> Jerez de los Caballeros ;;;;  Jerez de los Caballeros --> >Zahinos */
     	
     		
     		//ASSERT
-    		assertEquals("hl","hl");
+    
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().size(),3);
         	
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getOrigen(),"Zahinos");
-    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getDestino(),rutaFormulario.getOrigenCliente());
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getDestino(),"Badajoz");
         	
-    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getOrigen(),rutaFormulario.getOrigenCliente());
-    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getDestino(),rutaFormulario.getDestinoCliente());
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getOrigen(),"Badajoz");
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getDestino(),"Jerez de los Caballeros");
         	
-    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(2).getOrigen(),rutaFormulario.getDestinoCliente());
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(2).getOrigen(),"Jerez de los Caballeros");
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(2).getDestino(),"Zahinos");
 
     
@@ -91,6 +83,7 @@ class TrayectoServiceMockedTests {
     }
     
     @Test
+    @Transactional
     @DisplayName("calcular y asignar los diferentes trayectos de una ruta sin paradas intermedias CUYO ORIGEN ES ZAHINOS")
     void calcularTrayectosRutaSinParadasTest2() throws DuplicatedParadaException{
     			
@@ -108,22 +101,23 @@ class TrayectoServiceMockedTests {
     		
     	/*	Trayectos que se tienen que crear:
     	 
-    		Origen --> Destino ;;;;  Destino ---> Zahinos  */
+    		Zahinos --> Jerez de los Caballeros ;;;;  Jerez de los Caballeros ---> Zahinos  */
     	
     		
     		//ASSERT
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().size(),2);
         	
-    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getOrigen(),rutaFormulario.getOrigenCliente());
-    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getDestino(),rutaFormulario.getDestinoCliente());
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getOrigen(),"Zahinos");
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getDestino(),"Jerez de los Caballeros");
         	
-    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getOrigen(),rutaFormulario.getDestinoCliente());
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getOrigen(),"Jerez de los Caballeros");
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getDestino(),"Zahinos");
 
     	
     }
     
     @Test
+    @Transactional
     @DisplayName("calcular y asignar los diferentes trayectos de una ruta sin paradas intermedias CUYO DESTINO ES ZAHINOS")
     void calcularTrayectosRutaSinParadasTest3() throws DuplicatedParadaException {
     			
@@ -131,7 +125,8 @@ class TrayectoServiceMockedTests {
     		//ARRANGE
     		when(trayectoService.findByOrigenAndDestino("Zahinos", "Jerez de los Caballeros")).thenReturn(Trayecto.nuevoTrayecto("Zahinos","Jerez de los Caballeros",19.1,0.28));
     		when(trayectoService.findByOrigenAndDestino("Jerez de los Caballeros", "Zahinos")).thenReturn(Trayecto.nuevoTrayecto("Jerez de los Caballeros","Zahinos",19.1,0.27));
-        	Ruta rutaFormulario=nuevaRutaFormulario("Jerez de los Caballeros","Zahinos",new ArrayList<String>());
+        	
+    		Ruta rutaFormulario=nuevaRutaFormulario("Jerez de los Caballeros","Zahinos",new ArrayList<String>());
         	
 
         	//ACT
@@ -139,22 +134,23 @@ class TrayectoServiceMockedTests {
     		
     	/*	Trayectos que se tienen que crear:
     	 
-    		Zahinos --> Origen ;;;;  Origen ---> Destino  */
+    		Zahinos --> Jerez de los Caballeros ;;;;  Jerez de los Caballeros ---> Zahinos  */
     	
     		
     		//ASSERT
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().size(),2);
         	
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getOrigen(),"Zahinos");
-    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getDestino(),rutaFormulario.getOrigenCliente());
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getDestino(),"Jerez de los Caballeros");
         	
-    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getOrigen(),rutaFormulario.getOrigenCliente());
-    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getDestino(),rutaFormulario.getDestinoCliente());
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getOrigen(),"Jerez de los Caballeros");
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getDestino(),"Zahinos");
 
     	
     }
     
     @Test
+    @Transactional
     @DisplayName("calcular los kilómetros totales de una ruta, incluyendo el número de horas QUE ESTÁ EL CLIENTE EN EL AUTOMÓVIL (no en toda la ruta...)")
     void calcularKmYHoras() throws DuplicatedParadaException {
     		
@@ -179,6 +175,8 @@ class TrayectoServiceMockedTests {
     }
     
     @Test
+    @Transactional
+    @DisplayName("Origen y destino del viaje iguales")
     public void origenIgualDestinoTest() {
     	//ARRANGE
     	Ruta rutaFormulario=nuevaRutaFormulario("Badajoz","Badajoz",new ArrayList<String>());
@@ -186,6 +184,144 @@ class TrayectoServiceMockedTests {
        	assertThrows(DuplicatedParadaException.class,()->trayectoService.calcularYAsignarTrayectos(rutaFormulario));
 
     }
+    
+    
+    @Test
+    @Transactional
+    @DisplayName("Origen del cliente igual a la primera parada intermedia")
+    public void OrigenIgualPrimeraParadaTest() {
+    	//ARRANGE
+
+    	List<String> paradasIntermedias= new ArrayList<String>();
+    	paradasIntermedias.add("Zahinos");
+    	
+    	Ruta rutaFormulario=nuevaRutaFormulario("Zahinos","Jerez de los Caballeros",paradasIntermedias);
+    	// ACT & ASSERT
+       	assertThrows(DuplicatedParadaException.class,()->trayectoService.calcularYAsignarTrayectos(rutaFormulario));
+
+    }
+    
+    @Test
+    @Transactional
+    @DisplayName("Ultima parada intermedia igual al destino del cliente")
+    public void UltimaParadaIgualDestinoTest() {
+    	//ARRANGE
+    	
+		
+    	when(trayectoService.findByOrigenAndDestino("Zahinos", "Jerez de los Caballeros")).thenReturn(Trayecto.nuevoTrayecto("Zahinos","Jerez de los Caballeros",19.1,0.28));
+    	
+		List<String> paradasIntermedias= new ArrayList<String>();
+    	paradasIntermedias.add("Jerez de los Caballeros");
+    	
+    	Ruta rutaFormulario=nuevaRutaFormulario("Zahinos","Jerez de los Caballeros",paradasIntermedias);
+    	
+    	// ACT & ASSERT
+       	assertThrows(DuplicatedParadaException.class,()->trayectoService.calcularYAsignarTrayectos(rutaFormulario));
+
+    }
+    
+    @Test
+    @Transactional
+    @DisplayName("Dos paradas intermedias consecutivas iguales")
+    public void ParadasIntermediasCosecutivasIgualesTest() {
+    	//ARRANGE
+		when(trayectoService.findByOrigenAndDestino("Jerez de los Caballeros", "Zahinos")).thenReturn(Trayecto.nuevoTrayecto("Jerez de los Caballeros","Zahinos",19.1,0.27));
+
+    	List<String> paradasIntermedias= new ArrayList<String>();
+    	paradasIntermedias.add("Zahinos");
+    	paradasIntermedias.add("Zahinos");
+    	Ruta rutaFormulario=nuevaRutaFormulario("Jerez de los Caballeros","Badajoz",paradasIntermedias);
+    	// ACT & ASSERT
+       	assertThrows(DuplicatedParadaException.class,()->trayectoService.calcularYAsignarTrayectos(rutaFormulario));
+
+    }
+    
+    
+    @Test
+    @Transactional
+    @DisplayName("Calcular y asignar diferentes trayectos de una ruta con paradas intermedias")
+    void calcularTrayectosIntermediosTest() throws DuplicatedParadaException {
+   
+    		//ARRANGE
+    		when(trayectoService.findByOrigenAndDestino("Zahinos", "Badajoz")).thenReturn(Trayecto.nuevoTrayecto("Zahinos","Badajoz",72.3,1.15));
+    		when(trayectoService.findByOrigenAndDestino("Badajoz", "Jerez de los Caballeros")).thenReturn(Trayecto.nuevoTrayecto("Badajoz","Jerez de los Caballeros",73.7,1.03));
+    		when(trayectoService.findByOrigenAndDestino("Jerez de los Caballeros", "Zahinos")).thenReturn(Trayecto.nuevoTrayecto("Jerez de los Caballeros","Zahinos",19.1,0.27));
+        	when(trayectoService.findByOrigenAndDestino("Zahinos", "Jerez de los Caballeros")).thenReturn(Trayecto.nuevoTrayecto("Zahinos","Jerez de los Caballeros",19.1,0.28));
+
+    		
+    		List<String> paradasIntermedias= new ArrayList<String>();
+        	paradasIntermedias.add("Jerez de los Caballeros");
+        	paradasIntermedias.add("Zahinos");
+    		
+        	Ruta rutaFormulario=nuevaRutaFormulario("Badajoz","Jerez de los Caballeros",paradasIntermedias);
+        	
+        	//ACT
+    		Ruta rutaConTrayectosCalculados=trayectoService.calcularYAsignarTrayectos(rutaFormulario);
+    	/*	Trayectos que se tienen que crear:
+    		Zahinos --> Badajoz ;;;;  Badajoz ---> Jerez de los Caballeros ;;;;  Jerez de los Caballeros --> Zahinos ;;;;; Zahinos --> Jerez de los Caballeros ;;;;;; Jerez de los Caballeros ----> Zahinos */
+    		
+    	
+    		//ASSERT
+    	
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().size(),5);
+        	
+    		//Zahínos---> Badajoz
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getOrigen(),"Zahinos");
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getDestino(),"Badajoz");
+        	
+    		//Badajoz ---> Jerez de los Caballeros
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getOrigen(),"Badajoz");
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getDestino(),"Jerez de los Caballeros");
+        	
+    		//Jerez de los Caballeros ---> Zahinos
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(2).getOrigen(),"Jerez de los Caballeros");
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(2).getDestino(),"Zahinos");
+    		
+    		//Zahinos ---> Jerez de los Caballeros
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(3).getOrigen(),"Zahinos");
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(3).getDestino(),"Jerez de los Caballeros");
+    		
+    		//Jerez de los Caballeros ---> Zahinos
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(4).getOrigen(),"Jerez de los Caballeros");
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(4).getDestino(),"Zahinos");
+    
+    	
+    }
+    
+    @Test
+    @Transactional
+    @DisplayName("calcular los kilómetros totales de una ruta CON TRAYECTOS INTERMEDIOS, incluyendo el número de horas QUE ESTÁ EL CLIENTE EN EL AUTOMÓVIL (no en toda la ruta)")
+    void calcularKmYHorasTrayectosIntermediosTest() throws DuplicatedParadaException {
+    		
+    		
+    	//ARRANGE
+		when(trayectoService.findByOrigenAndDestino("Zahinos", "Badajoz")).thenReturn(Trayecto.nuevoTrayecto("Zahinos","Badajoz",72.3,1.15));
+		when(trayectoService.findByOrigenAndDestino("Badajoz", "Jerez de los Caballeros")).thenReturn(Trayecto.nuevoTrayecto("Badajoz","Jerez de los Caballeros",73.7,1.03));
+		when(trayectoService.findByOrigenAndDestino("Jerez de los Caballeros", "Zahinos")).thenReturn(Trayecto.nuevoTrayecto("Jerez de los Caballeros","Zahinos",19.1,0.27));
+    	when(trayectoService.findByOrigenAndDestino("Zahinos", "Jerez de los Caballeros")).thenReturn(Trayecto.nuevoTrayecto("Zahinos","Jerez de los Caballeros",19.1,0.28));
+    	
+		List<String> paradasIntermedias= new ArrayList<String>();
+    	paradasIntermedias.add("Jerez de los Caballeros");
+    	paradasIntermedias.add("Zahinos");
+ 
+    	Ruta rutaFormulario=nuevaRutaFormulario("Badajoz","Jerez de los Caballeros",paradasIntermedias);
+    	/*	Trayectos que se tienen que crear:
+		Zahinos --> Badajoz ;;;;  Badajoz ---> Jerez de los Caballeros ;;;;  Jerez de los Caballeros --> Zahinos ;;;;; Zahinos --> Jerez de los Caballeros ;;;;;; Jerez de los Caballeros ----> Zahinos */
+		
+    	double numKmTotal= 72.3+73.7+19.1+19.1+19.1;
+		Double numKmTotalAproximado=0.0 + Math.round(numKmTotal*100)/100;
+		Double horasEstimadasCliente=1.03+0.27+0.28; 
+    	
+    	
+    	//ACT
+		Ruta rutaConTrayectosCalculados=trayectoService.calcularYAsignarTrayectos(rutaFormulario);
+
+    	//ASSERT
+    	assertEquals(rutaConTrayectosCalculados.getNumKmTotales(),numKmTotalAproximado);
+    	assertEquals(rutaConTrayectosCalculados.getHorasEstimadasCliente(),horasEstimadasCliente);
+      
+    }
+    
     
     
     
@@ -218,9 +354,20 @@ class TrayectoServiceMockedTests {
         		trayectosRuta.add(trayecto);
         	}
     	}
+    	
     	nuevaRuta.setTrayectos(trayectosRuta);
     	return nuevaRuta;
     }
+   
+    /*
+    static Stream<Ruta> diferentesRutasSinParadas1() {
+    	
+    	Ruta ruta1=nuevaRutaFormulario("Badajoz","Jerez de los Caballeros",new ArrayList<String>());
+    	Ruta ruta2=nuevaRutaFormulario("Jerez de los Caballeros","Oliva de la Frontera",new ArrayList<String>());
+    	Ruta ruta3=nuevaRutaFormulario("Oliva de la Frontera","Badajoz",new ArrayList<String>());
     
+        return Stream.of(ruta1,ruta2,ruta3);
+    }
+    */
 
 }
