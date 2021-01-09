@@ -56,14 +56,18 @@ public class ReservaService {
 		fechaSalida.setMinutes(horaSalida.getMinutes());
 		
 		if(minutosSumar!=0) {
-			 Calendar calendar = Calendar.getInstance();
-		      calendar.setTime(fechaSalida); 
-		      calendar.add(Calendar.MINUTE, minutosSumar); 
-		      fechaSalida= calendar.getTime(); 
-		     
+			fechaSalida= this.addFecha(fechaSalida, Calendar.MINUTE, minutosSumar);
 		}
 		return fechaSalida;
 	}
+	
+	@Transactional
+	public Date addFecha(Date fechaBase, int tipoFecha, int cantidadSumar ) {
+		   Calendar calendar = Calendar.getInstance();
+		      calendar.setTime(fechaBase); 
+		      calendar.add(tipoFecha, cantidadSumar);
+		      return calendar.getTime();
+	   }
 	
 	@Transactional
 	public void fechaSalidaAnteriorActual(Date fechaSalida, Date horaSalida) throws FechaSalidaAnteriorActualException  {
@@ -96,7 +100,7 @@ public class ReservaService {
 		
 		//Si confirmarReserva= false solo se calcularán los campos estrictamente necesarios para mostrar la reserva en el precioReserva.jsp
 		
-		fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha 
+		fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha
 		Reserva reservaCalculada= new Reserva();
 		reservaCalculada.setDescripcionEquipaje(reserva.getDescripcionEquipaje());
 		reservaCalculada.setFechaSalida(reserva.getFechaSalida());

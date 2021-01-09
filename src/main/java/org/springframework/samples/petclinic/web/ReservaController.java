@@ -71,13 +71,10 @@ public class ReservaController {
 		Reserva nuevaReserva= new Reserva();
 		Date today= new Date();
 		nuevaReserva.setFechaSalida(today);
-		//Mostramos una fecha de salida predeterminada del día de hoy, con 5 minutos más a los actuales en la hora de salida
-		// ya que no se pueden realizar reservas con una fecha anterior al instante actuall
-		 Calendar calendar = Calendar.getInstance();
-	      calendar.setTime(today); 
-	      calendar.add(Calendar.MINUTE, 5); 
-	      today= calendar.getTime(); 
-	      /////////////
+		//Mostramos una fecha de salida predeterminada del día de hoy, con 45 minutos más a los actuales en la hora de salida
+		// ya que no se pueden realizar reservas con una antelación menor a 40 minutos de la fecha de salida
+		
+		today=reservaService.addFecha(today, Calendar.MINUTE, 45);
 		nuevaReserva.setHoraSalida(today);
 		modelMap.addAttribute("reserva",nuevaReserva);
 		Iterable<String> paradas= trayectoService.findDistinctParadas();
@@ -256,7 +253,7 @@ public class ReservaController {
 			modelMap.addAttribute("message", "Reserva anulada correctamente");
 		}else {
 			
-			modelMap.addAttribute("message", "Reserva no encontrado");
+			modelMap.addAttribute("message", "Reserva no encontrada");
 		}
 		return listadoReservas(modelMap);
 	}
