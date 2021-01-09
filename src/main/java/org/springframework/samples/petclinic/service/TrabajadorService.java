@@ -34,5 +34,10 @@ public class TrabajadorService {
 		return trabRepo.findById(id);
 	}
 	
+	@Transactional()
+	public void save(Trabajador trabajador)  {
+		
+		trabRepo.save(trabajador);
+	}
 }
 

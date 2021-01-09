@@ -27,7 +27,16 @@ public class TrayectoService {
 	public TrayectoService(TrayectoRepository trayectoRepo) {
 		this.trayectoRepo=trayectoRepo;
 	}
+	/*la ruta que se le pasa como parámetro viene desde un formulario con la siguiente estructura:
 	
+	Tendrá como List<Trayecto> solo los trayectos intermedios,
+    sin tener en cuenta origen-->parada1, tampoco tiene en cuenta que si origen!=Zahinos
+    el primer trayecto debería ser Zahinos --> origen
+    
+    Además, cada trayecto intermedio será trayecto1= {origen=parada1, destino=null}
+    
+    El siguiente método calcula y encadena todos los trayectos necesarios a esa ruta
+    */
 	@Transactional
 	public Ruta calcularYAsignarTrayectos(Ruta rutaFormulario) throws DataAccessException,DuplicatedParadaException {
 			
@@ -40,11 +49,13 @@ public class TrayectoService {
 			List<Trayecto> nuevaListaTrayectos= new ArrayList<Trayecto>();
 			Double numKmTotal=0.0;
 			Double horasEstimadasCliente=0.0;
-			if(rutaFormulario.getTrayectos()==null) { //No hay paradas intermedias
-			
+			if(rutaFormulario.getTrayectos()==null || rutaFormulario.getTrayectos().size()==0) { //No hay paradas intermedias
+			System.out.println("No hay paradas intermedias");
 					
 					Trayecto trayecto= trayectoRepo.findByOrigenAndDestino(rutaFormulario.getOrigenCliente(), 
 							rutaFormulario.getDestinoCliente());
+					
+					
 					nuevaListaTrayectos.add(trayecto);
 					numKmTotal+=trayecto.getNumKmTotales();
 					horasEstimadasCliente+=trayecto.getHorasEstimadas();
@@ -122,6 +133,10 @@ public class TrayectoService {
 			
 		}
 	
+	}
+	@Transactional 
+	public Trayecto findByOrigenAndDestino(String origen,String destino) {
+		return trayectoRepo.findByOrigenAndDestino(origen, destino);
 	}
 	
 	@Transactional
