@@ -50,7 +50,7 @@ public class TrayectoService {
 			Double numKmTotal=0.0;
 			Double horasEstimadasCliente=0.0;
 			if(rutaFormulario.getTrayectos()==null || rutaFormulario.getTrayectos().size()==0) { //No hay paradas intermedias
-			System.out.println("No hay paradas intermedias");
+
 					
 					Trayecto trayecto= trayectoRepo.findByOrigenAndDestino(rutaFormulario.getOrigenCliente(), 
 							rutaFormulario.getDestinoCliente());
@@ -66,6 +66,7 @@ public class TrayectoService {
 				List<Trayecto> listaTrayectos= rutaFormulario.getTrayectos();
 				
 				if(rutaFormulario.getOrigenCliente().equals(listaTrayectos.get(0).getOrigen())) {
+					System.out.println("origen igual a la primera parada intermedia");
 					throw new DuplicatedParadaException();
 				}else {
 					Trayecto trayectoInicial= trayectoRepo.findByOrigenAndDestino(rutaFormulario.getOrigenCliente(), 
@@ -79,6 +80,7 @@ public class TrayectoService {
 					int listaSize= listaTrayectos.size();
 					while(i<listaSize-1) {
 						if(listaTrayectos.get(i).getOrigen().equals(listaTrayectos.get(i+1).getOrigen())) {
+							System.out.println("Parada intermedia i igual que la parada intermedia i+1");
 							throw new DuplicatedParadaException();
 						}else {
 							Trayecto trayectoIntermedio= trayectoRepo.findByOrigenAndDestino(listaTrayectos.get(i).getOrigen(),
@@ -91,7 +93,7 @@ public class TrayectoService {
 						
 					}
 					if(listaTrayectos.get(listaSize-1).getOrigen().equals(rutaFormulario.getDestinoCliente())) {
-						
+						System.out.println("última parada intermedia igual al destino de la ruta");
 						throw new DuplicatedParadaException();
 					}else {
 						Trayecto trayectoFinal=trayectoRepo.findByOrigenAndDestino(listaTrayectos.get(listaSize-1).getOrigen(), 

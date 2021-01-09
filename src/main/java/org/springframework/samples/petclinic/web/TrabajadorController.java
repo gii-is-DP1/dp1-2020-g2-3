@@ -5,10 +5,7 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.petclinic.model.Automovil;
-import org.springframework.samples.petclinic.model.Contrato;
 import org.springframework.samples.petclinic.model.Trabajador;
-import org.springframework.samples.petclinic.service.ContratoService;
 import org.springframework.samples.petclinic.service.TrabajadorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -24,12 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class TrabajadorController {
 	
 	private final TrabajadorService trabajadorService;
-	private final ContratoService contratoService;
+	
 	
 	@Autowired
-	public TrabajadorController(TrabajadorService trabajadorService, ContratoService contratoService) {
+	public TrabajadorController(TrabajadorService trabajadorService) {
 		this.trabajadorService = trabajadorService;
-		this.contratoService = contratoService;
 	}
 	
 	
@@ -57,8 +53,5 @@ public class TrabajadorController {
 			modelMap.addAttribute("message","Trabajador creado correctamente");
 			return listadoTrabajadores(modelMap);
 		}
-	}
-	
-	
-
+}
 }

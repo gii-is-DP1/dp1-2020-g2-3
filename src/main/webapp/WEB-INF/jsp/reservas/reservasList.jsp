@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page session="false" trimDirectiveWhitespaces="true" %>
@@ -7,7 +8,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
-<petclinic:layout pageName="reservas">
+<petclinic:layout pageName="Reserva">
     <h2>Reservas</h2>
 
     <table id="reservasTable" class="table table-striped">
@@ -59,7 +60,18 @@
                     <c:out value="${reserva.estadoReserva}"/>
                 </td>
             </tr>
+            <td>
+                <spring:url value="/reservas/delete/{reservaId}" var="reservaDeleteUrl">
+                <spring:param name="reservaId" value="${reserva.id}"/>
+                </spring:url>
+				<a class="deleteReserva" href="${fn:escapeXml(servicioDeleteUrl)}"> <img alt="" id="delete" src="/resources/images/delete.png" style="width: 45px"></a>
+          
+            
         </c:forEach>
         </tbody>
     </table>
+    
+    <p>
+    	<a href="/reservas/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Añadir Reserva</a>
+    </p>
 </petclinic:layout>

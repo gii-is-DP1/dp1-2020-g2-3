@@ -41,7 +41,8 @@
         </tbody>
     </table>
     
-    <p>
+    
+<p>
     	<a href="/trabajadores/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Añadir Trabajador</a>
     </p>
 </petclinic:layout>

@@ -16,6 +16,7 @@ import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Cliente;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
+import org.springframework.samples.petclinic.model.Servicio;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
@@ -55,18 +56,25 @@ public class ReservaController {
 		this.authoService=authoService;
 	}
 	
+	@GetMapping(value = "/reservasList")
+	public String listadoReservas(ModelMap modelMap) {
+		String vista="reservas/reservasList";
+		Iterable<Reserva> reservas= reservaService.findAll();
+		modelMap.addAttribute("reserva", reservas);
+		return vista;
+	}
+	
+		
+	
 	@GetMapping("/new")
 	public String newReserva(ModelMap modelMap) {
 		Reserva nuevaReserva= new Reserva();
 		Date today= new Date();
 		nuevaReserva.setFechaSalida(today);
-		//Mostramos una fecha de salida predeterminada del día de hoy, con 5 minutos más a los actuales en la hora de salida
-		// ya que no se pueden realizar reservas con una fecha anterior al instante actuall
-		 Calendar calendar = Calendar.getInstance();
-	      calendar.setTime(today); 
-	      calendar.add(Calendar.MINUTE, 5); 
-	      today= calendar.getTime(); 
-	      /////////////
+		//Mostramos una fecha de salida predeterminada del día de hoy, con 45 minutos más a los actuales en la hora de salida
+		// ya que no se pueden realizar reservas con una antelación menor a 40 minutos de la fecha de salida
+		
+		today=reservaService.addFecha(today, Calendar.MINUTE, 45);
 		nuevaReserva.setHoraSalida(today);
 		modelMap.addAttribute("reserva",nuevaReserva);
 		Iterable<String> paradas= trayectoService.findDistinctParadas();
@@ -157,7 +165,7 @@ public class ReservaController {
 		
 		
 			try {
-				Reserva reservaCalculada= reservaService.calcularReserva(reserva, false); //Reserva con precio,horaEstimada de llegada, km totales...
+				Reserva reservaCalculada= reservaService.calcularNuevaReserva(reserva, false); //Reserva con precio,horaEstimada de llegada, km totales...
 				if(!reservaCalculada.getRuta().getOrigenCliente().equals("Zahinos")) {
 					modelMap.put("trayectoIdaTaxista", reservaCalculada.getRuta().getTrayectos().get(0));
 				}
@@ -236,5 +244,17 @@ public class ReservaController {
 
 		}
 	}
+	
+	@GetMapping(value="/delete/{reservaId}")
+	public String borrarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+		Optional<Reserva> reserva=reservaService.findReservaById(reservaId);
+		if (reserva.isPresent()) {
+			reservaService.delete(reserva.get()); 
+			modelMap.addAttribute("message", "Reserva anulada correctamente");
+		}else {
+			
+			modelMap.addAttribute("message", "Reserva no encontrada");
+		}
+		return listadoReservas(modelMap);
+	}
 }
-

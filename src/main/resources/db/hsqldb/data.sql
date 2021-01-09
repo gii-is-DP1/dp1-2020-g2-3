@@ -55,7 +55,6 @@ INSERT INTO Trabajador(id,dni,nombre,apellidos,email,telefono,tipo_trabajador_id
 INSERT INTO Trabajador(id,dni,nombre,apellidos,email,telefono,tipo_trabajador_id,username) VALUES (7,'80220030G','Eduardo','García Suarez','eduardo@gmail.com',655587419,2,'eduardo1');
 INSERT INTO Trabajador(id,dni,nombre,apellidos,email,telefono,tipo_trabajador_id,username) VALUES (8,'90115864J','Maria','Rodríguez','maria@gmail.com',635871121,2,'maria1');
 
-
 INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos) VALUES (1,'Toyota','Verso',5, 2000);
 INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos) VALUES (2,'Seat','Alhambra',7, 40000);
 INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos) VALUES (3,'Ford','Fiesta',5, 20000);
@@ -98,6 +97,4 @@ INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(12,
 INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id)VALUES(1,1);
 INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id)VALUES(1,2);
 
-
-
-INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,precio_Distancia,precio_Espera,precio_IVA_Repercutivo,base_Imponible)VALUES(1,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1,59.29,59.29,0,5.92,53.36);
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total)VALUES(1,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1,59.29);
