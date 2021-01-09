@@ -105,26 +105,6 @@ public class Reserva extends BaseEntity {
 	@Column(name = "num_Km_Totales")
 	private  Double numKmTotales;
 	
-	@Min(0)
-	@Digits(fraction=2,integer=5)
-	@Column(name = "precio_Distancia")
-	private  Double precioDistancia;
-	
-	
-	@Min(0)
-	@Digits(fraction=2,integer=5)
-	@Column(name = "precio_Espera")
-	private  Double precioEspera;
-	
-	@Min(0)
-	@Digits(fraction=2,integer=5)
-	@Column(name = "precio_IVA_Repercutivo")
-	private  Double precioIVA;
-	
-	@Min(0)
-	@Digits(fraction=2,integer=5)
-	@Column(name = "base_Imponible")
-	private  Double baseImponible;
 	
 	
 }

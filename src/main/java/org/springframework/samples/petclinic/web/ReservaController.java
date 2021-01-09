@@ -168,7 +168,7 @@ public class ReservaController {
 		
 		
 			try {
-				Reserva reservaCalculada= reservaService.calcularReserva(reserva, false); //Reserva con precio,horaEstimada de llegada, km totales...
+				Reserva reservaCalculada= reservaService.calcularNuevaReserva(reserva, false); //Reserva con precio,horaEstimada de llegada, km totales...
 				if(!reservaCalculada.getRuta().getOrigenCliente().equals("Zahinos")) {
 					modelMap.put("trayectoIdaTaxista", reservaCalculada.getRuta().getTrayectos().get(0));
 				}
