@@ -41,7 +41,7 @@ public class ReservaService {
 	}
 	
 	@Transactional
-	public Double calcularPrecio(Double kmTotal, Double precioPorKm) {
+	public Double calcularPrecioDistancia(Double kmTotal, Double precioPorKm) {
 		//precioPorKm realmente habría que buscarlo de la tarifa que se encuentre activa en este momento.
 		
 		Double precioTotal=kmTotal*precioPorKm;	
@@ -91,8 +91,8 @@ public class ReservaService {
 		return reservaRepo.findById(id);
 	}
 	
-	@Transactional //Este método calculará el precio, la fecha/hora estimada de llegada, los km totales,ruta... de la reserva.
-	public Reserva calcularReserva(Reserva reserva,boolean confirmarReserva) throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException {
+	@Transactional //Este método calculará el precio, la fecha/hora estimada de llegada, los km totales,ruta... de la reserva después del primer formulario de su creación
+	public Reserva calcularNuevaReserva(Reserva reserva,boolean confirmarReserva) throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException {
 		
 		//Si confirmarReserva= false solo se calcularán los campos estrictamente necesarios para mostrar la reserva en el precioReserva.jsp
 		
@@ -109,7 +109,7 @@ public class ReservaService {
 		reservaCalculada.setFechaLlegada(fechaHoraLlegada);
 		reservaCalculada.setHoraLlegada(fechaHoraLlegada);
 		Double precioPorKm=0.41; //Esto habría que cambiarlo cuadno estén implementadas las tarifas
-		Double precioTotal=calcularPrecio(nuevaRuta.getNumKmTotales(), precioPorKm);
+		Double precioTotal=calcularPrecioDistancia(nuevaRuta.getNumKmTotales(), precioPorKm);
 		reservaCalculada.setPrecioTotal(precioTotal);
 		if(confirmarReserva ) { //Solo cuando se confirma la reserva se añadirán los siguientes campos
 			
@@ -133,19 +133,15 @@ public class ReservaService {
 			}
 			reservaCalculada.setHorasEspera(0.0);
 			reservaCalculada.setEstadoReserva(estadoService.findEstadoById(1).get());
-			reservaCalculada.setPrecioDistancia(precioTotal); //Cuando se crea el viaje las horas de espera son 0 y el precio total es el de los km recorridos
-			reservaCalculada.setPrecioEspera(0.0);
 			Double precioIvaRedondeado= (double)Math.round((0.1*precioTotal)*100)/100; //Esto se cambiará cuando estén implementadas las tarifas
-			reservaCalculada.setPrecioIVA(precioIvaRedondeado);
 			Double baseImponibleRedondeada= (double)Math.round((0.9*precioTotal)*100)/100;
-			reservaCalculada.setBaseImponible(baseImponibleRedondeada); //Esto se cambiará cunado estén implementadas las tarifas
 		}
 		return reservaCalculada;
 		
 	}
 	@Transactional 
 	public void calcularYConfirmarReserva(Reserva reserva,String username)throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException{
-		Reserva reservaCalculada= calcularReserva(reserva,true);
+		Reserva reservaCalculada= calcularNuevaReserva(reserva,true);
 		Cliente cliente= clienteService.findClienteByUsername(username);
 		reservaCalculada.setCliente(cliente);
 		save(reservaCalculada);
