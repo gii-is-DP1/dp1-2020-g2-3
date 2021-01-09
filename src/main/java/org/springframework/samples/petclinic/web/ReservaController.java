@@ -16,6 +16,7 @@ import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Cliente;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
+import org.springframework.samples.petclinic.model.Servicio;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
@@ -54,6 +55,16 @@ public class ReservaController {
 		this.rutaService=rutaService;
 		this.authoService=authoService;
 	}
+	
+	@GetMapping(value = "/reservasList")
+	public String listadoReservas(ModelMap modelMap) {
+		String vista="reservas/reservasList";
+		Iterable<Reserva> reservas= reservaService.findAll();
+		modelMap.addAttribute("reserva", reservas);
+		return vista;
+	}
+	
+		
 	
 	@GetMapping("/new")
 	public String newReserva(ModelMap modelMap) {
@@ -157,7 +168,7 @@ public class ReservaController {
 		
 		
 			try {
-				Reserva reservaCalculada= reservaService.calcularReserva(reserva, false); //Reserva con precio,horaEstimada de llegada, km totales...
+				Reserva reservaCalculada= reservaService.calcularNuevaReserva(reserva, false); //Reserva con precio,horaEstimada de llegada, km totales...
 				if(!reservaCalculada.getRuta().getOrigenCliente().equals("Zahinos")) {
 					modelMap.put("trayectoIdaTaxista", reservaCalculada.getRuta().getTrayectos().get(0));
 				}
@@ -235,5 +246,18 @@ public class ReservaController {
 			return "reservas/newReservaForm";	
 
 		}
+	}
+	
+	@GetMapping(value="/delete/{reservaId}")
+	public String borrarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+		Optional<Reserva> reserva=reservaService.findReservaById(reservaId);
+		if (reserva.isPresent()) {
+			reservaService.delete(reserva.get()); 
+			modelMap.addAttribute("message", "Reserva anulada correctamente");
+		}else {
+			
+			modelMap.addAttribute("message", "Reserva no encontrado");
+		}
+		return listadoReservas(modelMap);
 	}
 }
