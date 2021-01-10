@@ -38,7 +38,7 @@ public class RutaService {
 	public Optional<Ruta> findRutaByRuta(Ruta ruta){//Nos intentará devolver una ruta existente en la BD igual que la dada como parámetro 
 													// comparando también sus TRAYECTOS asociados (Relación ManyToMany)
 		List<Trayecto> trayectosRutaParametro= ruta.getTrayectos();
-		Collection<Ruta> rutasPosibles=findRutasByAttributes(ruta.getOrigenCliente(),ruta.getDestinoCliente(),ruta.getNumKmTotales(),ruta.getHorasEstimadasCliente());
+		Collection<Ruta> rutasPosibles=findRutasByAttributes(ruta.getOrigenCliente(),ruta.getDestinoCliente(),ruta.getNumKmTotales(),ruta.getHorasEstimadasCliente(),ruta.getHorasEstimadasTaxista());
 		Optional<Ruta> resultado= Optional.ofNullable(null);
 		
 	if(rutasPosibles.size()!=0 && rutasPosibles!=null) {
@@ -103,9 +103,9 @@ public class RutaService {
 	
 	@Transactional()
 	public Collection<Ruta> findRutasByAttributes(String origenCliente, String destinoCliente,
-			Double numKmTotales, Double horasEstimadasCliente)  {
+			Double numKmTotales, Double horasEstimadasCliente, Double horasEstimadasTaxista)  {
 		
-		return rutaRepo.findRutasByAttributes(origenCliente, destinoCliente, numKmTotales, horasEstimadasCliente);
+		return rutaRepo.findRutasByAttributes(origenCliente, destinoCliente, numKmTotales, horasEstimadasCliente,horasEstimadasTaxista);
 	}
 	
 	

@@ -51,7 +51,8 @@ public class RutaServiceTest {
 		ruta1.setOrigenCliente("uno");
 		ruta1.setDestinoCliente("dos");
 		ruta1.setNumKmTotales(kmTotales);
-		ruta1.setHorasEstimadasCliente(1.00);
+		ruta1.setHorasEstimadasCliente(0.5);
+		ruta1.setHorasEstimadasTaxista(1.0);
 		List<Trayecto> trayectos1= new ArrayList<Trayecto>();
 		Trayecto trayecto1= Trayecto.nuevoTrayecto("uno", "dos", 40.0, 0.5);
 		Trayecto trayecto2= Trayecto.nuevoTrayecto("dos", "uno", 40.0, 0.5);  //Trayecto de vuelta del taxista, no va el cliente
@@ -67,7 +68,8 @@ public class RutaServiceTest {
 		ruta2.setOrigenCliente("uno");
 		ruta2.setDestinoCliente("dos");
 		ruta2.setNumKmTotales(80.0);
-		ruta2.setHorasEstimadasCliente(1.00);
+		ruta2.setHorasEstimadasCliente(0.5);
+		ruta2.setHorasEstimadasTaxista(1.0);
 		List<Trayecto> trayectos2= new ArrayList<Trayecto>();
 		Trayecto trayecto3= Trayecto.nuevoTrayecto("uno", "tres", 20.0, 0.25);
 		Trayecto trayecto4= Trayecto.nuevoTrayecto("tres", "dos", 20.0, 0.25);
@@ -86,10 +88,10 @@ public class RutaServiceTest {
 		//ACT 
 		
 		//intentamos conseguir las 2 rutas creadas anteriormente
-		Collection<Ruta> rutasEncontradas=rutaService.findRutasByAttributes("uno", "dos", 80.0, 1.00);
+		Collection<Ruta> rutasEncontradas=rutaService.findRutasByAttributes("uno", "dos", 80.0, 0.5,1.0);
 		
 		//intentamos conseguir rutas con atributos que no existan
-		Collection<Ruta> rutasInexistentes= rutaService.findRutasByAttributes("origenInexistente", "destinoInexistente", 80.0, 1.00);
+		Collection<Ruta> rutasInexistentes= rutaService.findRutasByAttributes("origenInexistente", "destinoInexistente", 80.0,0.5,1.0);
 		
 		//ASSERT
 		assertEquals(rutasEncontradas.size(),2); //Hemos encontrado 2 rutas con esos atributos aunque tengan diferentes trayectos
@@ -99,7 +101,8 @@ public class RutaServiceTest {
 			assertEquals(r.getOrigenCliente(),"uno");
 			assertEquals(r.getDestinoCliente(),"dos");
 			assertEquals(r.getNumKmTotales(),80.0);
-			assertEquals(r.getHorasEstimadasCliente(),1.00);	
+			assertEquals(r.getHorasEstimadasCliente(),0.5);	
+			assertEquals(r.getHorasEstimadasTaxista(),1.0);	
 		}	
 	}
 }
