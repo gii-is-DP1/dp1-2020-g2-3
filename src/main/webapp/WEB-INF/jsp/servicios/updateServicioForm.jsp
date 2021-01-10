@@ -9,8 +9,9 @@
 <petclinic:layout pageName="servicios">
     <form:form modelAttribute="servicio" class="form-horizontal" id="add-service-form">
         
-            <petclinic:inputField label="Nombre" name="name"/>
-            <petclinic:inputField label="Fecha" name="fecha"/>
+           
+        	<label for="fecha">Fecha</label>
+            <input type="date" name="fecha"  id="fecha" value="<fmt:formatDate pattern = "yyyy-MM-dd" value = "${servicio.fecha}" />"/>
             <petclinic:inputField label="Precio" name="precio"/>
             <petclinic:inputField label="Descripción" name="descripcion"/>
 		

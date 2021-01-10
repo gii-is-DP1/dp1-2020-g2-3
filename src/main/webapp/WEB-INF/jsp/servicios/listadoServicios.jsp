@@ -13,7 +13,7 @@
     <table id="serviciosTable" class="table table-striped">
         <thead>
         <tr>
-            <th>Nombre</th>
+          
             <th>Fecha</th>
             <th>Precio</th>
             <th>Trabajador</th>
@@ -27,9 +27,6 @@
         <tbody>
         <c:forEach items="${servicios}" var="servicio">
             <tr>
-              <td>
-                    <c:out value="${servicio.name}"/>
-                </td>
                 <td>
                     <c:out value="${servicio.fecha}"/>
                 </td>
