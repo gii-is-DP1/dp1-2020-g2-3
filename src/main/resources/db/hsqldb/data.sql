@@ -67,7 +67,7 @@ INSERT INTO talleres(id,name,ubicacion,telefono) VALUES (2,'Chapa y pintura Rami
 INSERT INTO servicios(id,name,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion) VALUES (1,'Revisión aceite','2013-01-04', 70.50, 1, 1, 1, 'Revisión periódica aceite y filtros');
 INSERT INTO servicios(id,name,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion) VALUES (2,'Arreglo luna','2013-01-04', 50.00, 3, 2, 2, 'Arreglar picotazo parabrisas');
 
-INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (1,0.3,10,4,true,true);
+INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (1,0.41,10,4,true,true);
 INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (2,0.5,10,4,false,true);
 INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (3,0.7,10,6,false,true);
 INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (4,0.9,10,8,false,false);

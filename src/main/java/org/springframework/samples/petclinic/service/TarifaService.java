@@ -11,9 +11,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TarifaService {
-	@Autowired
+	
 	private TarifaRepository tariRep;
-	private Tarifa tarifa;
+
+	@Autowired
+	public TarifaService(TarifaRepository tariRep) {
+		this.tariRep=tariRep;
+		
+	}
+	
+	@Transactional
+	public Tarifa findTarifaActiva() {
+		return tariRep.findTarifaActiva();
+	}
 	
 	@Transactional
 	public long tarifaCount() {

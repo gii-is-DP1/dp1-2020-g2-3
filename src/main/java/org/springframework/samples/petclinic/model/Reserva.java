@@ -4,6 +4,8 @@ import org.springframework.beans.support.PropertyComparator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,7 +34,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "Reserva")
 public class Reserva extends BaseEntity {
@@ -105,6 +108,13 @@ public class Reserva extends BaseEntity {
 	@Column(name = "num_Km_Totales")
 	private  Double numKmTotales;
 	
-	
+	public static Reserva newReservaSinCalcular(Date fechaSalida,Date horaSalida, Integer plazasOcupadas,String descripcionEquipaje) {
+		Reserva nuevaReserva= new Reserva();
+		nuevaReserva.setFechaSalida(fechaSalida);
+		nuevaReserva.setHoraSalida(horaSalida);
+		nuevaReserva.setPlazas_Ocupadas(plazasOcupadas);
+		nuevaReserva.setDescripcionEquipaje(descripcionEquipaje);
+		return nuevaReserva;
+	}
 	
 }
