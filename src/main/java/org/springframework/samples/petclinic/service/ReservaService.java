@@ -25,19 +25,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ReservaService {
-
+	//Repositorio
 	private ReservaRepository reservaRepo;
+	//Servicios
 	private TrayectoService trayectoService;
 	private EstadoReservaService estadoService;
 	private ClienteService clienteService;
 	private RutaService rutaService;
+	private TarifaService tarifaService;
+	
 	@Autowired
-	public ReservaService(ReservaRepository reservaRepo,TrayectoService trayectoService,EstadoReservaService estadoService,ClienteService clienteService,RutaService rutaService) {
+	public ReservaService(ReservaRepository reservaRepo,TrayectoService trayectoService,EstadoReservaService estadoService,ClienteService clienteService,RutaService rutaService,TarifaService tarifaService) {
 		this.reservaRepo=reservaRepo;
 		this.trayectoService=trayectoService;
 		this.estadoService=estadoService;
 		this.clienteService=clienteService;
 		this.rutaService=rutaService;
+		this.tarifaService=tarifaService;
 	}
 	
 	@Transactional
@@ -68,6 +72,8 @@ public class ReservaService {
 		      calendar.add(tipoFecha, cantidadSumar);
 		      return calendar.getTime();
 	   }
+	
+
 	
 	@Transactional
 	public void fechaSalidaAnteriorActual(Date fechaSalida, Date horaSalida) throws FechaSalidaAnteriorActualException  {
@@ -112,7 +118,7 @@ public class ReservaService {
 		Date fechaHoraLlegada=calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
 		reservaCalculada.setFechaLlegada(fechaHoraLlegada);
 		reservaCalculada.setHoraLlegada(fechaHoraLlegada);
-		Double precioPorKm=0.41; //Esto habría que cambiarlo cuadno estén implementadas las tarifas
+		Double precioPorKm=tarifaService.findTarifaActiva().getPrecioPorKm();
 		Double precioTotal=calcularPrecioDistancia(nuevaRuta.getNumKmTotales(), precioPorKm);
 		reservaCalculada.setPrecioTotal(precioTotal);
 		if(confirmarReserva ) { //Solo cuando se confirma la reserva se añadirán los siguientes campos
@@ -123,6 +129,7 @@ public class ReservaService {
 			
 			//si la ruta creada ya existe en la BD se asignará
 			Optional<Ruta> rutaExistente= rutaService.findRutaByRuta(nuevaRuta);
+		
 			if(rutaExistente.isPresent()) {
 				System.out.println("Ya existe una ruta similar! Se asignará desde la BD");
 				nuevaRuta= rutaExistente.get();
@@ -137,23 +144,29 @@ public class ReservaService {
 			}
 			reservaCalculada.setHorasEspera(0.0);
 			reservaCalculada.setEstadoReserva(estadoService.findEstadoById(1).get());
-			Double precioIvaRedondeado= (double)Math.round((0.1*precioTotal)*100)/100; //Esto se cambiará cuando estén implementadas las tarifas
-			Double baseImponibleRedondeada= (double)Math.round((0.9*precioTotal)*100)/100;
+			
 		}
 		return reservaCalculada;
 		
 	}
 	@Transactional 
-	public void calcularYConfirmarReserva(Reserva reserva,String username)throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException{
+	public Reserva calcularYConfirmarReserva(Reserva reserva,String username)throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException{
 		Reserva reservaCalculada= calcularNuevaReserva(reserva,true);
 		Cliente cliente= clienteService.findClienteByUsername(username);
 		reservaCalculada.setCliente(cliente);
 		save(reservaCalculada);
+		return reservaCalculada;
 	}
 	
 	@Transactional
 	public void delete(Reserva reserva) throws DataAccessException  {
 			reservaRepo.delete(reserva);
+	}
+
+	
+	@Transactional
+	public String borrar() throws DataAccessException  {
+			return "";
 	}
 
 	@Transactional

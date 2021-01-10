@@ -70,12 +70,13 @@ public class ReservaController {
 	public String newReserva(ModelMap modelMap) {
 		Reserva nuevaReserva= new Reserva();
 		Date today= new Date();
-		nuevaReserva.setFechaSalida(today);
+		
 		//Mostramos una fecha de salida predeterminada del día de hoy, con 45 minutos más a los actuales en la hora de salida
 		// ya que no se pueden realizar reservas con una antelación menor a 40 minutos de la fecha de salida
 		
 		today=reservaService.addFecha(today, Calendar.MINUTE, 45);
 		nuevaReserva.setHoraSalida(today);
+		nuevaReserva.setFechaSalida(today);
 		modelMap.addAttribute("reserva",nuevaReserva);
 		Iterable<String> paradas= trayectoService.findDistinctParadas();
 		modelMap.addAttribute("paradas", paradas);
