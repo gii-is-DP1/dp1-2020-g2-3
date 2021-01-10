@@ -79,7 +79,6 @@ INSERT INTO Estado_Reserva(id,name)VALUES(4,'Completada');
 INSERT INTO Estado_Reserva(id,name)VALUES(5,'Incompleta');
 
 
-INSERT INTO Ruta(id,origen_cliente,destino_cliente,num_Km_Totales,horas_Estimadas_Cliente)VALUES(1,'Zahinos','Badajoz',144.6,2.23);
 
 INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(1,'Zahinos','Badajoz',72.3,1.15);
 INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(2,'Badajoz','Zahinos',72.3,1.08);
@@ -93,8 +92,3 @@ INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(9,'
 INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(10,'Badajoz','Oliva de la Frontera',90.7,1.22);
 INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(11,'Jerez de los Caballeros','Badajoz',74.8,1);
 INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(12,'Badajoz','Jerez de los Caballeros',73.7,1.03);
-
-INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id)VALUES(1,1);
-INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id)VALUES(1,2);
-
-INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total)VALUES(1,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1,59.29);
