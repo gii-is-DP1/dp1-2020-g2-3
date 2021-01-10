@@ -64,8 +64,8 @@ INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos) VALUES (4,'Seat'
 INSERT INTO talleres(id,name,ubicacion,telefono) VALUES (1,'Talleres Manolito','Calle Sol', 698585858);
 INSERT INTO talleres(id,name,ubicacion,telefono) VALUES (2,'Chapa y pintura Ramirez','Calle Luna', 698585837);
 
-INSERT INTO servicios(id,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion) VALUES (1,'2013-01-04', 70.50, 1, 1, 1, 'Revisión periódica aceite y filtros');
-INSERT INTO servicios(id,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion) VALUES (2,'2013-01-04', 50.00, 3, 2, 2, 'Arreglar picotazo parabrisas');
+INSERT INTO servicios(id,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion, completado, fecha_completado) VALUES (1,'2013-01-04', 70.50, 1, 1, 1, 'Revisión periódica aceite y filtros', true, '2013-02-04');
+INSERT INTO servicios(id,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion, completado) VALUES (2,'2013-01-04', 50.00, 3, 2, 2, 'Arreglar picotazo parabrisas', false);
 
 INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (1,0.41,10,4,true,true);
 INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (2,0.5,10,4,false,true);

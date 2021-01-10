@@ -12,8 +12,12 @@
            
         	<label for="fecha">Fecha</label>
             <input type="date" name="fecha"  id="fecha" value="<fmt:formatDate pattern = "yyyy-MM-dd" value = "${servicio.fecha}" />"/>
+            
             <petclinic:inputField label="Precio" name="precio"/>
             <petclinic:inputField label="Descripción" name="descripcion"/>
+            
+            <label for="fechaCompletado">Fecha Completado</label>
+            <input type="date" name="fechaCompletado"  id="fechaCompletado" value="<fmt:formatDate pattern = "yyyy-MM-dd" value = "${servicio.fechaCompletado}" />"/>
 		
 			 <label for="trabajador">Trabajador:</label>
 		<select name="trabajador" id="trabajador">
@@ -67,8 +71,17 @@
 		</select>
 		
 		
+		 <label for="completado">Completado:</label>
+		<select name="completado" id="completado">
+			
+            <option value="true"  >Completado</option>
+				
+                
+            <option value="false" selected >No Completado</option>
+		                      
+		</select>
 		
-		
+
 
              <input type="hidden" name="id" id="id" value="${servicio.id}"/>
              <c:choose>

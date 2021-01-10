@@ -20,6 +20,8 @@
             <th>Automóvil</th>
             <th>Taller</th>
             <th>Descripción</th>
+            <th>Fecha Completado</th>
+            <th>Completado</th>
             <th>Editar</th>
             <th>Eliminar</th>   
         </tr>
@@ -50,6 +52,12 @@
                 </td>
                 <td>
                     <c:out value="${servicio.descripcion}"/>
+                </td>
+                 <td>
+                    <c:out value="${servicio.fechaCompletado}"/>
+                </td>
+                 <td>
+                    <c:out value="${servicio.completado}"/>
                 </td>
                 <td>
                 <spring:url value="/servicios/edit/{servicioId}" var="servicioEditUrl">
