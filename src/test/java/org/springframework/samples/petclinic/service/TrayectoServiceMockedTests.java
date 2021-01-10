@@ -162,7 +162,8 @@ class TrayectoServiceMockedTests {
 			double numKmTotal= 72.3+73.7+19.1;
     		Double numKmTotalAproximado=0.0 + Math.round(numKmTotal*100)/100;
     		//¡Las horas estimadas del cliente no tendrán en cuenta los trayectos que realice únicamente el taxista!
-    		Double horasEstimadasCliente=1.03; 
+    		Double horasEstimadasCliente=0.0+1.03;
+    		Double horasEstimadasTaxista=0.0+1.15+1.03+0.27;
         	Ruta rutaFormulario=nuevaRutaFormulario("Badajoz","Jerez de los Caballeros",new ArrayList<String>());
         	
         	//ACT
@@ -171,7 +172,9 @@ class TrayectoServiceMockedTests {
 
     		//ASSERT
     		assertEquals(rutaConTrayectosCalculados.getNumKmTotales(),numKmTotalAproximado);
+    
     		assertEquals(rutaConTrayectosCalculados.getHorasEstimadasCliente(),horasEstimadasCliente);
+    		assertEquals(rutaConTrayectosCalculados.getHorasEstimadasTaxista(),horasEstimadasTaxista);
       
     }
     
@@ -306,14 +309,16 @@ class TrayectoServiceMockedTests {
     	paradasIntermedias.add("Zahinos");
  
     	Ruta rutaFormulario=nuevaRutaFormulario("Badajoz","Jerez de los Caballeros",paradasIntermedias);
-    	/*	Trayectos que se tienen que crear:
+    	/*	Trayectos que se tienen que crear que realizará el taxista:
 		Zahinos --> Badajoz ;;;;  Badajoz ---> Jerez de los Caballeros ;;;;  Jerez de los Caballeros --> Zahinos ;;;;; Zahinos --> Jerez de los Caballeros ;;;;;; Jerez de los Caballeros ----> Zahinos */
 		
     	double numKmTotal= 72.3+73.7+19.1+19.1+19.1;
 		Double numKmTotalAproximado=0.0 + Math.round(numKmTotal*100)/100;
-		Double horasEstimadasCliente=1.03+0.27+0.28; 
-    	
-    	
+		 
+		//Trayectos en los que estará el cliente: Badajoz---> Jerez de los Caballeros ---> Zahinos ----> Jerez de los Caballero
+		Double horasEstimadasCliente=0.0+1.03 + 0.27 + 0.28;
+		Double horasEstimadasTaxista=3.0; //1.15+1.03+0.27+0.28+0.27;
+	
     	//ACT
 		Ruta rutaConTrayectosCalculados=trayectoService.calcularYAsignarTrayectos(rutaFormulario);
 
@@ -321,6 +326,7 @@ class TrayectoServiceMockedTests {
 		
     	assertEquals(rutaConTrayectosCalculados.getNumKmTotales(),numKmTotalAproximado);
     	assertEquals(rutaConTrayectosCalculados.getHorasEstimadasCliente(),horasEstimadasCliente);
+    	assertEquals(rutaConTrayectosCalculados.getHorasEstimadasTaxista(),horasEstimadasTaxista);
       
     }
     

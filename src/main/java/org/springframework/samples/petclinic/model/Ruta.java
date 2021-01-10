@@ -59,6 +59,13 @@ public class Ruta extends BaseEntity {
 	@NotNull
 	private  Double horasEstimadasCliente;
 	
+	@Min(0)
+	@Digits(fraction=2,integer=3)
+	@Column(name = "horas_Estimadas_Taxista")
+	@NotNull
+	private  Double horasEstimadasTaxista;
+	
+	
 	@ManyToMany
 	List<Trayecto> trayectos;
 	
