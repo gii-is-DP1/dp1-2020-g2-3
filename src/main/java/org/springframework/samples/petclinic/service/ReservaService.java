@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Automovil;
@@ -131,14 +132,16 @@ public class ReservaService {
 			Optional<Ruta> rutaExistente= rutaService.findRutaByRuta(nuevaRuta);
 		
 			if(rutaExistente.isPresent()) {
-				System.out.println("Ya existe una ruta similar! Se asignará desde la BD");
-				nuevaRuta= rutaExistente.get();
+				System.out.println("Ya existe una ruta similar! No hace falta guardarla en la BD");
+				nuevaRuta.setId(rutaExistente.get().getId());
 				reserva.setRuta(nuevaRuta);
 				System.out.println("Trayectos de la ruta existente: " + rutaExistente.get().getTrayectos());
+				System.out.println("Ruta existente: " + rutaExistente.get());
 				
 			}else {
 				
 				System.out.println("No existe la ruta, se asignará una  una nueva a la reserva"); //Ya está asignada antes del if(confirmarReserva)
+				
 				rutaService.save(nuevaRuta); //Se guarda en la BD la nueva ruta
 				System.out.println("ruta asignada!");
 			}
@@ -154,7 +157,7 @@ public class ReservaService {
 		Reserva reservaCalculada= calcularNuevaReserva(reserva,true);
 		Cliente cliente= clienteService.findClienteByUsername(username);
 		reservaCalculada.setCliente(cliente);
-		save(reservaCalculada);
+		this.save(reservaCalculada);
 		return reservaCalculada;
 	}
 	
