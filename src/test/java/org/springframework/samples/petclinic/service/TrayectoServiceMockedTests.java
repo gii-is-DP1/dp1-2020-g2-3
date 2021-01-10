@@ -163,7 +163,8 @@ class TrayectoServiceMockedTests {
     		Double numKmTotalAproximado=0.0 + Math.round(numKmTotal*100)/100;
     		//¡Las horas estimadas del cliente no tendrán en cuenta los trayectos que realice únicamente el taxista!
     		Double horasEstimadasCliente=0.0+1.03;
-    		Double horasEstimadasTaxista=0.0+1.15+1.03+0.27;
+    		Double horasEstimadasTaxista=1.15+1.03+0.27;
+    		Double horasEstimadasTaxistaAproximadas= 0.0 + Math.round(horasEstimadasTaxista*100)/100;
         	Ruta rutaFormulario=nuevaRutaFormulario("Badajoz","Jerez de los Caballeros",new ArrayList<String>());
         	
         	//ACT
@@ -174,7 +175,7 @@ class TrayectoServiceMockedTests {
     		assertEquals(rutaConTrayectosCalculados.getNumKmTotales(),numKmTotalAproximado);
     
     		assertEquals(rutaConTrayectosCalculados.getHorasEstimadasCliente(),horasEstimadasCliente);
-    		assertEquals(rutaConTrayectosCalculados.getHorasEstimadasTaxista(),horasEstimadasTaxista);
+    		assertEquals(rutaConTrayectosCalculados.getHorasEstimadasTaxista(),horasEstimadasTaxistaAproximadas);
       
     }
     
