@@ -9,5 +9,9 @@ public interface TarifaRepository extends CrudRepository<Tarifa,Integer>{
 	
 	@Query("FROM Tarifa WHERE original=true")
 	public Iterable<Tarifa> findByOriginal();
-
+	
+	
+	@Query("SELECT t FROM Tarifa t WHERE t.activado=true")
+	public Tarifa findTarifaActiva();
+	
 }
