@@ -49,7 +49,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Entity
 @Table(name = "servicios")
-public class Servicio extends NamedEntity{
+public class Servicio extends BaseEntity{
 
 	@Column(name = "fecha")
 	@NotNull
