@@ -164,10 +164,7 @@ public class ReservaService {
 	}
 
 	
-	@Transactional
-	public String borrar() throws DataAccessException  {
-			return "";
-	}
+	
 
 	@Transactional
 	public void save(Reserva reserva)  {
