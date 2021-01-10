@@ -136,10 +136,10 @@ public class TrayectoService {
 			}
 			Ruta nuevaRuta= new Ruta();
 			double numKmTotalAproximado=Math.round(numKmTotal*100)/100;
-			
+			double horasTaxistaAproximadas= Math.round(horasEstimadasTaxista*100)/100;
 			nuevaRuta.setTrayectos(nuevaListaTrayectos);
 			nuevaRuta.setHorasEstimadasCliente(horasEstimadasCliente);
-			nuevaRuta.setHorasEstimadasTaxista(horasEstimadasTaxista);
+			nuevaRuta.setHorasEstimadasTaxista(horasTaxistaAproximadas);
 			nuevaRuta.setNumKmTotales(numKmTotalAproximado);
 			nuevaRuta.setOrigenCliente(rutaFormulario.getOrigenCliente());
 			nuevaRuta.setDestinoCliente(rutaFormulario.getDestinoCliente());

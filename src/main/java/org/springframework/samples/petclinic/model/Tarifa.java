@@ -6,11 +6,14 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "Tarifa")
-public class Tarifa extends NamedEntity{
+public class Tarifa extends BaseEntity{
 	
 	@Column(name = "precio_Por_Km")
 	@NotNull

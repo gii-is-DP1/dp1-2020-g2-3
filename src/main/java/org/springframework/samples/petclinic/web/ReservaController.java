@@ -176,6 +176,8 @@ public class ReservaController {
 				
 				List<Trayecto> trayectosIntermedios= reserva.getRuta().getTrayectos(); //Trayectos intermedios, que serán los que tenga la ruta antigua que vino desde el formulario
 				modelMap.put("reserva", reservaCalculada);
+				System.out.println("CLIENTE : " + reservaCalculada.getRuta().getHorasEstimadasCliente());
+				System.out.println("TAXISTA: " + reservaCalculada.getRuta().getHorasEstimadasTaxista());
 				modelMap.put("trayectosIntermedios", trayectosIntermedios);
 				modelMap.put("horasRutaCliente", rutaService.calcularHorasRutaCliente(reservaCalculada.getRuta()));
 				modelMap.put("minutosRutaCliente", rutaService.calcularMinutosRutaCliente(reservaCalculada.getRuta()));
