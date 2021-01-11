@@ -86,6 +86,37 @@ public class RutaService {
 		int minutosRealesAproximados= (int)Math.round((totalHoras%1)*60);
 		return minutosRealesAproximados;
 	}
+	@Transactional 
+	public List<Trayecto> obtenerTrayectosIntermedios(Ruta ruta){ //obtenemos los trayectos intermedios empezando por el que tenga como origen la primera parada intermedia
+		List<Trayecto> trayectosIntermedios= new ArrayList<Trayecto>();
+		List<Trayecto> listaTrayectos= ruta.getTrayectos();
+		
+		boolean origenEncontrado= false;
+		int i=0;
+			while(i<listaTrayectos.size()) {
+				
+				Trayecto tr= listaTrayectos.get(i);
+				
+				if(!origenEncontrado && tr.getOrigen().equals(ruta.getOrigenCliente()) && tr.getDestino().equals(ruta.getDestinoCliente())) { //No hay paradas intermedias
+					break;
+				}else if(!origenEncontrado && tr.getOrigen().equals(ruta.getOrigenCliente())) {
+					origenEncontrado=true;
+					
+				}else if(origenEncontrado) {
+					trayectosIntermedios.add(tr);
+					
+					if(tr.getDestino().equals(ruta.getDestinoCliente())) {
+						
+						break;
+					}
+					
+					
+				}
+				i++;
+			}
+		
+		return trayectosIntermedios;
+	}
 	@Transactional(readOnly = true)
 	public Optional<Ruta> findRutaById(int id) throws DataAccessException {
 		return rutaRepo.findById(id);

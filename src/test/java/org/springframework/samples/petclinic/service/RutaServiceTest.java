@@ -86,7 +86,6 @@ public class RutaServiceTest {
 		rutaService.save(ruta2);
 		
 		//ACT 
-		
 		//intentamos conseguir las 2 rutas creadas anteriormente
 		Collection<Ruta> rutasEncontradas=rutaService.findRutasByAttributes("uno", "dos", 80.0, 0.5,1.0);
 		
@@ -98,11 +97,12 @@ public class RutaServiceTest {
 		assertEquals(rutasInexistentes.size(),0); //La ruta inventada no existe
 		
 		for(Ruta r: rutasEncontradas) {
+			
 			assertEquals(r.getOrigenCliente(),"uno");
 			assertEquals(r.getDestinoCliente(),"dos");
 			assertEquals(r.getNumKmTotales(),80.0);
 			assertEquals(r.getHorasEstimadasCliente(),0.5);	
 			assertEquals(r.getHorasEstimadasTaxista(),1.0);	
-		}	
+		}
 	}
 }

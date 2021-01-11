@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Cliente;
+import org.springframework.samples.petclinic.model.EstadoReserva;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
 import org.springframework.samples.petclinic.model.Servicio;
@@ -46,21 +47,23 @@ public class ReservaController {
 	private final  TrayectoService trayectoService;
 	private final RutaService rutaService;
 	private final AuthoritiesService authoService;
+	private final EstadoReservaService estadoReservaService;
 	
 	
 	@Autowired
-	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService) {
+	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService,EstadoReservaService estadoReservaService) {
 		this.reservaService=reservaService;
 		this.trayectoService=trayectoService;
 		this.rutaService=rutaService;
 		this.authoService=authoService;
+		this.estadoReservaService=estadoReservaService;
 	}
 	
 	@GetMapping(value = "/reservasList")
 	public String listadoReservas(ModelMap modelMap) {
 		String vista="reservas/reservasList";
 		Iterable<Reserva> reservas= reservaService.findAll();
-		modelMap.addAttribute("reserva", reservas);
+		modelMap.addAttribute("reservas", reservas);
 		return vista;
 	}
 	
@@ -176,8 +179,6 @@ public class ReservaController {
 				
 				List<Trayecto> trayectosIntermedios= reserva.getRuta().getTrayectos(); //Trayectos intermedios, que serán los que tenga la ruta antigua que vino desde el formulario
 				modelMap.put("reserva", reservaCalculada);
-				System.out.println("CLIENTE : " + reservaCalculada.getRuta().getHorasEstimadasCliente());
-				System.out.println("TAXISTA: " + reservaCalculada.getRuta().getHorasEstimadasTaxista());
 				modelMap.put("trayectosIntermedios", trayectosIntermedios);
 				modelMap.put("horasRutaCliente", rutaService.calcularHorasRutaCliente(reservaCalculada.getRuta()));
 				modelMap.put("minutosRutaCliente", rutaService.calcularMinutosRutaCliente(reservaCalculada.getRuta()));
@@ -253,11 +254,46 @@ public class ReservaController {
 		Optional<Reserva> reserva=reservaService.findReservaById(reservaId);
 		if (reserva.isPresent()) {
 			reservaService.delete(reserva.get()); 
-			modelMap.addAttribute("message", "Reserva anulada correctamente");
+			modelMap.addAttribute("message", "Reserva eliminada correctamente");
 		}else {
 			
 			modelMap.addAttribute("message", "Reserva no encontrada");
 		}
 		return listadoReservas(modelMap);
 	}
+	
+	@GetMapping(value= "/edit/{reservaId}")
+	public String editReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+		
+		Optional<Reserva> reservaOptional=reservaService.findReservaById(reservaId);
+		if(reservaOptional.isPresent()) {
+			Reserva reserva=reservaOptional.get();
+			modelMap.addAttribute("reserva",reserva);
+			if(!reserva.getRuta().getOrigenCliente().equals("Zahinos")) {
+				System.out.println("El origen no es zahinos");
+				modelMap.put("trayectoIdaTaxista", reserva.getRuta().getTrayectos().get(0));
+			}
+			if(!reserva.getRuta().getDestinoCliente().equals("Zahinos")) {
+				modelMap.put("trayectoVueltaTaxista", reserva.getRuta().getTrayectos().get(reserva.getRuta().getTrayectos().size()-1));
+			}
+			
+		
+			//Obtenemos los trayectos intermedios empezando por el que tenga la primera parada como origen
+			List<Trayecto> trayectosIntermedios= rutaService.obtenerTrayectosIntermedios(reserva.getRuta());
+			Iterable<EstadoReserva> estadosReserva= estadoReservaService.findAll();
+			modelMap.put("estadosReserva", estadosReserva);
+			Integer numCiudadesIntermedias= trayectosIntermedios.size();
+			modelMap.put("trayectosIntermedios", trayectosIntermedios);
+			modelMap.put("horasRutaCliente", rutaService.calcularHorasRutaCliente(reserva.getRuta()));
+			modelMap.put("minutosRutaCliente", rutaService.calcularMinutosRutaCliente(reserva.getRuta()));
+			modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+			modelMap.put("finBucle",numCiudadesIntermedias-1);
+			
+			return "reservas/editReservaForm";
+		}else {
+			modelMap.addAttribute("message","No se ha encontrado la reserva a editar");
+			return listadoReservas(modelMap);
+		}
+	} 
+	
 }
