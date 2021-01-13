@@ -15,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
 import java.time.LocalDate;
@@ -67,6 +68,7 @@ public class Ruta extends BaseEntity {
 	
 	
 	@ManyToMany
+	@OrderColumn
 	List<Trayecto> trayectos;
 	
 	@Override

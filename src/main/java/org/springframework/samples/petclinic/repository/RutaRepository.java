@@ -18,4 +18,5 @@ public interface RutaRepository extends CrudRepository<Ruta,Integer> {
 	public Collection<Ruta> findRutasByAttributes(String origenCliente, String destinoCliente,
 			Double numKmTotales, Double horasEstimadasCliente,Double horasEstimadasTaxista);
 	
+	
 }

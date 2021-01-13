@@ -13,13 +13,15 @@
     <table id="serviciosTable" class="table table-striped">
         <thead>
         <tr>
-            <th>Nombre</th>
+          
             <th>Fecha</th>
             <th>Precio</th>
             <th>Trabajador</th>
             <th>Automóvil</th>
             <th>Taller</th>
             <th>Descripción</th>
+            <th>Fecha Completado</th>
+            <th>Completado</th>
             <th>Editar</th>
             <th>Eliminar</th>   
         </tr>
@@ -27,9 +29,6 @@
         <tbody>
         <c:forEach items="${servicios}" var="servicio">
             <tr>
-              <td>
-                    <c:out value="${servicio.name}"/>
-                </td>
                 <td>
                     <c:out value="${servicio.fecha}"/>
                 </td>
@@ -53,6 +52,12 @@
                 </td>
                 <td>
                     <c:out value="${servicio.descripcion}"/>
+                </td>
+                 <td>
+                    <c:out value="${servicio.fechaCompletado}"/>
+                </td>
+                 <td>
+                    <c:out value="${servicio.completado}"/>
                 </td>
                 <td>
                 <spring:url value="/servicios/edit/{servicioId}" var="servicioEditUrl">
