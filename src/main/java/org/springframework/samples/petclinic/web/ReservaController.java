@@ -256,7 +256,7 @@ public class ReservaController {
 			modelMap.addAttribute("message", "Reserva anulada correctamente");
 		}else {
 			
-			modelMap.addAttribute("message", "Reserva no encontrada");
+			modelMap.addAttribute("message", "Reserva no encontrada!");
 		}
 		return listadoReservas(modelMap);
 	}
