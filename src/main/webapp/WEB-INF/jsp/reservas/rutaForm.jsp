@@ -7,11 +7,8 @@
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
 
-<petclinic:layout pageName="reservas">
-    <form:form modelAttribute="reserva" class="form-horizontal" id="add-reserva-form" action="/reservas/redirigirNewReservaForm">
-        
-         <input type="hidden" name="numCiudadesIntermedias" value="${numCiudadesIntermedias}"/>
-        <p> ${usuario}</p>
+ <input type="hidden" name="numCiudadesIntermedias" value="${numCiudadesIntermedias}"/>
+      
        
         <label for="ruta.origenCliente">Ciudad Origen:</label>
 		<select required="true" name="ruta.origenCliente" id="ruta.origenCliente">
@@ -65,24 +62,3 @@
                	 </c:choose>
     		 </c:forEach>
 		</select>
-		<br><br>
-           
-        <!--  Meter dentro del binding la fecha y hora de salida aquí porque en el tag hay conflictos -->
-            <label for="fechaSalida">Fecha de salida</label>
-            <input type="date" name="fechaSalida"  id="fechaSalida" value="<fmt:formatDate pattern = "yyyy-MM-dd" value = "${reserva.fechaSalida}" />"/>     
-           
-           
-           <label for="horaSalida">Hora de salida</label> 
-           <input type="time"  name="horaSalida" id="horaSalida" value="<fmt:formatDate type = "time" pattern="HH:mm" value = "${reserva.horaSalida}" />"/>
-           
-           
-           
-            <petclinic:inputField label="Plazas ocupadas" name="plazas_Ocupadas"/>
-            <petclinic:inputField label="Descripción del equipaje" name="descripcionEquipaje"/>
-     		
-    	    <!-- Vamos a tener 2 botones submit  en el mismo formulario  -->
-    	       
-		<button class="btn btn-default" type="submit" name="action" value="continuar">Calcular Precio</button> 		 
-    </form:form>    
-    
-</petclinic:layout>

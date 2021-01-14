@@ -7,7 +7,7 @@
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
 <petclinic:layout pageName="reservas">
-    <form:form modelAttribute="reserva" class="form-horizontal" id="add-reserva-form" action="/reservas/redirigir">
+    <form:form modelAttribute="reserva" class="form-horizontal" id="add-reserva-form" action="/reservas/redirigirPrecioReserva">
         
        
         
@@ -18,7 +18,7 @@
  <c:when test = "${not empty trayectoIdaTaxista}">
   <!-- Trayecto desde la localidad del taxista (Zahinos) hasta el origen marcado por el cliente-->
   <div style="float:left">
- <p style="color:green"  > ${trayectoIdaTaxista.origen} -->  </p> 
+ <p style="color:green"  > ${trayectoIdaTaxista} -->  </p> 
  </div>
  </c:when>
 </c:choose>
@@ -43,7 +43,7 @@
  <c:when test = "${not empty trayectoVueltaTaxista}">
   <!-- Trayecto de vuelta del taxista desde el destino del cliente hasta la localidad del taxista, zahinos-->
 
-  <p style="color:green";"float:left"> -->  ${trayectoVueltaTaxista.destino}</p>
+  <p style="color:green";"float:left"> -->  ${trayectoVueltaTaxista}</p>
  </c:when>
 </c:choose>
       <br>

@@ -92,3 +92,11 @@ INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(9,'
 INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(10,'Badajoz','Oliva de la Frontera',90.7,1.22);
 INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(11,'Jerez de los Caballeros','Badajoz',74.8,1);
 INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(12,'Badajoz','Jerez de los Caballeros',73.7,1.03);
+
+
+INSERT INTO Ruta(origen_cliente,destino_cliente,num_Km_Totales,horas_Estimadas_Cliente,horas_Estimadas_Taxista)VALUES('Zahinos','Badajoz',144.6,1.15,2.23);
+
+INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id,trayectos_order)VALUES(1,1,0);
+INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id,trayectos_order)VALUES(1,2,1);
+
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales)VALUES(1,1,1,'2020-01-12','2020-01-12','17:40','18:40',0.0,4,'Maleta grande',1,59.29,144.6);
