@@ -7,18 +7,19 @@
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
 <petclinic:layout pageName="reservas">
-    <form:form modelAttribute="reserva" class="form-horizontal" id="add-reserva-form" action="">
+    <form:form modelAttribute="reserva" class="form-horizontal" id="add-reserva-form" action="/reservas/redirigirEditReservaForm">
         
        
         
        <h2>Ruta establecida</h2>
-      
-              <input type="hidden" name="numCiudadesIntermedias" id="numCiudadesIntermedias" value="${numCiudadesIntermedias}"/>
+               <input type="hidden" name="id" id="id" value="${reserva.id}"/>
+       
+        <input type="hidden" name="numCiudadesIntermedias" id="numCiudadesIntermedias" value="${numCiudadesIntermedias}"/>
 <c:choose>
  <c:when test = "${not empty trayectoIdaTaxista}">
   <!-- Trayecto desde la localidad del taxista (Zahinos) hasta el origen marcado por el cliente-->
   <div style="float:left">
- <p style="color:green"  > ${trayectoIdaTaxista.origen} -->  </p> 
+ <p style="color:green"  > ${trayectoIdaTaxista} -->  </p> 
  </div>
  </c:when>
 </c:choose>
@@ -27,10 +28,13 @@
        <p style="float:left"> ${reserva.ruta.origenCliente} -->  </p> 
      <c:choose>
        <c:when test = "${numCiudadesIntermedias>0}"> 
+       
+       
+       
        <c:forEach var="i" begin="0" end="${finBucle}" step="1" varStatus ="status">
        <p style="float:left"> 
       	   ${trayectosIntermedios[i].origen} --> </p>
-       		<input type="hidden" name="ruta.trayectos[${i}].origen" id="ruta.trayectos[${i}].origen" value="${trayectosIntermedios[i].origen}" />
+    	 <input type="hidden" name="ruta.trayectos[${i}].origen" id="ruta.trayectos[${i}].origen" value="${trayectosIntermedios[i].origen}" />
            	</c:forEach>
        </c:when>
      </c:choose>
@@ -43,7 +47,7 @@
  <c:when test = "${not empty trayectoVueltaTaxista}">
   <!-- Trayecto de vuelta del taxista desde el destino del cliente hasta la localidad del taxista, zahinos-->
 
-  <p style="color:green";"float:left"> -->  ${trayectoVueltaTaxista.destino}</p>
+  <p style="color:green";"float:left"> -->  ${trayectoVueltaTaxista}</p>
  </c:when>
 </c:choose>
 
@@ -51,8 +55,11 @@
       
      <petclinic:inputField label="Kilómetros totales" name="numKmTotales"/>
              <p>  Duración del viaje:  ${horasRutaCliente} horas y ${minutosRutaCliente} minutos </p> <br>
+             
+            <input type="hidden" name="horasRutaCliente" id="horasRutaCliente" value="${horasRutaCliente}"/>
+              <input type="hidden" name="minutosRutaCliente" id="minutosRutaCliente" value="${minutosRutaCliente}"/>
       
-<button class="btn btn-default" type="submit" name="action" value="atras"> Editar Ruta </button> <span> &nbsp;&nbsp;<button class="btn btn-default" type="submit" name="action" value="confirmarReserva">Recalcular Ruta y Reserva</button> </span>
+<button class="btn btn-default" type="submit" name="action" value="editarRuta"> Editar Ruta </button> 
 <br><br>
        <p> *Para el cálculo de kilómetros totales se tiene en cuenta el <span style="color:green">  trayecto que realiza el taxista para llegar al origen </span>,
        así como el de <span style="color:green"> vuelta hasta su localidad (Zahínos) </span></p>
@@ -92,17 +99,31 @@
 		<select required="true" name="estadoReserva" id="estadoReserva">
 				 <c:forEach items="${estadosReserva}" var="estado">
 				 <c:choose>
-                    <c:when test="${estado == reserva.estadoReserva}">
-                        <option value="${estado}" selected > ${estado.name}</option>
+                    <c:when test="${estado.id == reserva.estadoReserva.id}">
+                        <option value="${estado.id}" selected > ${estado.name}</option>
                     </c:when>
                     <c:otherwise>
-                        <option value="${estado}"> ${estado.name}</option>
+                        <option value="${estado.id}"> ${estado.name}</option>
+                    </c:otherwise>
+               	 </c:choose>
+    	        </c:forEach>
+		</select>
+		
+		<label for="cliente"> Cliente:</label>
+		<select required="true" name="cliente" id="cliente">
+				 <c:forEach items="${clientes}" var="cliente">
+				 <c:choose>
+                    <c:when test="${cliente.id == reserva.cliente.id}">
+                        <option value="${cliente.id}" selected > ${cliente.user.username}</option>
+                    </c:when>
+                    <c:otherwise>
+                        <option value="${cliente.id}"> ${cliente.user.username}</option>
                     </c:otherwise>
                	 </c:choose>
     	        </c:forEach>
 		</select>
 		<br><br>
-	<span> &nbsp;&nbsp;<button class="btn btn-default" type="submit" name="action" value="confirmarReserva">Recalcular precio a partir de los atributos actuales</button> </span>	<span> &nbsp;&nbsp;<button class="btn btn-default" type="submit" name="action" value="confirmarReserva">Guardar reserva</button> </span> 
+	<span> &nbsp;&nbsp;<button class="btn btn-default" type="submit" name="action" value="guardarReserva">Guardar reserva</button> </span> 
      	 
      	 
     	
