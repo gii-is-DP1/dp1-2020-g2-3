@@ -37,8 +37,12 @@
                  <td>
                     <c:out value="${trabajador.telefono}"/>
                 </td>
+                 <spring:url value="/contratos/new/{trabajadorId}" var="trabajadorNewUrl">
+                <spring:param name="trabajadorId" value="${trabajador.id}"/>
+               </spring:url>
+  
                 <td>
-               <a href="/contratos/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Añadir Contrato</a>
+               <a href="${fn:escapeXml(trabajadorNewUrl)}" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Añadir Contrato</a>
                 </td>
             </tr>
         </c:forEach>

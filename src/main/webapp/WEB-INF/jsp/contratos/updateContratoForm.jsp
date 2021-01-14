@@ -12,7 +12,8 @@
             <petclinic:inputField label="Salario Mensual" name="salarioMensual"/>
             <petclinic:inputField label="Fecha Inicio" name="fechaInicio"/>
             <petclinic:inputField label="Fecha Fin" name="fechaFin"/>
-            <petclinic:inputField label="Trabajador" name="trabajador_id"/>
+  			<petclinic:inputField label="trabajador" name="trabajadorId"/>
+  			
             
 			     
 	 <!--  El trabajador correspondiente aparecerá seleccionado por defecto-->
