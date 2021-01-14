@@ -49,7 +49,7 @@ public class TrayectoServiceTest {
 	 	
 	 	
 	 	@Test
-	 	public void findDistinctParadas() { //Vamos a probar una Custom Query
+	 	public void findDistinctParadasTest() { //Vamos a probar una Custom Query
 	 		//ARRANGE
 	 		Iterable<Trayecto> trayectos= trayectoService.findAll(); //método nativo de Spring
 	 		Set<String> diferentesParadas= new HashSet<String>();

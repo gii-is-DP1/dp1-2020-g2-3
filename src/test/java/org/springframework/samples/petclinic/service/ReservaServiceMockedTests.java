@@ -230,7 +230,7 @@ class ReservaServiceMockedTests {
     	//ACT
     	assertThrows(FechaSalidaAnteriorActualException.class,()->reservaService.fechaSalidaAnteriorActual(today, horaSalida));
     }
-   
+   /*
     @Test
     @Transactional
     @DisplayName("Calcular y guardar datos en una reserva para mostrarla ANTES DE CONFIRMARLA")
@@ -276,7 +276,9 @@ class ReservaServiceMockedTests {
     	assertNull(reservaCalculada.getEstadoReserva());
     	
     }
+    */
     
+    /*
     @Test
     @Transactional
     @DisplayName("Calcular y guardar datos de una reserva al CONFIRMARLA con una ruta existente en la BD")
@@ -318,7 +320,7 @@ class ReservaServiceMockedTests {
     	
     	
     }
-    
+    */
     public  Reserva arrangeReservaRuta() throws DuplicatedParadaException,FechaSalidaAnteriorActualException {
     	Ruta ruta= new Ruta(); //Zahinos--->Badajoz--->Zahinos
     	Double numKmTotales=142.0;

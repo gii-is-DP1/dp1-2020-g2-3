@@ -64,8 +64,8 @@ INSERT INTO AUTOMOVIL(id,marca,modelo,num_Plazas,km_Recorridos) VALUES (4,'Seat'
 INSERT INTO talleres(id,name,ubicacion,telefono) VALUES (1,'Talleres Manolito','Calle Sol', 698585858);
 INSERT INTO talleres(id,name,ubicacion,telefono) VALUES (2,'Chapa y pintura Ramirez','Calle Luna', 698585837);
 
-INSERT INTO servicios(id,name,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion) VALUES (1,'Revisión aceite','2013-01-04', 70.50, 1, 1, 1, 'Revisión periódica aceite y filtros');
-INSERT INTO servicios(id,name,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion) VALUES (2,'Arreglo luna','2013-01-04', 50.00, 3, 2, 2, 'Arreglar picotazo parabrisas');
+INSERT INTO servicios(id,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion, completado, fecha_completado) VALUES (1,'2013-01-04', 70.50, 1, 1, 1, 'Revisión periódica aceite y filtros', true, '2013-02-04');
+INSERT INTO servicios(id,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion, completado) VALUES (2,'2013-01-04', 50.00, 3, 2, 2, 'Arreglar picotazo parabrisas', false);
 
 INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (1,0.41,10,4,true,true);
 INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (2,0.5,10,4,false,true);
@@ -92,3 +92,11 @@ INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(9,'
 INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(10,'Badajoz','Oliva de la Frontera',90.7,1.22);
 INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(11,'Jerez de los Caballeros','Badajoz',74.8,1);
 INSERT INTO Trayecto(id,origen,destino,num_Km_Totales,horas_Estimadas)VALUES(12,'Badajoz','Jerez de los Caballeros',73.7,1.03);
+
+
+INSERT INTO Ruta(origen_cliente,destino_cliente,num_Km_Totales,horas_Estimadas_Cliente,horas_Estimadas_Taxista)VALUES('Zahinos','Badajoz',144.6,1.15,2.23);
+
+INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id,trayectos_order)VALUES(1,1,0);
+INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id,trayectos_order)VALUES(1,2,1);
+
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales)VALUES(1,1,1,'2020-01-12','2020-01-12','17:40','18:40',0.0,4,'Maleta grande',1,59.29,144.6);

@@ -16,6 +16,7 @@
             <th style="width: 200px;">Apellidos</th>
             <th style="width: 200px;">Correo Electronico</th>
             <th style="width: 200px;">Telefono</th>
+            <th style="width: 200px;">Contrato</th>
         </tr>
         </thead>
         <tbody>
@@ -35,6 +36,9 @@
                 </td>
                  <td>
                     <c:out value="${trabajador.telefono}"/>
+                </td>
+                <td>
+               <a href="/contratos/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Añadir Contrato</a>
                 </td>
             </tr>
         </c:forEach>
