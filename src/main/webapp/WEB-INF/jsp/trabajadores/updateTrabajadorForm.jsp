@@ -15,8 +15,11 @@
             <petclinic:inputField label="Correo electrónico" name="email"/>
             <petclinic:inputField label="Teléfono" name="telefono"/>
           
-         
-          
+           
+          <petclinic:inputField label="Salario Mensual" name="contrato.salarioMensual"/>
+            <petclinic:inputField label="Fecha Inicio" name="contrato.fechaInicio"/>
+            <petclinic:inputField label="Fecha Fin" name="contrato.fechaFin"/>
+  			
 			     
 	 <!--  El trabajador correspondiente aparecerá seleccionado por defecto-->
 	 

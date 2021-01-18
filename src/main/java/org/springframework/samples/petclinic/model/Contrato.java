@@ -29,9 +29,7 @@ public class Contrato extends BaseEntity{
 	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private LocalDate fechaFin;
 	
-	@ManyToOne
-	@JoinColumn(name = "trabajador_id",referencedColumnName="id") //Cuando la clave primaria de Trabajador sea DNI habrá que referenciarlo aquí en lugar del id como está ahora.
-	private Trabajador trabajadorId;
+
 
 	public Double getSalarioMensual() {
 		return salarioMensual;
@@ -57,18 +55,12 @@ public class Contrato extends BaseEntity{
 		this.fechaFin = fechaFin;
 	}
 
-	public Trabajador getTrabajadorId() {
-		return trabajadorId;
-	}
 
-	public void setTrabajador(Trabajador trabajadorId) {
-		this.trabajadorId = trabajadorId;
-	}
 
 	@Override
 	public String toString() {
 		return "Contrato [salarioMensual=" + salarioMensual + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin
-				+ ", trabajador=" + trabajadorId + "]";
+				+ "]";
 	}
 	
 	

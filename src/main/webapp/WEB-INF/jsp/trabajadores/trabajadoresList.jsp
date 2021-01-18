@@ -16,7 +16,9 @@
             <th style="width: 200px;">Apellidos</th>
             <th style="width: 200px;">Correo Electronico</th>
             <th style="width: 200px;">Telefono</th>
-            <th style="width: 200px;">Contrato</th>
+            <th style="width: 200px;">Inicio Contrato</th>
+            <th style="width: 200px;">Fin Contrato</th>
+            <th style="width: 200px;">Sueldo</th>
         </tr>
         </thead>
         <tbody>
@@ -37,13 +39,16 @@
                  <td>
                     <c:out value="${trabajador.telefono}"/>
                 </td>
-                 <spring:url value="/contratos/new/{trabajadorId}" var="trabajadorNewUrl">
-                <spring:param name="trabajadorId" value="${trabajador.id}"/>
-               </spring:url>
-  
-                <td>
-               <a href="${fn:escapeXml(trabajadorNewUrl)}" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Añadir Contrato</a>
+               <td>
+                    <c:out value="${trabajador.contrato.fechaInicio}"/>
                 </td>
+                <td>
+                    <c:out value="${trabajador.contrato.fechaFin}"/>
+                </td>
+                <td>
+                    <c:out value="${trabajador.contrato.salarioMensual}"/>
+                </td>
+            
             </tr>
         </c:forEach>
         </tbody>
