@@ -51,6 +51,7 @@ public class ContratoController {
 
 	private final  ContratoService contratoService;
 	private final TrabajadorService trabService;
+	
 	private final TrabajadorController trabController;
 	@Autowired
 	public ContratoController(ContratoService contratoService, TrabajadorService trabService, TrabajadorController trabController) {
@@ -60,14 +61,15 @@ public class ContratoController {
 
 	}
 
-	@GetMapping("/new")
-	public String NewContrato(ModelMap modelMap) {
+	@GetMapping("/new/{trabajadorId}")
+	public String editNewContrato(@PathVariable("trabajadorId") int trabajadorId,ModelMap modelMap) {
 		modelMap.addAttribute("contrato",new Contrato());
-		modelMap.addAttribute("trabajadores", trabService.findAll());
+		Trabajador trabajador=trabService.findById(trabajadorId);
+		modelMap.addAttribute("trabajador", trabajador);
 		return "contratos/updateContratoForm";
 	} 
 	
-	@PostMapping("/new")
+	@PostMapping("/new/{trabajadorId}")
 	public String saveNewContrato(@Valid Contrato contrato, BindingResult binding, ModelMap modelMap) {
 		if(binding.hasErrors()) {			
 			return "contratos/updateContratoForm";

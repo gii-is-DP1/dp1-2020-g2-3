@@ -5,7 +5,10 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.model.Contrato;
 import org.springframework.samples.petclinic.model.Trabajador;
+import org.springframework.samples.petclinic.service.ContratoService;
+import org.springframework.samples.petclinic.service.TipoTrabajadorService;
 import org.springframework.samples.petclinic.service.TrabajadorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -21,11 +24,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class TrabajadorController {
 	
 	private final TrabajadorService trabajadorService;
+	private final TipoTrabajadorService tipoTrabajadorService;
+
 	
 	
 	@Autowired
-	public TrabajadorController(TrabajadorService trabajadorService) {
+	public TrabajadorController(TrabajadorService trabajadorService, TipoTrabajadorService tipoTrabajadorService) {
 		this.trabajadorService = trabajadorService;
+		this.tipoTrabajadorService = tipoTrabajadorService;
+
 	}
 	
 	
@@ -39,7 +46,10 @@ public class TrabajadorController {
 	
 	@GetMapping("/new")
 	public String editNewTrabajador(ModelMap modelMap) {
+		Iterable<Trabajador> trabajadores= trabajadorService.findAll();
+		modelMap.addAttribute("trabajadores", trabajadores);
 		modelMap.addAttribute("trabajador",new Trabajador());
+		modelMap.addAttribute("tipostrabajador", tipoTrabajadorService.findAll());
 		return "trabajadores/updateTrabajadorForm";
 	} 
 	
