@@ -1,12 +1,15 @@
 package org.springframework.samples.petclinic.model;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,13 +24,17 @@ public class Contrato extends BaseEntity{
 	
 	@Column(name = "fecha_inicio")
 	@NotNull
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
-	private LocalDate fechaInicio;
+	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date fechaInicio;
 	
 	@Column(name = "fecha_fin")
 	@NotNull
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
-	private LocalDate fechaFin;
+	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date fechaFin;
+	
+	
 	
 
 
@@ -39,19 +46,19 @@ public class Contrato extends BaseEntity{
 		this.salarioMensual = salarioMensual;
 	}
 
-	public LocalDate getFechaInicio() {
+	public Date getFechaInicio() {
 		return fechaInicio;
 	}
 
-	public void setFechaInicio(LocalDate fechaInicio) {
+	public void setFechaInicio(Date fechaInicio) {
 		this.fechaInicio = fechaInicio;
 	}
 
-	public LocalDate getFechaFin() {
+	public Date getFechaFin() {
 		return fechaFin;
 	}
 
-	public void setFechaFin(LocalDate fechaFin) {
+	public void setFechaFin(Date fechaFin) {
 		this.fechaFin = fechaFin;
 	}
 
