@@ -46,6 +46,10 @@ INSERT INTO users(username,password,enabled) VALUES ('manuel84','manuel84',TRUE)
 INSERT INTO authorities(id,username,authority) VALUES (17,'manuel84','cliente');
 INSERT INTO clientes(id,nombre,apellidos,DNI,email,telefono,username) VALUES(4,'Manuel','Perez Barrasa','29666111L','manuel@gmail.com',666555789,'manuel84');
 
+INSERT INTO users(username,password,enabled) VALUES ('pepe33','pepe33',TRUE);
+INSERT INTO authorities(id,username,authority) VALUES (18,'pepe33','cliente');
+INSERT INTO clientes(id,nombre,apellidos,DNI,email,telefono,username) VALUES(5,'Pepe','Perez Barrasa','29433111L','pepe@gmail.com',666225789,'pepe33');
+
 INSERT INTO Trabajador(id,dni,nombre,apellidos,email,telefono,tipo_trabajador_id,username) VALUES (1,'80090030P','Rodolfo','García Ordóñez','rodolfo@gmail.com',632587419,1,'taxista1');
 INSERT INTO Trabajador(id,dni,nombre,apellidos,email,telefono,tipo_trabajador_id,username) VALUES (2,'90065864L','Roberta','Maestre','maestre@gmail.com',635874921,2,'roberta1');
 INSERT INTO Trabajador(id,dni,nombre,apellidos,email,telefono,tipo_trabajador_id,username) VALUES (3,'80550030C','Paco','Pérez González','paco@gmail.com',632583419,2,'paco1');
@@ -83,4 +87,4 @@ INSERT INTO Ruta_Trayecto(id,ruta_id,trayecto_id)VALUES(1,1,1);
 INSERT INTO Ruta_Trayecto(id,ruta_id,trayecto_id)VALUES(2,1,2);
 
 INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id)VALUES(1,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1);
-INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id)VALUES(2,4,1,'2020-12-22','2020-12-28','18:00','19:23',0,3,'Llevo una maleta grande',2);
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id)VALUES(2,5,1,'2020-12-22','2020-12-28','18:00','19:23',0,3,'Llevo una maleta grande',2);

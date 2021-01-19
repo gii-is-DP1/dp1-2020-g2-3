@@ -43,6 +43,8 @@ public class ClienteService {
 		return clienteRepository.findAll();
 	}
 	
+	
+	
 	@Transactional
 	public void saveCliente(Cliente cliente) throws DataAccessException {
 		//creating owner
