@@ -104,7 +104,8 @@ public class ServicioController {
 	public String editServicio(@PathVariable("servicioId") int id, @Valid Servicio modifiedServicio, BindingResult binding, ModelMap modelMap) {
 		Optional<Servicio> servicio=servicioService.findServicioById(id);
 		
-		if(binding.hasErrors()) {			
+		if(binding.hasErrors()) {	
+			modelMap.addAttribute("message", binding.getAllErrors());
 			modelMap.put("servicio", modifiedServicio);
 			Iterable<Trabajador> trabajadores=trabService.findAll();
 			modelMap.addAttribute("trabajadores", trabajadores);

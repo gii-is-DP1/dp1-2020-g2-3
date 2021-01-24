@@ -25,8 +25,12 @@ public class ClienteService {
 	@Autowired
 	public ClienteService(ClienteRepository clienteRepository) {
 		this.clienteRepository = clienteRepository;
-	}	
-	
+	}
+	@Transactional(readOnly = true)
+	public Cliente findClienteByUsername(String username) {
+		
+		return clienteRepository.findClienteByUsername(username);
+	}
 	
 	@Transactional(readOnly = true)
 	public Cliente findClienteById(int id) throws DataAccessException {
@@ -53,6 +57,10 @@ public class ClienteService {
 		userService.saveUser(cliente.getUser());
 		//creating authorities
 		authoritiesService.saveAuthorities(cliente.getUser().getUsername(), "cliente");
-	}	
+	}
+	@Transactional
+	public Integer findIdByUsername(String username) {
+		return clienteRepository.findIdByUsername(username);
+	}
 	
 }

@@ -40,13 +40,18 @@ public class Trabajador extends Person {
 	@JoinColumn(name = "tipo_trabajador_id",referencedColumnName="id")
 	private  TipoTrabajador tipoTrabajador;
 	
-	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "contrato", referencedColumnName = "id")
+	private Contrato contrato;
 
 	@Override
 	public String toString() {
-		return "Trabajador [ " + ", correoElectronico="
-				+ email + ", telefono=" + telefono + ", "+  "]";
+		return "Trabajador [email=" + email + ", telefono=" + telefono + ", user=" + user + ", tipoTrabajador="
+				+ tipoTrabajador + ", contrato=" + contrato + "]";
 	}
+	
+
+
 
 	
 	

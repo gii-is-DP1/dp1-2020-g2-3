@@ -1,24 +1,43 @@
 package org.springframework.samples.petclinic.model;
+import org.springframework.beans.support.MutableSortDefinition;
+import org.springframework.beans.support.PropertyComparator;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
+@Getter
+@Setter
 @Entity
-@Table(name = "reserva")
+@Table(name = "Reserva")
 public class Reserva extends BaseEntity {
 	
 	@ManyToOne
@@ -31,42 +50,39 @@ public class Reserva extends BaseEntity {
 	
 	@Column(name = "fecha_Salida")
 	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern="yyyy-MM-dd")
 	@NotNull
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private Date fechaSalida;
 	
 
 	@Column(name = "fecha_Llegada")
 	@Temporal(TemporalType.DATE)
-	@NotNull
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
+	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date fechaLlegada;
 
 	@Column(name = "hora_Salida")
+	@NotNull
 	@Temporal(TemporalType.TIME)
 	@DateTimeFormat(pattern = "HH:mm")
-	@NotNull
 	private Date horaSalida;
 	
 	@Column(name = "hora_Llegada")
 	@Temporal(TemporalType.TIME)
 	@DateTimeFormat(pattern = "HH:mm")
-	@NotNull
 	private Date horaLlegada;
 	
 	
 	@Min(0)
 	@Digits(fraction=2,integer=3)
 	@Column(name = "horas_Espera")
-	@NotNull
 	private  Double horasEspera;
 	
 	
 	@Column(name = "plazas_Ocupadas")
+	@NotNull
 	@Digits(fraction = 0, integer = 1)
 	@Max(6)
 	@Min(1)
-	@NotNull
 	private  Integer plazas_Ocupadas;
 	
 	//Poner tipoPrivacidad en caso de implementar lo de compartir viajes
@@ -74,116 +90,31 @@ public class Reserva extends BaseEntity {
 
 	@Column(name = "descripcion_Equipaje")
 	@Size(min = 0, max =280)
-	@NotEmpty
 	private String descripcionEquipaje;
 	
 	
 	@ManyToOne
 	@JoinColumn(name = "estado_Reserva_id",referencedColumnName="id")
 	private  EstadoReserva estadoReserva;
-
-
-	public Cliente getCliente() {
-		return cliente;
-	}
-
-
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
-	}
-
-
-	public Ruta getRuta() {
-		return ruta;
-	}
-
-
-	public void setRuta(Ruta ruta) {
-		this.ruta = ruta;
-	}
-
-
-	public Date getFechaSalida() {
-		return fechaSalida;
-	}
-
-
-	public void setFechaSalida(Date fechaSalida) {
-		this.fechaSalida = fechaSalida;
-	}
-
-
-	public Date getFechaLlegada() {
-		return fechaLlegada;
-	}
-
-
-	public void setFechaLlegada(Date fechaLlegada) {
-		this.fechaLlegada = fechaLlegada;
-	}
-
-
-	public Date getHoraSalida() {
-		return horaSalida;
-	}
-
-
-	public void setHoraSalida(Date horaSalida) {
-		this.horaSalida = horaSalida;
-	}
-
-
-	public Date getHoraLlegada() {
-		return horaLlegada;
-	}
-
-
-	public void setHoraLlegada(Date horaLlegada) {
-		this.horaLlegada = horaLlegada;
-	}
-
-
-	public Double getHorasEspera() {
-		return horasEspera;
-	}
-
-
-	public void setHorasEspera(Double horasEspera) {
-		this.horasEspera = horasEspera;
-	}
-
-
-	public Integer getPlazas_Ocupadas() {
-		return plazas_Ocupadas;
-	}
-
-
-	public void setPlazas_Ocupadas(Integer plazas_Ocupadas) {
-		this.plazas_Ocupadas = plazas_Ocupadas;
-	}
-
-
-	public String getDescripcionEquipaje() {
-		return descripcionEquipaje;
-	}
-
-
-	public void setDescripcionEquipaje(String descripcionEquipaje) {
-		this.descripcionEquipaje = descripcionEquipaje;
-	}
-
-
-	public EstadoReserva getEstadoReserva() {
-		return estadoReserva;
-	}
-
-
-	public void setEstadoReserva(EstadoReserva estadoReserva) {
-		this.estadoReserva = estadoReserva;
-	}
 	
 	//Meter relación reserva recursiva en caso de implementar compartir viajes
+	@Min(0)
+	@Digits(fraction=2,integer=5)
+	@Column(name = "precio_Total")
+	private  Double precioTotal;
 	
+	@Min(0)
+	@Digits(fraction=2,integer=6)
+	@Column(name = "num_Km_Totales")
+	private  Double numKmTotales;
 	
+	public static Reserva newReservaSinCalcular(Date fechaSalida,Date horaSalida, Integer plazasOcupadas,String descripcionEquipaje) {
+		Reserva nuevaReserva= new Reserva();
+		nuevaReserva.setFechaSalida(fechaSalida);
+		nuevaReserva.setHoraSalida(horaSalida);
+		nuevaReserva.setPlazas_Ocupadas(plazasOcupadas);
+		nuevaReserva.setDescripcionEquipaje(descripcionEquipaje);
+		return nuevaReserva;
+	}
 	
 }

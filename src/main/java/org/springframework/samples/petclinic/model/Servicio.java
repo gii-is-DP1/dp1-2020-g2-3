@@ -18,6 +18,7 @@ package org.springframework.samples.petclinic.model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -49,12 +52,18 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Entity
 @Table(name = "servicios")
-public class Servicio extends NamedEntity{
+
+public class Servicio extends BaseEntity{
+
+
 
 	@Column(name = "fecha")
 	@NotNull
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
-	private LocalDate fecha;
+	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date fecha;
+	
+	
 	
 	@Column(name = "precio")
 	@NotNull
@@ -75,12 +84,22 @@ public class Servicio extends NamedEntity{
 	@Column(name = "descripcion")
 	@NotEmpty
 	private String descripcion;
+	
+	@Column(name = "completado")
+	private Boolean completado;
+	
+	@Column(name = "fecha_completado")
+	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date fechaCompletado;
+			
+	
 
-	public LocalDate getFecha() {
+	public Date getFecha() {
 		return fecha;
 	}
 
-	public void setFecha(LocalDate fecha) {
+	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
 
@@ -123,13 +142,31 @@ public class Servicio extends NamedEntity{
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
+	
+	public Boolean getCompletado() {
+		return completado;
+	}
+
+	public void setCompletado(Boolean completado) {
+		this.completado = completado;
+	}
+	
+	public Date getFechaCompletado() {
+		return fechaCompletado;
+	}
+
+	public void setFechaCompletado(Date fecha_completado) {
+		this.fechaCompletado = fecha_completado;
+	}
 
 	@Override
 	public String toString() {
 		return "Servicio [fecha=" + fecha + ", precio=" + precio + ", trabajador=" + trabajador + ", automovil="
-				+ automovil + ", taller=" + taller + ", descripcion=" + descripcion + "]";
+				+ automovil + ", taller=" + taller + ", descripcion=" + descripcion + ", completado=" + completado
+				+ ", fechaCompletado=" + fechaCompletado + "]";
 	}
 	
+
 	
 	
 

@@ -4,14 +4,18 @@ import org.springframework.beans.support.PropertyComparator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
 import java.time.LocalDate;
@@ -29,7 +33,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-@Data
+@Getter 
+@Setter
 @Entity
 @Table(name = "Ruta")
 public class Ruta extends BaseEntity {
@@ -54,8 +59,18 @@ public class Ruta extends BaseEntity {
 	@Column(name = "horas_Estimadas_Cliente")
 	@NotNull
 	private  Double horasEstimadasCliente;
-
-
+	
+	@Min(0)
+	@Digits(fraction=2,integer=3)
+	@Column(name = "horas_Estimadas_Taxista")
+	@NotNull
+	private  Double horasEstimadasTaxista;
+	
+	
+	@ManyToMany
+	@OrderColumn
+	List<Trayecto> trayectos;
+	
 	@Override
 	public String toString() {
 		return "Ruta [origenCliente=" + origenCliente + ", destinoCliente=" + destinoCliente + ", numKmTotales="

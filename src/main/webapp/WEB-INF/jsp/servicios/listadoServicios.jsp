@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+    pageEncoding="UTF-8"%>
 <%@ page session="false" trimDirectiveWhitespaces="true" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -13,13 +13,15 @@
     <table id="serviciosTable" class="table table-striped">
         <thead>
         <tr>
-            <th>Nombre</th>
-            <th>Fecha</th>
+          
+            <th>Fecha solicitud</th>
             <th>Precio</th>
             <th>Trabajador</th>
-            <th>Automóvil</th>
+            <th>AutomÃ³vil</th>
             <th>Taller</th>
-            <th>Descripción</th>
+            <th>DescripciÃ³n</th>
+            <th>Fecha Completado</th>
+            <th>Completado</th>
             <th>Editar</th>
             <th>Eliminar</th>   
         </tr>
@@ -27,9 +29,6 @@
         <tbody>
         <c:forEach items="${servicios}" var="servicio">
             <tr>
-              <td>
-                    <c:out value="${servicio.name}"/>
-                </td>
                 <td>
                     <c:out value="${servicio.fecha}"/>
                 </td>
@@ -54,6 +53,12 @@
                 <td>
                     <c:out value="${servicio.descripcion}"/>
                 </td>
+                 <td>
+                    <c:out value="${servicio.fechaCompletado}"/>
+                </td>
+                 <td>
+                    <c:out value="${servicio.completado}"/>
+                </td>
                 <td>
                 <spring:url value="/servicios/edit/{servicioId}" var="servicioEditUrl">
                 <spring:param name="servicioId" value="${servicio.id}"/>
@@ -70,6 +75,6 @@
         </tbody>
     </table>
     <p>
-    	<a href="/servicios/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Añadir Servicio</a>
+    	<a href="/servicios/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>AÃ±adir Servicio</a>
     </p>
 </petclinic:layout>
