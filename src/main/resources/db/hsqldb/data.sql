@@ -46,6 +46,10 @@ INSERT INTO users(username,password,enabled) VALUES ('manuel84','manuel84',TRUE)
 INSERT INTO authorities(id,username,authority) VALUES (17,'manuel84','cliente');
 INSERT INTO clientes(id,nombre,apellidos,DNI,email,telefono,username) VALUES(4,'Manuel','Perez Barrasa','29666111L','manuel@gmail.com',666555789,'manuel84');
 
+INSERT INTO users(username,password,enabled) VALUES ('pepe33','pepe33',TRUE);
+INSERT INTO authorities(id,username,authority) VALUES (18,'pepe33','cliente');
+INSERT INTO clientes(id,nombre,apellidos,DNI,email,telefono,username) VALUES(5,'Pepe','Perez Barrasa','29666441L','pepe@gmail.com',666551119,'pepe33');
+
 INSERT INTO CONTRATOS(id,salario_mensual,fecha_inicio,fecha_fin)VALUES(1,1200,'2020-01-04','2021-01-04');
 INSERT INTO CONTRATOS(id,salario_mensual,fecha_inicio,fecha_fin)VALUES(2,1100,'2020-01-04','2021-01-04');
 INSERT INTO CONTRATOS(id,salario_mensual,fecha_inicio,fecha_fin)VALUES(3,900,'2020-01-04','2021-01-04');
@@ -109,6 +113,6 @@ INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id,trayectos_order)VALUES(1,1,0);
 INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id,trayectos_order)VALUES(1,2,1);
 
 INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales)VALUES(1,1,1,'2020-01-12','2020-01-12','17:40','18:40',0.0,4,'Maleta grande',1,59.29,144.6);
-INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id)VALUES(1,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1);
-INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id)VALUES(2,5,1,'2020-12-22','2020-12-28','18:00','19:23',0,3,'Llevo una maleta grande',2);
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales)VALUES(2,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1,59.29,113.7);
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales)VALUES(3,5,1,'2020-12-22','2020-12-28','18:00','19:23',0,4, 'Maleta pequeña',2,70.9,150.3);
 

@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -246,7 +247,7 @@ public class ReservaService {
 	
 	@Transactional
 	public Collection<Reserva> findReservasByClienteId(int id) throws DataAccessException {
-	return resRepo.findReservasByClienteId(id);
+	return reservaRepo.findReservasByClienteId(id);
 	}
 
 	
