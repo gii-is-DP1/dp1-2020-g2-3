@@ -225,14 +225,8 @@ public class ReservaController {
 	
 	public String mostrarReservaCalculada(Reserva reserva, ModelMap modelMap,String formularioExito,List<Trayecto> trayectosIntermedios,int horasRutaCliente,int minutosRutaCliente) {
 				
-				if(!reserva.getRuta().getOrigenCliente().equals("Zahinos")) {
-					modelMap.put("trayectoIdaTaxista", "Zahinos");
-				}
-				if(!reserva.getRuta().getDestinoCliente().equals("Zahinos")) {
-					modelMap.put("trayectoVueltaTaxista", "Zahinos");
-				}
-				
-				if(formularioExito.equals("reservas/editReservaForm")) {
+			
+				if(formularioExito.equals("reservas/editReservaForm")) { //Si hemos solicitado EDITAR la ruta, aparecerán más campos en el formulario
 					Iterable<EstadoReserva> estadosReserva= estadoReservaService.findAll();
 					modelMap.put("estadosReserva", estadosReserva);
 					
@@ -409,6 +403,57 @@ public class ReservaController {
 		}else {
 			return "exception";
 		}
-	
 	}
+	
+	
+	@GetMapping(value = "/peticionesReservas")
+	public String listadoPeticionesReservas(ModelMap modelMap) {
+		String vista="reservas/peticionesReservas";
+		Iterable<Reserva> reservas= reservaService.findPeticionesReserva();
+		modelMap.addAttribute("reservas", reservas);
+		return vista;
+	}
+	
+	@GetMapping(value= "/aceptar/{reservaId}")
+	public String aceptarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+		
+		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
+		EstadoReserva estadoReserva= estadoReservaService.findEstadoById(2).get(); //Estado 2= Aceptada
+		
+		if(!reservaOptional.isPresent()) {
+			modelMap.addAttribute("error", "Reserva no encontrada");
+			return listadoPeticionesReservas(modelMap);
+		}else if(!reservaOptional.get().getEstadoReserva().getName().equals("Solicitada")){
+			modelMap.addAttribute("error", "La reserva ya ha sido aceptada/rechazada anteriormente");
+			return listadoPeticionesReservas(modelMap);
+			
+		}else {
+			reservaOptional.get().setEstadoReserva(estadoReserva);
+			modelMap.addAttribute("message", "Reserva aceptada correctamente");
+			return listadoPeticionesReservas(modelMap);
+			
+		}
+		
+	}
+	
+	@GetMapping(value= "/rechazar/{reservaId}")
+	public String rechazarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+		
+		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
+		EstadoReserva estadoReserva= estadoReservaService.findEstadoById(3).get(); //Estado 3= Rechazada
+		if(!reservaOptional.isPresent()) {
+			modelMap.addAttribute("error", "Reserva no encontrada");
+			return listadoPeticionesReservas(modelMap);
+		}else if(!reservaOptional.get().getEstadoReserva().getName().equals("Solicitada")){
+				modelMap.addAttribute("error", "La reserva ya ha sido aceptada/rechazada anteriormente");
+				return listadoPeticionesReservas(modelMap);
+		}else {
+			reservaOptional.get().setEstadoReserva(estadoReserva);
+			modelMap.addAttribute("message", "Reserva rechazada correctamente");
+			return listadoPeticionesReservas(modelMap);
+			
+		}
+		
+	}
+	
 }
