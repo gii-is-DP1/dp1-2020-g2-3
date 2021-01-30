@@ -234,6 +234,12 @@ public class ReservaService {
 	}
 	
 	@Transactional
+	public Iterable<Reserva> findPeticionesReserva() throws DataAccessException {
+		 return reservaRepo.findPeticionesReserva();
+		
+	}
+	
+	@Transactional
 	public void delete(Reserva reserva) throws DataAccessException  {
 			reservaRepo.delete(reserva);
 	}

@@ -52,12 +52,12 @@ public class AutomovilController {
 				modelMap.addAttribute("message", "Automóvil borrado correctamente");
 			}catch(DataAccessException exception) {
 				
-				modelMap.addAttribute("message", "No se puede eliminar un automóvil que haya realizado un servicio o viaje");
+				modelMap.addAttribute("error", "No se puede eliminar un automóvil que haya realizado un servicio o viaje");
 			}
 			
 		}else {
 			
-			modelMap.addAttribute("message", "Automóvil no encontrado");
+			modelMap.addAttribute("error", "Automóvil no encontrado");
 		}
 		return listadoAutomoviles(modelMap);
 	}
