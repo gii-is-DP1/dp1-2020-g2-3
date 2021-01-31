@@ -15,41 +15,7 @@
                <input type="hidden" name="id" id="id" value="${reserva.id}"/>
        
         <input type="hidden" name="numCiudadesIntermedias" id="numCiudadesIntermedias" value="${numCiudadesIntermedias}"/>
-<c:choose>
- <c:when test = "${reserva.ruta.origenCliente != 'Zahinos'}">
-  <!-- Trayecto desde la localidad del taxista (Zahinos) hasta el origen marcado por el cliente-->
-  <div style="float:left">
- <p style="color:green"  > Zahinos -->  </p> 
- </div>
- </c:when>
-</c:choose>
-       
-       <input type="hidden" name="ruta.origenCliente" id="ruta.origenCliente" value="${reserva.ruta.origenCliente}"/>
-       <p style="float:left"> ${reserva.ruta.origenCliente} -->  </p> 
-     <c:choose>
-       <c:when test = "${numCiudadesIntermedias>0}"> 
-       
-       
-       
-       <c:forEach var="i" begin="0" end="${finBucle}" step="1" varStatus ="status">
-       <p style="float:left"> 
-      	   ${trayectosIntermedios[i].origen} --> </p>
-    	 <input type="hidden" name="ruta.trayectos[${i}].origen" id="ruta.trayectos[${i}].origen" value="${trayectosIntermedios[i].origen}" />
-           	</c:forEach>
-       </c:when>
-     </c:choose>
-    
-      <input type="hidden" name="ruta.destinoCliente" id="ruta.destinoCliente" value="${reserva.ruta.destinoCliente}"/>
-       
-       <p style="float:left"> ${reserva.ruta.destinoCliente} </p>
-       
-       <c:choose>
- <c:when test = "${reserva.ruta.destinoCliente != 'Zahinos'}">
-  <!-- Trayecto de vuelta del taxista desde el destino del cliente hasta la localidad del taxista, zahinos-->
-
-  <p style="color:green";"float:left"> -->  Zahinos </p>
- </c:when>
-</c:choose>
+      <jsp:include page="/WEB-INF/jsp/reservas/mostrarRuta.jsp"/>
 
       <br>
       
@@ -59,13 +25,16 @@
             <input type="hidden" name="horasRutaCliente" id="horasRutaCliente" value="${horasRutaCliente}"/>
               <input type="hidden" name="minutosRutaCliente" id="minutosRutaCliente" value="${minutosRutaCliente}"/>
       
-<button class="btn btn-default" type="submit" name="action" value="editarRuta"> Editar Ruta </button> 
+<button class="btn btn-info" type="submit" name="action" value="editarRuta"><span class="glyphicon glyphicon-edit" aria-hidden="false"></span> Editar Ruta  </button> 
 <br><br>
-       <p> *Para el cálculo de kilómetros totales se tiene en cuenta el <span style="color:green">  trayecto que realiza el taxista para llegar al origen </span>,
-       así como el de <span style="color:green"> vuelta hasta su localidad (Zahínos) </span></p>
-       <p style="color:green"> **Los trayectos en verde no le corresponden al cliente</p>
-        <p> ***La duración del viaje, así como la fecha estimada de llegada, corresponde a la ruta realizada por el cliente (Trayectos en negro)</p>
-           
+       <p style="border:3px; border-style:solid; border-color:#000000; background-color:#FFF699">
+       *Para el cálculo de kilómetros totales se tiene en cuenta el <span style="color:green">  trayecto que realiza el taxista para llegar al origen </span>,
+       así como el de <span style="color:green"> vuelta hasta su localidad (Zahínos) </span> <br>
+       **Los trayectos en verde no le corresponden al cliente <br>
+      ***La duración del viaje, así como la fecha estimada de llegada, corresponde a la ruta realizada por el cliente (Trayectos en negro)</p>
+       		
+      			
+      <br>
        <h2>Fecha de Salida</h2>
        
         <label for="fechaSalida">Fecha de salida</label>

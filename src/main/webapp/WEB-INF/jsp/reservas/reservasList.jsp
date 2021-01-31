@@ -12,7 +12,7 @@
     
      <p>
     	<a href="/reservas/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Solicitar nueva reserva</a>
-    	<a href="/reservas/peticionesReservas" class="btn  btn-success"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Ver peticiones de reservas</a>
+    	<a href="/reservas/peticionesReservas" class="btn  btn-success"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Aceptar/Rechazar peticiones de reservas</a>
     	
     </p>
     <br> 
@@ -72,7 +72,7 @@
                    <spring:url value="/reservas/edit/{reservaId}" var="reservaEditUrl">
                    <spring:param name="reservaId" value="${reserva.id}"/>                  
                 </spring:url>
-                  <a class="editReserva" href="${fn:escapeXml(reservaEditUrl)}"> <img alt="" id="edit" src="/resources/images/edit.png" style="width: 45px"></a>
+                  <a  class="btn btn-info" href="${fn:escapeXml(reservaEditUrl)}"> <span class="glyphicon glyphicon-eye-open" aria-hidden="false"> <span class="glyphicon glyphicon-edit" aria-hidden="false"></a>
                 
                
                 </td>
@@ -80,7 +80,7 @@
                  <spring:url value="/reservas/delete/{reservaId}" var="reservaDeleteUrl">
                 <spring:param name="reservaId" value="${reserva.id}"/>
                 </spring:url>
-				<a class="deleteReserva" href="${fn:escapeXml(reservaDeleteUrl)}"> <img alt="" id="delete" src="/resources/images/delete.png" style="width: 45px"></a>
+				<a class="btn btn-danger" href="${fn:escapeXml(reservaDeleteUrl)}"> <span class="glyphicon glyphicon-trash" aria-hidden="false"></a>
                 </td>
             </tr>
             <td>

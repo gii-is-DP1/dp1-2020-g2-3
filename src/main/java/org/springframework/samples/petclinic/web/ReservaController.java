@@ -30,6 +30,7 @@ import org.springframework.samples.petclinic.service.TrayectoService;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
+import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -418,42 +419,38 @@ public class ReservaController {
 	public String aceptarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
 		
 		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
-		EstadoReserva estadoReserva= estadoReservaService.findEstadoById(2).get(); //Estado 2= Aceptada
-		
 		if(!reservaOptional.isPresent()) {
 			modelMap.addAttribute("error", "Reserva no encontrada");
 			return listadoPeticionesReservas(modelMap);
-		}else if(!reservaOptional.get().getEstadoReserva().getName().equals("Solicitada")){
-			modelMap.addAttribute("error", "La reserva ya ha sido aceptada/rechazada anteriormente");
-			return listadoPeticionesReservas(modelMap);
-			
 		}else {
-			reservaOptional.get().setEstadoReserva(estadoReserva);
-			modelMap.addAttribute("message", "Reserva aceptada correctamente");
+			try {
+				reservaService.aceptarRechazarReserva(reservaOptional.get(),true);
+				modelMap.addAttribute("message", "Reserva aceptada correctamente");
+			}catch(ParadaYaAceptadaRechazadaException e) {
+				modelMap.addAttribute("error", "La reserva que se intenta aceptar ya ha sido aceptada/rechazada anteriormente");
+			}
 			return listadoPeticionesReservas(modelMap);
-			
+		}
 		}
 		
-	}
+	
 	
 	@GetMapping(value= "/rechazar/{reservaId}")
 	public String rechazarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
 		
 		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
-		EstadoReserva estadoReserva= estadoReservaService.findEstadoById(3).get(); //Estado 3= Rechazada
 		if(!reservaOptional.isPresent()) {
 			modelMap.addAttribute("error", "Reserva no encontrada");
 			return listadoPeticionesReservas(modelMap);
-		}else if(!reservaOptional.get().getEstadoReserva().getName().equals("Solicitada")){
-				modelMap.addAttribute("error", "La reserva ya ha sido aceptada/rechazada anteriormente");
-				return listadoPeticionesReservas(modelMap);
 		}else {
-			reservaOptional.get().setEstadoReserva(estadoReserva);
-			modelMap.addAttribute("message", "Reserva rechazada correctamente");
+			try {
+				reservaService.aceptarRechazarReserva(reservaOptional.get(),false);
+				modelMap.addAttribute("message", "Reserva rechazada correctamente");
+			}catch(ParadaYaAceptadaRechazadaException e) {
+				modelMap.addAttribute("error", "La reserva que se intenta rechazar ya ha sido aceptada/rechazada anteriormente");
+			}
 			return listadoPeticionesReservas(modelMap);
-			
 		}
-		
 	}
 	
 }

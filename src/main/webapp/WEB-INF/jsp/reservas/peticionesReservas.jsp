@@ -10,9 +10,7 @@
 
 <petclinic:layout pageName="Reserva">
     
-     <p>
-    	<a href="/reservas/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Solicitar nueva reserva</a>
-    </p>
+     
     <br> 
 	<h2>Reservas solicitadas</h2>
 	
@@ -67,14 +65,20 @@
                     <c:out value="${reserva.estadoReserva}"/>
                 </td>
                  <td>
-                   <spring:url value="/reservas/aceptar/{reservaId}" var="aceptarReservaUrl">
+                 
+                  <spring:url value="/reservas/aceptar/{reservaId}" var="aceptarReservaUrl">
                    <spring:param name="reservaId" value="${reserva.id}"/>                  
                 </spring:url>
-                
-                
-                  <a class="btn btn-success" href="${fn:escapeXml(aceptarReservaUrl)}"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></a>
+                  <a class="btn btn-info" href="${fn:escapeXml(aceptarReservaUrl)}">
+                    <span class="glyphicon glyphicon-eye-open" aria-hidden="false">
+                  </a>
                 </td>
                 <td>
+                
+                <spring:url value="/reservas/aceptar/{reservaId}" var="aceptarReservaUrl">
+                   <spring:param name="reservaId" value="${reserva.id}"/>                  
+                </spring:url>
+                  <a class="btn btn-success" href="${fn:escapeXml(aceptarReservaUrl)}"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></a>
                  <spring:url value="/reservas/rechazar/{reservaId}" var="rechazarReservaUrl">
                 <spring:param name="reservaId" value="${reserva.id}"/>
                 </spring:url>
