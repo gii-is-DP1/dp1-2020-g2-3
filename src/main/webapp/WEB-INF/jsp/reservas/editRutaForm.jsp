@@ -27,9 +27,9 @@
        
 		<br><br>
           
-		<button class="btn btn-default" type="submit" name="action" value="recalcularReserva">Recalcular Reserva</button> 
+		<button class="btn btn-default" type="submit" name="action" value="recalcularReserva">Recalcular Reserva <span class="glyphicon glyphicon-menu-right" aria-hidden="false"></span></button> 
 		<br><br>
-		*se recalculará el nuevo precio teniendo en cuenta la tarifa que se encuentra activa en este momento		 
+		*se recalculará el nuevo precio teniendo en cuenta la tarifa que se encuentre activa en este momento		 
     </form:form>    
     
 </petclinic:layout>

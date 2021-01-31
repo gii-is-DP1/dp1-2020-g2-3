@@ -30,6 +30,7 @@ import org.springframework.samples.petclinic.service.TrayectoService;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
+import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -225,14 +226,8 @@ public class ReservaController {
 	
 	public String mostrarReservaCalculada(Reserva reserva, ModelMap modelMap,String formularioExito,List<Trayecto> trayectosIntermedios,int horasRutaCliente,int minutosRutaCliente) {
 				
-				if(!reserva.getRuta().getOrigenCliente().equals("Zahinos")) {
-					modelMap.put("trayectoIdaTaxista", "Zahinos");
-				}
-				if(!reserva.getRuta().getDestinoCliente().equals("Zahinos")) {
-					modelMap.put("trayectoVueltaTaxista", "Zahinos");
-				}
-				
-				if(formularioExito.equals("reservas/editReservaForm")) {
+			
+				if(formularioExito.equals("reservas/editReservaForm")) { //Si hemos solicitado EDITAR la ruta, aparecerán más campos en el formulario
 					Iterable<EstadoReserva> estadosReserva= estadoReservaService.findAll();
 					modelMap.put("estadosReserva", estadosReserva);
 					
@@ -409,6 +404,53 @@ public class ReservaController {
 		}else {
 			return "exception";
 		}
-	
 	}
+	
+	
+	@GetMapping(value = "/peticionesReservas")
+	public String listadoPeticionesReservas(ModelMap modelMap) {
+		String vista="reservas/peticionesReservas";
+		Iterable<Reserva> reservas= reservaService.findPeticionesReserva();
+		modelMap.addAttribute("reservas", reservas);
+		return vista;
+	}
+	
+	@GetMapping(value= "/aceptar/{reservaId}")
+	public String aceptarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+		
+		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
+		if(!reservaOptional.isPresent()) {
+			modelMap.addAttribute("error", "Reserva no encontrada");
+			return listadoPeticionesReservas(modelMap);
+		}else {
+			try {
+				reservaService.aceptarRechazarReserva(reservaOptional.get(),true);
+				modelMap.addAttribute("message", "Reserva aceptada correctamente");
+			}catch(ParadaYaAceptadaRechazadaException e) {
+				modelMap.addAttribute("error", "La reserva que se intenta aceptar ya ha sido aceptada/rechazada anteriormente");
+			}
+			return listadoPeticionesReservas(modelMap);
+		}
+		}
+		
+	
+	
+	@GetMapping(value= "/rechazar/{reservaId}")
+	public String rechazarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+		
+		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
+		if(!reservaOptional.isPresent()) {
+			modelMap.addAttribute("error", "Reserva no encontrada");
+			return listadoPeticionesReservas(modelMap);
+		}else {
+			try {
+				reservaService.aceptarRechazarReserva(reservaOptional.get(),false);
+				modelMap.addAttribute("message", "Reserva rechazada correctamente");
+			}catch(ParadaYaAceptadaRechazadaException e) {
+				modelMap.addAttribute("error", "La reserva que se intenta rechazar ya ha sido aceptada/rechazada anteriormente");
+			}
+			return listadoPeticionesReservas(modelMap);
+		}
+	}
+	
 }

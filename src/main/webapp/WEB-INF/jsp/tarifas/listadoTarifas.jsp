@@ -16,7 +16,7 @@
             <th>Precio por kilómetro</th>
             <th>Porcentaje IVA Repercutido</th>
             <th>Precio de espera por hora</th>
-            <th>Activado</th>
+            <th>Activada</th>
             <th>Editar</th>
             <th>Eliminar</th>   
         </tr>
@@ -34,7 +34,20 @@
                     <c:out value="${tarifa.precioEsperaPorHora}"/>
                 </td>
                <td>
-                    <c:out value="${tarifa.activado}"/>
+                    
+                    <c:choose>
+                    <c:when test="${tarifa.activado}">
+                    <c:out value= "Sí"/>
+                        
+                    </c:when>
+                    <c:otherwise>
+					 <c:out value= "No"/>
+						
+                    </c:otherwise>
+               	 </c:choose>
+                    
+                    
+                    
                 </td>
                 <td>
                 <spring:url value="/tarifas/edit/{tarifaId}" var="tarifaEditUrl">

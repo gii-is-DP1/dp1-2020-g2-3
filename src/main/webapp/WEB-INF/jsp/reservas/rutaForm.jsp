@@ -47,7 +47,8 @@
 	</c:when>
 </c:choose>
     	    <br> 
-		<button class="btn btn-default" type="submit" name="action" value="addParada">Añadir parada intermedia +</button> 		 
+    	 	<button class="btn btn-success" type="submit" name="action" value="addParada">Añadir parada intermedia <span class="glyphicon glyphicon-plus" aria-hidden="false"></span></button> 		 
+    	    
 		 <br><br>
         <label for="ruta.destinoCliente">Ciudad Destino:</label>
 		<select required="true" name="ruta.destinoCliente" id="ruta.destinoCliente">

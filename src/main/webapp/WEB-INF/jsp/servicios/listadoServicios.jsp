@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+    pageEncoding="UTF-8"%>
 <%@ page session="false" trimDirectiveWhitespaces="true" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -14,12 +14,12 @@
         <thead>
         <tr>
           
-            <th>Fecha</th>
+            <th>Fecha solicitud</th>
             <th>Precio</th>
             <th>Trabajador</th>
-            <th>Automóvil</th>
+            <th>AutomÃ³vil</th>
             <th>Taller</th>
-            <th>Descripción</th>
+            <th>DescripciÃ³n</th>
             <th>Fecha Completado</th>
             <th>Completado</th>
             <th>Editar</th>
@@ -75,6 +75,6 @@
         </tbody>
     </table>
     <p>
-    	<a href="/servicios/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Añadir Servicio</a>
+    	<a href="/servicios/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>AÃ±adir Servicio</a>
     </p>
 </petclinic:layout>

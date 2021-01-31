@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Cliente;
+import org.springframework.samples.petclinic.model.EstadoReserva;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
 import org.springframework.samples.petclinic.model.Trayecto;
@@ -21,6 +22,7 @@ import org.springframework.samples.petclinic.repository.RutaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
+import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -231,6 +233,34 @@ public class ReservaService {
 		reservaCalculada.setCliente(cliente);
 		this.save(reservaCalculada);
 		return reservaCalculada;
+	}
+	
+	@Transactional
+	public Iterable<Reserva> findPeticionesReserva() throws DataAccessException {
+		 return reservaRepo.findPeticionesReserva();
+		
+	}
+	
+	@Transactional
+	public void aceptarRechazarReserva(Reserva reserva,boolean aceptar) throws DataAccessException,ParadaYaAceptadaRechazadaException {
+		
+		if(!reserva.getEstadoReserva().getName().equals("Solicitada")) {
+			throw new ParadaYaAceptadaRechazadaException();
+		}else {
+			
+			EstadoReserva estadoReserva;
+			
+			if(aceptar) {
+				estadoReserva= estadoService.findEstadoById(2).get(); //Estado 2= Aceptada
+			}else {
+				estadoReserva= estadoService.findEstadoById(3).get(); //Estado 3= Rechazada
+			}
+			reserva.setEstadoReserva(estadoReserva);
+			save(reserva);
+			
+		}
+		
+		
 	}
 	
 	@Transactional

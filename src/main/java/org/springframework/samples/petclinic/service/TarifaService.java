@@ -22,7 +22,9 @@ public class TarifaService {
 	
 	@Transactional
 	public Tarifa findTarifaActiva() {
+		
 		return tariRep.findTarifaActiva();
+		
 	}
 	
 	@Transactional

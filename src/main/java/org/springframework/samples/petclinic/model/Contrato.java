@@ -1,12 +1,15 @@
 package org.springframework.samples.petclinic.model;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,23 +18,25 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Table(name = "contratos")
 public class Contrato extends BaseEntity{
 
-	@Column(name = "salarioMensual")
+	@Column(name = "salario_mensual")
 	@NotNull
 	private Double salarioMensual;
 	
-	@Column(name = "fechaInicio")
+	@Column(name = "fecha_inicio")
 	@NotNull
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
-	private LocalDate fechaInicio;
+	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date fechaInicio;
 	
-	@Column(name = "fechaFin")
+	@Column(name = "fecha_fin")
 	@NotNull
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
-	private LocalDate fechaFin;
+	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date fechaFin;
 	
-	@ManyToOne
-	@JoinColumn(name = "trabajador_id",referencedColumnName="id") //Cuando la clave primaria de Trabajador sea DNI habrá que referenciarlo aquí en lugar del id como está ahora.
-	private Trabajador trabajador;
+	
+	
+
 
 	public Double getSalarioMensual() {
 		return salarioMensual;
@@ -41,34 +46,28 @@ public class Contrato extends BaseEntity{
 		this.salarioMensual = salarioMensual;
 	}
 
-	public LocalDate getFechaInicio() {
+	public Date getFechaInicio() {
 		return fechaInicio;
 	}
 
-	public void setFechaInicio(LocalDate fechaInicio) {
+	public void setFechaInicio(Date fechaInicio) {
 		this.fechaInicio = fechaInicio;
 	}
 
-	public LocalDate getFechaFin() {
+	public Date getFechaFin() {
 		return fechaFin;
 	}
 
-	public void setFechaFin(LocalDate fechaFin) {
+	public void setFechaFin(Date fechaFin) {
 		this.fechaFin = fechaFin;
 	}
 
-	public Trabajador getTrabajador() {
-		return trabajador;
-	}
 
-	public void setTrabajador(Trabajador trabajador) {
-		this.trabajador = trabajador;
-	}
 
 	@Override
 	public String toString() {
 		return "Contrato [salarioMensual=" + salarioMensual + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin
-				+ ", trabajador=" + trabajador + "]";
+				+ "]";
 	}
 	
 	

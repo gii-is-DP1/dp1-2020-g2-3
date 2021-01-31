@@ -1,4 +1,5 @@
 <%@ page session="false" trimDirectiveWhitespaces="true" %>
+<%@page pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -14,7 +15,7 @@
             <input type="date" name="fecha"  id="fecha" value="<fmt:formatDate pattern = "yyyy-MM-dd" value = "${servicio.fecha}" />"/>
             
             <petclinic:inputField label="Precio" name="precio"/>
-            <petclinic:inputField label="Descripción" name="descripcion"/>
+            <petclinic:inputField label="DescripciÃ³n" name="descripcion"/>
             
             <label for="fechaCompletado">Fecha Completado</label>
             <input type="date" name="fechaCompletado"  id="fechaCompletado" value="<fmt:formatDate pattern = "yyyy-MM-dd" value = "${servicio.fechaCompletado}" />"/>
@@ -86,7 +87,7 @@
              <input type="hidden" name="id" id="id" value="${servicio.id}"/>
              <c:choose>
                     <c:when test="${servicio['new']}">
-                        <button class="btn btn-default" type="submit">Añadir servicio</button>
+                        <button class="btn btn-default" type="submit">AÃ±adir servicio</button>
                     </c:when>
                     <c:otherwise>
                         <button class="btn btn-default" type="submit">Actualizar servicio</button>
