@@ -38,6 +38,9 @@ public class TrabajadorService {
 	public Iterable<Trabajador> findAll(){
 		 return trabRepo.findAll();
 	}
+	public Trabajador findByUsername(String username) {
+		return trabRepo.findByUsername(username);
+	}
 	
 	
 	@Transactional(readOnly = true)
