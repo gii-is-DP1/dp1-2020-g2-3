@@ -8,10 +8,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
 import javax.persistence.Table;
 
 import java.util.Date;
@@ -31,15 +27,6 @@ public class Reserva extends BaseEntity {
 	@ManyToOne
     @JoinColumn(name = "cliente_id", referencedColumnName = "id")
 	private Cliente cliente;
-	
-	@OneToOne(optional=true)
-	@JoinColumn(name="automovil_id", referencedColumnName="id")
-	private Automovil automovil;
-	
-	@OneToOne(optional=true)
-	@JoinColumn(name="trabajador_id", referencedColumnName="id")
-	private Trabajador trabajador;
-	
 	
 	@ManyToOne
     @JoinColumn(name = "ruta_id", referencedColumnName = "id")
