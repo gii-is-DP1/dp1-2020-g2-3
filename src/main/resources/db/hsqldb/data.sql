@@ -59,7 +59,7 @@ INSERT INTO CONTRATOS(id,salario_mensual,fecha_inicio,fecha_fin)VALUES(6,950,'20
 INSERT INTO CONTRATOS(id,salario_mensual,fecha_inicio,fecha_fin)VALUES(7,1000,'2021-01-04','2022-01-04');
 INSERT INTO CONTRATOS(id,salario_mensual,fecha_inicio,fecha_fin)VALUES(8,1100,'2021-01-04','2022-01-04');
 
-INSERT INTO Trabajador(id,dni,nombre,apellidos,email,telefono,tipo_trabajador_id,username, contrato) VALUES (1,'80090030P','Rodolfo','García Ordóñez','rodolfo@gmail.com',632587419,1,'admin',1);
+INSERT INTO Trabajador(id,dni,nombre,apellidos,email,telefono,tipo_trabajador_id,username, contrato) VALUES (1,'80090030P','Rodolfo','García Ordóñez','rodolfo@gmail.com',632587419,1,'taxista1',1);
 INSERT INTO Trabajador(id,dni,nombre,apellidos,email,telefono,tipo_trabajador_id,username, contrato) VALUES (2,'90065864L','Roberta','Maestre','maestre@gmail.com',635874921,2,'roberta1',2);
 INSERT INTO Trabajador(id,dni,nombre,apellidos,email,telefono,tipo_trabajador_id,username, contrato) VALUES (3,'80550030C','Paco','Pérez González','paco@gmail.com',632583419,2,'paco1',3);
 INSERT INTO Trabajador(id,dni,nombre,apellidos,email,telefono,tipo_trabajador_id,username, contrato) VALUES (4,'90665864A','Sonia','Marquez','sonia@gmail.com',635874121,2,'sonia1',4);

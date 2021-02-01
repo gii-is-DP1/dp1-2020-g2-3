@@ -39,9 +39,6 @@ public class TrabajadorService {
 		 return trabRepo.findAll();
 	}
 	
-	public Trabajador findByUsername(String username) {
-		return trabRepo.findByUsername(username);
-	}
 	
 	@Transactional(readOnly = true)
 	public Trabajador findById(int id) throws DataAccessException {
