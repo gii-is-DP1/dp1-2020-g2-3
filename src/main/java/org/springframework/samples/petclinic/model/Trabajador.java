@@ -29,7 +29,7 @@ public class Trabajador extends Person {
 	@Column(name = "telefono")
 	@Digits(fraction = 0, integer = 10)
 	@NotNull
-	private  Integer telefono;
+	private  String telefono;
 	
 	
 	

@@ -50,7 +50,7 @@ public class TrabajadorControllerTests {
 		charles.setNombre("Charles");
 		charles.setApellidos("Pérez García");
 		charles.setEmail("charles@gmail.es");
-		charles.setTelefono(608555102);
+		charles.setTelefono("608555102");
 		given(this.trabajadorService.findById(TEST_TRABAJADOR_ID)).willReturn(charles);
 
 	}
