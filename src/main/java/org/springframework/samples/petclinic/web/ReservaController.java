@@ -19,6 +19,9 @@ import org.springframework.samples.petclinic.model.EstadoReserva;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
 import org.springframework.samples.petclinic.model.Servicio;
+import org.springframework.samples.petclinic.model.Taller;
+import org.springframework.samples.petclinic.model.Tarifa;
+import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
@@ -26,6 +29,7 @@ import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.EstadoReservaService;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.RutaService;
+import org.springframework.samples.petclinic.service.TarifaService;
 import org.springframework.samples.petclinic.service.TrayectoService;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
@@ -50,16 +54,18 @@ public class ReservaController {
 	private final AuthoritiesService authoService;
 	private final EstadoReservaService estadoReservaService;
 	private final ClienteService clienteService;
+	private final TarifaService tarifaService;
 	
 	
 	@Autowired
-	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService,EstadoReservaService estadoReservaService,ClienteService clienteService) {
+	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService,EstadoReservaService estadoReservaService,ClienteService clienteService, TarifaService tarifaService) {
 		this.reservaService=reservaService;
 		this.trayectoService=trayectoService;
 		this.rutaService=rutaService;
 		this.authoService=authoService;
 		this.estadoReservaService=estadoReservaService;
 		this.clienteService=clienteService;
+		this.tarifaService=tarifaService;
 	}
 	
 	@GetMapping(value = "/reservasList")
@@ -411,4 +417,22 @@ public class ReservaController {
 		}
 	
 	}
+	
+	
+
+	@GetMapping("/reservaFactura/{reservaId}")
+	public String reservaFactura(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+		Optional<Reserva> reserva=reservaService.findReservaById(reservaId);
+		if(reserva.isPresent()) {
+			modelMap.addAttribute("reserva",reserva.get());
+			Tarifa tarifa=tarifaService.findTarifaActiva();
+			modelMap.addAttribute("tarifa",tarifa);
+			return "reservas/reservaFactura";
+		}else {
+			modelMap.addAttribute("message","No se ha encontrado el servicio a editar");
+			return listadoReservas(modelMap);
+		}
+	} 
+	
+	
 }

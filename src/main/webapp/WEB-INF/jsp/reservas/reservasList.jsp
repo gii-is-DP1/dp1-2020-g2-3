@@ -29,6 +29,7 @@
             <th style="width: 150px;">Plazas Ocupadas</th>
             <th style="width: 200px;">Precio total</th>
             <th style="width: 200px;">Estado Reserva</th>
+             <th style="width: 200px;">Factura</th>
              <th style="width: 200px;">Detalles/Editar</th>
               <th style="width: 200px;">Eliminar</th>
         </tr>
@@ -66,7 +67,17 @@
                   <td>
                     <c:out value="${reserva.estadoReserva}"/>
                 </td>
+             
                  <td>
+                   <spring:url value="/reservas/reservaFactura/{reservaId}" var="reservaFacturaEditUrl">
+                   <spring:param name="reservaId" value="${reserva.id}"/>                  
+                </spring:url>
+                  <a class="editFacturaReserva" href="${fn:escapeXml(reservaFacturaEditUrl)}"> Ver</a>
+                
+               
+                </td>
+                                 
+                <td>
                    <spring:url value="/reservas/edit/{reservaId}" var="reservaEditUrl">
                    <spring:param name="reservaId" value="${reserva.id}"/>                  
                 </spring:url>
