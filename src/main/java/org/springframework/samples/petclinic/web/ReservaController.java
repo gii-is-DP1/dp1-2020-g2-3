@@ -22,12 +22,14 @@ import org.springframework.samples.petclinic.model.Servicio;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
+import org.springframework.samples.petclinic.service.AutomovilService;
 import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.EstadoReservaService;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.RutaService;
 import org.springframework.samples.petclinic.service.TrayectoService;
 import org.springframework.samples.petclinic.service.UserService;
+import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasInsuficientesException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
@@ -51,16 +53,18 @@ public class ReservaController {
 	private final AuthoritiesService authoService;
 	private final EstadoReservaService estadoReservaService;
 	private final ClienteService clienteService;
+	private final AutomovilService autoService;
 	
 	
 	@Autowired
-	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService,EstadoReservaService estadoReservaService,ClienteService clienteService) {
+	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService,EstadoReservaService estadoReservaService,ClienteService clienteService,AutomovilService autoService) {
 		this.reservaService=reservaService;
 		this.trayectoService=trayectoService;
 		this.rutaService=rutaService;
 		this.authoService=authoService;
 		this.estadoReservaService=estadoReservaService;
 		this.clienteService=clienteService;
+		this.autoService=autoService;
 	}
 	
 	@GetMapping(value = "/reservasList")
@@ -415,6 +419,7 @@ public class ReservaController {
 		return vista;
 	}
 	
+	
 	@GetMapping(value= "/aceptar/{reservaId}")
 	public String aceptarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
 		
@@ -423,17 +428,41 @@ public class ReservaController {
 			modelMap.addAttribute("error", "Reserva no encontrada");
 			return listadoPeticionesReservas(modelMap);
 		}else {
-			try {
-				reservaService.aceptarRechazarReserva(reservaOptional.get(),true);
-				modelMap.addAttribute("message", "Reserva aceptada correctamente");
-			}catch(ParadaYaAceptadaRechazadaException e) {
-				modelMap.addAttribute("error", "La reserva que se intenta aceptar ya ha sido aceptada/rechazada anteriormente");
+			Iterable<Automovil> automoviles= autoService.findAll();
+			modelMap.addAttribute("automoviles",automoviles);
+			return "reservas/selectAutomovil";
 			}
+		}
+	
+	
+	@PostMapping(value= "/aceptar/{reservaId}")
+	public String aceptarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap,@RequestParam("autoId") int autoId, Principal p) {
+	
+		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
+		if(!reservaOptional.isPresent()) {
+			modelMap.addAttribute("error", "Reserva no encontrada");
 			return listadoPeticionesReservas(modelMap);
+		}else {
+			Optional<Automovil> automovil= autoService.findAutomovilById(autoId);
+			if(!automovil.isPresent()) {
+				modelMap.addAttribute("error", "El automóvil que se ha intentado asignar no existe");
+				return listadoPeticionesReservas(modelMap);
+			}else {
+				
+				try {
+					reservaService.aceptarReserva(reservaOptional.get(),automovil.get(),p);
+					modelMap.addAttribute("message", "Reserva aceptada correctamente");
+				}catch(ParadaYaAceptadaRechazadaException e) {
+					modelMap.addAttribute("error", "La reserva que se intenta aceptar ya ha sido aceptada/rechazada anteriormente");
+				}catch(AutomovilPlazasInsuficientesException e) {
+					modelMap.addAttribute("error", "El automóvil que ha seleccionado no tiene suficientes plazas para realizar la reserva");
+				}
+				return listadoPeticionesReservas(modelMap);
+			}
+			
 		}
 		}
 		
-	
 	
 	@GetMapping(value= "/rechazar/{reservaId}")
 	public String rechazarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
@@ -444,7 +473,7 @@ public class ReservaController {
 			return listadoPeticionesReservas(modelMap);
 		}else {
 			try {
-				reservaService.aceptarRechazarReserva(reservaOptional.get(),false);
+				reservaService.rechazarReserva(reservaOptional.get());
 				modelMap.addAttribute("message", "Reserva rechazada correctamente");
 			}catch(ParadaYaAceptadaRechazadaException e) {
 				modelMap.addAttribute("error", "La reserva que se intenta rechazar ya ha sido aceptada/rechazada anteriormente");

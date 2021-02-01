@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.service;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,12 +15,14 @@ import org.springframework.samples.petclinic.model.Cliente;
 import org.springframework.samples.petclinic.model.EstadoReserva;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
+import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.AutomovilRepository;
 import org.springframework.samples.petclinic.repository.ClienteRepository;
 import org.springframework.samples.petclinic.repository.ReservaRepository;
 import org.springframework.samples.petclinic.repository.RutaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
+import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasInsuficientesException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
@@ -36,15 +39,17 @@ public class ReservaService {
 	private ClienteService clienteService;
 	private RutaService rutaService;
 	private TarifaService tarifaService;
+	private TrabajadorService trabajadorService;
 	
 	@Autowired
-	public ReservaService(ReservaRepository reservaRepo,TrayectoService trayectoService,EstadoReservaService estadoService,ClienteService clienteService,RutaService rutaService,TarifaService tarifaService) {
+	public ReservaService(ReservaRepository reservaRepo,TrayectoService trayectoService,EstadoReservaService estadoService,ClienteService clienteService,RutaService rutaService,TarifaService tarifaService,TrabajadorService trabajadorService) {
 		this.reservaRepo=reservaRepo;
 		this.trayectoService=trayectoService;
 		this.estadoService=estadoService;
 		this.clienteService=clienteService;
 		this.rutaService=rutaService;
 		this.tarifaService=tarifaService;
+		this.trabajadorService=trabajadorService;
 	}
 	
 	@Transactional
@@ -240,28 +245,49 @@ public class ReservaService {
 		 return reservaRepo.findPeticionesReserva();
 		
 	}
-	
 	@Transactional
-	public void aceptarRechazarReserva(Reserva reserva,boolean aceptar) throws DataAccessException,ParadaYaAceptadaRechazadaException {
+	public void rechazarReserva(Reserva reserva) throws DataAccessException,ParadaYaAceptadaRechazadaException {
 		
 		if(!reserva.getEstadoReserva().getName().equals("Solicitada")) {
 			throw new ParadaYaAceptadaRechazadaException();
 		}else {
 			
-			EstadoReserva estadoReserva;
-			
-			if(aceptar) {
-				estadoReserva= estadoService.findEstadoById(2).get(); //Estado 2= Aceptada
-			}else {
-				estadoReserva= estadoService.findEstadoById(3).get(); //Estado 3= Rechazada
-			}
+			EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); //Estado 3= Rechazada
 			reserva.setEstadoReserva(estadoReserva);
 			save(reserva);
 			
 		}
 		
+	}
+	@Transactional
+	public void aceptarReserva(Reserva reserva,Automovil auto,Principal p) throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException {
+	
+		if(!reserva.getEstadoReserva().getName().equals("Solicitada")) {
+			throw new ParadaYaAceptadaRechazadaException();
+		}else {
+			System.out.println("P GET NAME: " + p.getName());
+			Trabajador trabajador= trabajadorService.findByUsername(p.getName());
+			
+			if(auto.getNumPlazas()-1<reserva.getPlazas_Ocupadas()){
+				throw new AutomovilPlazasInsuficientesException();
+			} //Añadir con else if las comprobaciones de las RN-02 Automóvil en uso  y RN-04- Rechazar viajes en un mismo horario
+			else {
+				
+				
+				EstadoReserva estadoReserva=estadoService.findEstadoById(2).get(); //Estado 2= Aceptada
+				reserva.setTrabajador(trabajador);
+				reserva.setAutomovil(auto);
+				reserva.setEstadoReserva(estadoReserva);
+				save(reserva);
+			}
+		
+		}
+		
 		
 	}
+	
+	
+	
 	
 	@Transactional
 	public void delete(Reserva reserva) throws DataAccessException  {
