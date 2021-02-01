@@ -258,10 +258,6 @@ public class ReservaService {
 
 		
 	
-	@Transactional(readOnly = true)
-	public Collection<Reserva> findReservasByClienteId(int clienteId) throws DataAccessException{
-		return reservaRepo.findReservasByClienteId(clienteId);
-	}
 	
 	
 
