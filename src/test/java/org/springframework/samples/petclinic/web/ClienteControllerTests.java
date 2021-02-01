@@ -11,6 +11,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Date;
+
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +25,12 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
 import org.springframework.samples.petclinic.model.Cliente;
+import org.springframework.samples.petclinic.model.EstadoReserva;
+import org.springframework.samples.petclinic.model.Reserva;
+import org.springframework.samples.petclinic.model.Ruta;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.ClienteService;
+import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -40,6 +48,9 @@ public class ClienteControllerTests {
 	
 	@MockBean
 	private ClienteService clienteService;
+	
+	@MockBean
+	private ReservaService reservaService;
         
     @MockBean
 	private UserService userService;
@@ -51,6 +62,12 @@ public class ClienteControllerTests {
 	private MockMvc mockMvc;
 
 	private Cliente lucas;
+	
+	private Reserva reserva;
+	
+	private EstadoReserva estRes;
+	
+	private Ruta ruta;
 	
 	@BeforeEach
 	void setup() {
@@ -64,6 +81,39 @@ public class ClienteControllerTests {
 		lucas.setTelefono("608555103");
 		given(this.clienteService.findClienteById(TEST_CLIENTE_ID)).willReturn(lucas);
 
+//		estRes = new EstadoReserva();
+//		estRes.setId(1);
+//		estRes.setName("Solicitada");
+//		
+//		ruta = new Ruta();
+//		ruta.setDestinoCliente("Zahinos");
+//		ruta.setOrigenCliente("Badajoz");
+//		ruta.setId(1);
+//		ruta.setNumKmTotales(58.8);
+//		ruta.setHorasEstimadasCliente(10.);
+//		ruta.setHorasEstimadasTaxista(8.);
+//		
+//		reserva = new Reserva();
+//		reserva.setCliente(lucas);
+//		reserva.setDescripcionEquipaje("Maleta pequeña");
+//		reserva.setEstadoReserva(estRes);
+//		Date fechaLlegada = new Date(2021,3,3);
+//		reserva.setFechaLlegada(fechaLlegada);
+//		Date fechaSalida = new Date(2021,3,2);
+//		reserva.setFechaSalida(fechaSalida);
+//		Date horaLlegada = new Date(2021,3,3,19,30,00);
+//		reserva.setHoraLlegada(horaLlegada);
+//		Date horaSalida = new Date(2021,3,2,22,30,00);
+//		reserva.setHoraSalida(horaSalida);
+//		reserva.setHorasEspera(0.);
+//		reserva.setId(1);
+//		reserva.setPlazas_Ocupadas(5);
+//		reserva.setNumKmTotales(58.8);
+//		reserva.setPrecioTotal(39.5);
+//		reserva.setRuta(ruta);
+//		
+//		given(this.reservaService.findReservasByClienteId(TEST_CLIENTE_ID));
+		
 	}
 	
 	@WithMockUser(value = "spring")
@@ -110,17 +160,17 @@ public class ClienteControllerTests {
 	@Test
     void testProcessFindFormSuccess() throws Exception {
 	given(this.clienteService.findClienteByNombre("")).willReturn(Lists.newArrayList(lucas, new Cliente()));
-	mockMvc.perform(get("/clientes")).andExpect(status().isOk()).andExpect(view().name("clientes/findClientes"));
+	mockMvc.perform(get("/clientes")).andExpect(status().isOk()).andExpect(view().name("clientes/clientesList"));
 	}
 
-	@WithMockUser(value = "spring")
-    @Test
-    void testProcessFindFormByLastName() throws Exception {
-		given(this.clienteService.findClienteByNombre(lucas.getApellidos())).willReturn(Lists.newArrayList(lucas));
-
-		mockMvc.perform(get("/clientes").param("apellidos", "Perez")).andExpect(status().is3xxRedirection())
-			.andExpect(view().name("redirect:/clientes/" + TEST_CLIENTE_ID));
-	}
+//	@WithMockUser(value = "spring")
+//    @Test
+//    void testProcessFindFormByLastName() throws Exception {
+//		given(this.clienteService.findClienteByNombre(lucas.getApellidos())).willReturn(Lists.newArrayList(lucas));
+//
+//		mockMvc.perform(get("/clientes").param("apellidos", "Perez")).andExpect(status().is3xxRedirection())
+//			.andExpect(view().name("redirect:/clientes/" + TEST_CLIENTE_ID));
+//	}
 
     @WithMockUser(value = "spring")
     @Test
@@ -184,5 +234,15 @@ void testInitUpdateClienteForm() throws Exception {
 			.andExpect(model().attribute("cliente", hasProperty("telefono", is("608555103"))))
 			.andExpect(view().name("clientes/clienteDetails"));
     }
+    
+//    @WithMockUser(value = "spring")
+//    @Test
+//    void testShowReservas() throws Exception {
+//    	
+//		mockMvc.perform(get("/clientes/{clienteId}/myReservas", TEST_CLIENTE_ID)).andExpect(status().isOk())
+//		    .andExpect(model().attributeExists("cliente"))
+//		    .andExpect(model().attributeExists("reserva"))
+//			.andExpect(view().name("reservas/reservasList"));
+//	}
 
 }

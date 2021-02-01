@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page session="false" trimDirectiveWhitespaces="true" %>
@@ -12,40 +11,37 @@
     
      <p>
     	<a href="/reservas/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Solicitar nueva reserva</a>
-    	<a href="/reservas/peticionesReservas" class="btn  btn-success"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Ver peticiones de reservas</a>
-    	
     </p>
     <br> 
-	<h2>Listado de Reservas</h2>
+	<h2>Reservas</h2>
 	
     <table id="reservasTable" class="table table-striped">
         <thead>
         <tr>
          	<th style="width: 100px;">Cliente</th>
-          	<th style="width: 100px;">Origen</th>
-            <th style="width: 200px;">Destino</th>
+          	<th style="width: 100px;">Ruta</th>
             <th style="width: 200px;">Fecha Salida</th>
             <th style="width: 100px;">Hora Salida</th>
             <th style="width: 100px;">Fecha llegada</th>
             <th style="width: 100px;">Hora llegada</th>
+            <th style="width: 100px;">Horas Espera</th>
             <th style="width: 150px;">Plazas Ocupadas</th>
-            <th style="width: 200px;">Precio total</th>
+            <th style="width: 200px;">Descripcion Equipaje</th>
             <th style="width: 200px;">Estado Reserva</th>
+            <th style="width: 100px;">Precio Total</th>
+            <th style="width: 100px;">Numero de kms</th>
              <th style="width: 200px;">Detalles/Editar</th>
               <th style="width: 200px;">Eliminar</th>
         </tr>
         </thead>
         <tbody>
-        <c:forEach items="${reservas}" var="reserva">
+        <c:forEach items="${reserva}" var="reserva">
             <tr>
             	<td>
-                    <c:out value="${reserva.cliente.user.username}"/>
+                    <c:out value="${reserva.cliente.id}"/>
                 </td>
                 <td>
-                    <c:out value="${reserva.ruta.origenCliente}"/>
-                </td>
-                <td>
-                    <c:out value="${reserva.ruta.destinoCliente}"/>
+                    <c:out value="${reserva.ruta.id}"/>
                 </td>
                 <td>
                     <c:out value="${reserva.fechaSalida}"/>
@@ -59,14 +55,23 @@
                  <td>
                     <c:out value="${reserva.horaLlegada}"/>
                 </td>
+                 <td>
+                    <c:out value="${reserva.horasEspera}"/>
+                </td>
                   <td>
                     <c:out value="${reserva.plazas_Ocupadas}"/>
                 </td>
                   <td>
-                    <c:out value="${reserva.precioTotal}"/>
+                    <c:out value="${reserva.descripcionEquipaje}"/>
                 </td>
                   <td>
                     <c:out value="${reserva.estadoReserva}"/>
+                </td>
+                 <td>
+                    <c:out value="${reserva.precioTotal}"/>
+                </td>
+                 <td>
+                    <c:out value="${reserva.numKmTotales}"/>
                 </td>
                  <td>
                    <spring:url value="/reservas/edit/{reservaId}" var="reservaEditUrl">
@@ -91,3 +96,4 @@
     
    
 </petclinic:layout>
+

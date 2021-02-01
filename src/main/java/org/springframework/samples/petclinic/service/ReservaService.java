@@ -238,6 +238,11 @@ public class ReservaService {
 		 return reservaRepo.findPeticionesReserva();
 		
 	}
+
+	@Transactional
+	public Collection<Reserva> findReservasByClienteId(int id) throws DataAccessException {
+	return reservaRepo.findReservasByClienteId(id);
+	}
 	
 	@Transactional
 	public void delete(Reserva reserva) throws DataAccessException  {
