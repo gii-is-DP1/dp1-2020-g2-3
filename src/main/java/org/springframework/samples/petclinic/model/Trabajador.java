@@ -11,6 +11,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -22,13 +23,13 @@ public class Trabajador extends Person {
 	
 	
 	@Column(name = "email")
-	@NotEmpty
+	@Email
 	private  String email;
 	
 	@Column(name = "telefono")
 	@Digits(fraction = 0, integer = 10)
 	@NotNull
-	private  Integer telefono;
+	private  String telefono;
 	
 	
 	
@@ -40,13 +41,18 @@ public class Trabajador extends Person {
 	@JoinColumn(name = "tipo_trabajador_id",referencedColumnName="id")
 	private  TipoTrabajador tipoTrabajador;
 	
-	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "contrato", referencedColumnName = "id")
+	private Contrato contrato;
 
 	@Override
 	public String toString() {
-		return "Trabajador [ " + ", correoElectronico="
-				+ email + ", telefono=" + telefono + ", "+  "]";
+		return "Trabajador [email=" + email + ", telefono=" + telefono + ", user=" + user + ", tipoTrabajador="
+				+ tipoTrabajador + ", contrato=" + contrato + "]";
 	}
+	
+
+
 
 	
 	

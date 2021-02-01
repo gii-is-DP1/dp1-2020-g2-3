@@ -59,7 +59,7 @@ public class ContratoService {
 	}
 	
 	@Transactional(readOnly = true)
-	public Optional<Contrato> findContratoById(int id) throws DataAccessException {
+	public Optional<Contrato> findById(int id) throws DataAccessException {
 		return contratoRepository.findById(id);
 	}
 	

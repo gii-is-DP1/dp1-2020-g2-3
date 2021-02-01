@@ -15,10 +15,13 @@
       
               <input type="hidden" name="numCiudadesIntermedias" id="numCiudadesIntermedias" value="${numCiudadesIntermedias}"/>
 <c:choose>
- <c:when test = "${not empty trayectoIdaTaxista}">
-  <!-- Trayecto desde la localidad del taxista (Zahinos) hasta el origen marcado por el cliente-->
+
+
+
+ <c:when test = "${reserva.ruta.origenCliente != 'Zahinos'}"> <!--  El trayecto del taxista al origen del cliente se muestra en otro color --> 
+ 
   <div style="float:left">
- <p style="color:green"  > ${trayectoIdaTaxista} -->  </p> 
+ <p style="color:green"  > Zahinos -->  </p> 
  </div>
  </c:when>
 </c:choose>
@@ -40,10 +43,11 @@
        <p style="float:left"> ${reserva.ruta.destinoCliente} </p>
        
        <c:choose>
- <c:when test = "${not empty trayectoVueltaTaxista}">
+       
+ <c:when test = "${reserva.ruta.destinoCliente != 'Zahinos'}">
   <!-- Trayecto de vuelta del taxista desde el destino del cliente hasta la localidad del taxista, zahinos-->
 
-  <p style="color:green";"float:left"> -->  ${trayectoVueltaTaxista}</p>
+  <p style="color:green";"float:left"> -->  Zahinos </p>
  </c:when>
 </c:choose>
       <br>

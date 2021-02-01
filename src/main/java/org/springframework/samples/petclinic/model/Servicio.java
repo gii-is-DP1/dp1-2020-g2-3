@@ -60,8 +60,10 @@ public class Servicio extends BaseEntity{
 	@Column(name = "fecha")
 	@NotNull
 	@Temporal(TemporalType.DATE)
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date fecha;
+	
+	
 	
 	@Column(name = "precio")
 	@NotNull
@@ -88,7 +90,7 @@ public class Servicio extends BaseEntity{
 	
 	@Column(name = "fecha_completado")
 	@Temporal(TemporalType.DATE)
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date fechaCompletado;
 			
 	
