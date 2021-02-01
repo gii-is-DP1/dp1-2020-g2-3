@@ -72,10 +72,9 @@ class ReservaServiceMockedTests {
     
     @Mock
     private TarifaService tarifaService;
-   
+    
     @Mock
     private TrabajadorService trabajadorService;
-    
    
 
     protected ReservaService reservaService;

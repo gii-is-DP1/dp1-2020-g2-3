@@ -1,9 +1,9 @@
-
 package org.springframework.samples.petclinic.service;
 
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -241,11 +241,14 @@ public class ReservaService {
 		return reservaCalculada;
 	}
 	
+	
+	
 	@Transactional
 	public Iterable<Reserva> findPeticionesReserva() throws DataAccessException {
 		 return reservaRepo.findPeticionesReserva();
 		
 	}
+
 	@Transactional
 	public void rechazarReserva(Reserva reserva) throws DataAccessException,ParadaYaAceptadaRechazadaException {
 		
@@ -286,9 +289,10 @@ public class ReservaService {
 		
 		
 	}
-	
-	
-	
+	@Transactional
+	public Collection<Reserva> findReservasByClienteId(int id) throws DataAccessException {
+	return reservaRepo.findReservasByClienteId(id);
+	}
 	
 	@Transactional
 	public void delete(Reserva reserva) throws DataAccessException  {
@@ -300,8 +304,11 @@ public class ReservaService {
 		
 		reservaRepo.save(reserva);
 	}
+
+		
+	
+	
 	
 
 	
 }
-
