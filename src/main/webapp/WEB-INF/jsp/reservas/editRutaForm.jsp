@@ -27,7 +27,7 @@
        
 		<br><br>
           
-		<button class="btn btn-default" type="submit" name="action" value="recalcularReserva">Recalcular Reserva <span class="glyphicon glyphicon-menu-right" aria-hidden="false"></span></button> 
+		<button class="btn btn-default" type="submit" name="action" value="recalcularReserva">Recalcular Reserva</button> 
 		<br><br>
 		*se recalculará el nuevo precio teniendo en cuenta la tarifa que se encuentre activa en este momento		 
     </form:form>    
