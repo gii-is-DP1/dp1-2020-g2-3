@@ -18,6 +18,7 @@ package org.springframework.samples.petclinic.model;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 
 /**
  * Simple JavaBean domain object representing an person.
@@ -27,28 +28,43 @@ import javax.validation.constraints.NotEmpty;
 @MappedSuperclass
 public class Person extends BaseEntity {
 
-	@Column(name = "first_name")
+	@Column(name = "nombre")
 	@NotEmpty
-	protected String firstName;
+	protected String nombre;
 
-	@Column(name = "last_name")
+	@Column(name = "apellidos")
 	@NotEmpty
-	protected String lastName;
+	protected String apellidos;
+	
+	@Column(name = "dni")
+	@Pattern(regexp="[0-9]{8}[A-Za-z]{1}")
+	@NotEmpty
+	protected String dni;
 
-	public String getFirstName() {
-		return this.firstName;
+	public String getNombre() {
+		return nombre;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
-	public String getLastName() {
-		return this.lastName;
+	public String getApellidos() {
+		return apellidos;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
 	}
+
+	public String getDni() {
+		return dni;
+	}
+
+	public void setDni(String dni) {
+		this.dni = dni;
+	}
+
+	
 
 }

@@ -12,7 +12,7 @@
     <table class="table table-striped">
         <tr>
             <th>Nombre</th>
-            <td><b><c:out value="${cliente.firstName} ${cliente.lastName}"/></b></td>
+            <td><b><c:out value="${cliente.nombre} ${cliente.apellidos}"/></b></td>
         </tr>
         <tr>
             <th>DNI</th>
@@ -32,6 +32,11 @@
         <spring:param name="clienteId" value="${cliente.id}"/>
     </spring:url>
     <a href="${fn:escapeXml(editUrl)}" class="btn btn-default">Edit Cliente</a>
+    
+     <spring:url value="{clienteId}/myReservas" var="reservaUrl">
+        <spring:param name="clienteId" value="${cliente.id}"/>
+    </spring:url>
+    <a href="${fn:escapeXml(reservaUrl)}" class="btn btn-default">Mis Reservas</a>
 
     <spring:url value="{clienteId}/clientes/new" var="addUrl">
         <spring:param name="clienteId" value="${cliente.id}"/>

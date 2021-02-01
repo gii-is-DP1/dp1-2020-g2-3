@@ -61,13 +61,9 @@ public class Automovil extends BaseEntity {
 	@NotNull
 	private  Double kmRecorridos;
 	
-	@ManyToOne
-	@JoinColumn(name = "trabajador_id",referencedColumnName="id") //Cuando la clave primaria de Trabajador sea DNI habrá que referenciarlo aquí en lugar del id como está ahora.
-	private Trabajador trabajador;
-	
 	@Override
 	public String toString() {
 		return "Automovil [marca=" + marca + ", modelo=" + modelo + ", numPlazas=" + numPlazas + ", kmRecorridos="
-				+ kmRecorridos + ", trabajador=" + trabajador + "]";
+				+ kmRecorridos + "]";
 	}
 }

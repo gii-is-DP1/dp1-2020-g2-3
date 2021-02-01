@@ -11,6 +11,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -18,28 +19,17 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "trabajador")
-public class Trabajador extends BaseEntity {
+public class Trabajador extends Person {
 	
-	@Column(name = "DNI")
-	@NotEmpty
-	private String DNI;
 	
-	@Column(name = "nombre") //Hacer que extienda a Person 
-	@NotEmpty
-	private  String nombre;
-	
-	@Column(name = "apellidos")
-	@NotEmpty
-	private  String apellidos;
-
-	@Column(name = "correo_Electronico")
-	@NotEmpty
-	private  String correoElectronico;
+	@Column(name = "email")
+	@Email
+	private  String email;
 	
 	@Column(name = "telefono")
 	@Digits(fraction = 0, integer = 10)
 	@NotNull
-	private  Integer telefono;
+	private  String telefono;
 	
 	
 	
@@ -51,15 +41,18 @@ public class Trabajador extends BaseEntity {
 	@JoinColumn(name = "tipo_trabajador_id",referencedColumnName="id")
 	private  TipoTrabajador tipoTrabajador;
 	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "trabajador") 
-	private Set<Automovil> automoviles;
-	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "contrato", referencedColumnName = "id")
+	private Contrato contrato;
 
 	@Override
 	public String toString() {
-		return "Trabajador [DNI=" + DNI + ", nombre=" + nombre + ", apellidos=" + apellidos + ", correoElectronico="
-				+ correoElectronico + ", telefono=" + telefono + ", "+  "]";
+		return "Trabajador [email=" + email + ", telefono=" + telefono + ", user=" + user + ", tipoTrabajador="
+				+ tipoTrabajador + ", contrato=" + contrato + "]";
 	}
+	
+
+
 
 	
 	

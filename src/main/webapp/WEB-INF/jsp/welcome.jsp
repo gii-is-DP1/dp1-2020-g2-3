@@ -13,14 +13,14 @@
     <p><h2> Group ${group}</h2></p>
     <p><ul>
     <c:forEach items="${persons}" var="person">
-    <li>${person.lastName} , ${person.firstName} </li>
+    <li>${person.apellidos} , ${person.nombre} </li>
     </c:forEach>    
     </ul>
     </p>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <spring:url value="/resources/images/pets.png" htmlEscape="true" var="petsImage"/>
+            <spring:url value="/resources/images/coche.jpg" htmlEscape="true" var="petsImage"/>
             <img class="img-responsive" src="${petsImage}"/>
         </div>
     </div>

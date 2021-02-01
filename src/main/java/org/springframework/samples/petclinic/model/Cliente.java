@@ -14,15 +14,11 @@ import javax.validation.constraints.NotEmpty;
 @Table(name = "clientes")
 public class Cliente extends Person{
 
-	@Column(name = "dni")
-	@NotEmpty
-	private String dni;
-	
 	@Column(name = "email")
 	@Email
 	private String email;
 	
-	@Column(name = "telephone")
+	@Column(name = "telefono")
 	@NotEmpty
 	@Digits(fraction = 0, integer = 10)
 	private String telefono;
@@ -31,13 +27,6 @@ public class Cliente extends Person{
 	@JoinColumn(name = "username", referencedColumnName = "username")
 	private User user;
 
-	public String getDni() {
-		return dni;
-	}
-
-	public void setDni(String dni) {
-		this.dni = dni;
-	}
 
 	public String getEmail() {
 		return email;
@@ -65,7 +54,7 @@ public class Cliente extends Person{
 
 	@Override
 	public String toString() {
-		return "Cliente [dni=" + dni + ", nombre=" + firstName + ", apellidos=" + lastName + ", email=" + email
+		return "Cliente [" + ", nombre=" + nombre + ", apellidos=" + apellidos + ", email=" + email
 				+ ", telefono=" + telefono + ", user=" + user + "]";
 	}
 	

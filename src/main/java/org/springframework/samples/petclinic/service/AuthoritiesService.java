@@ -17,6 +17,7 @@ package org.springframework.samples.petclinic.service;
 
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -48,6 +49,12 @@ public class AuthoritiesService {
 	public void saveAuthorities(Authorities authorities) throws DataAccessException {
 		authoritiesRepository.save(authorities);
 	}
+	
+	@Transactional
+	public Set<String> findAuthoritiesByUsername(String username) throws DataAccessException {
+		return authoritiesRepository.findAuthoritiesByUsername(username);
+	}
+	
 	
 	@Transactional
 	public void saveAuthorities(String username, String role) throws DataAccessException {

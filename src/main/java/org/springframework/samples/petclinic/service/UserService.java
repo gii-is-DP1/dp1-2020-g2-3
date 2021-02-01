@@ -17,6 +17,7 @@ package org.springframework.samples.petclinic.service;
 
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -49,5 +50,10 @@ public class UserService {
 	
 	public Optional<User> findUser(String username) {
 		return userRepository.findById(username);
+	}
+	
+	@Transactional
+	public Iterable<User> findAll() throws DataAccessException {
+		return userRepository.findAll();
 	}
 }

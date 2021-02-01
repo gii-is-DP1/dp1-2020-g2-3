@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic.web;
 
 import java.util.Map;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,23 +29,23 @@ public class WelcomeController {
 			 Person person5 = new Person();
 			 Person person6 = new Person();
 			 
-		    person1.setFirstName("José Manuel");
-		    person1.setLastName("Cuevas Gallardo");
+		    person1.setNombre("José Manuel");
+		    person1.setApellidos("Cuevas Gallardo");
 		    persons.add(person1);
-		    person2.setFirstName("Vicente");
-		    person2.setLastName("Díaz Correa");
+		    person2.setNombre("Vicente");
+		    person2.setApellidos("Díaz Correa");
 		    persons.add(person2);
-		    person3.setFirstName("Iván");
-		    person3.setLastName("Hernández Rodriguez");
+		    person3.setNombre("Iván");
+		    person3.setApellidos("Hernández Rodriguez");
 		    persons.add(person3);
-		    person4.setFirstName("José Antonio");
-		    person4.setLastName("Macías Portillo");
+		    person4.setNombre("José Antonio");
+		    person4.setApellidos("Macías Portillo");
 		    persons.add(person4);
-		    person5.setFirstName("Elena");
-		    person5.setLastName("Nold Cardona");
+		    person5.setNombre("Elena");
+		    person5.setApellidos("Nold Cardona");
 		    persons.add(person5);
-		    person6.setFirstName("Manuel");
-		    person6.setLastName("Rivas Llamas");
+		    person6.setNombre("Manuel");
+		    person6.setApellidos("Rivas Llamas");
 		    persons.add(person6);
 		    
 		    model.put("persons", persons);
