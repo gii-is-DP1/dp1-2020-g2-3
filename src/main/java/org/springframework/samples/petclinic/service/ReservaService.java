@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
