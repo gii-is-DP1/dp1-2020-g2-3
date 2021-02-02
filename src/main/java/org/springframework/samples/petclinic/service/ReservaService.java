@@ -322,7 +322,20 @@ public class ReservaService {
 		reservaRepo.save(reserva);
 	}
 
+	@Transactional
+	public Iterable<Reserva> findAcceptRes(int id) throws DataAccessException {
+		 return reservaRepo.findAcceptResById(id);
 		
+	}
+	
+	@Transactional
+	public void cancelarReserva(Reserva reserva) throws DataAccessException {
+		if(reserva.getEstadoReserva().getName().equals("Aceptada")) {
+			EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
+			reserva.setEstadoReserva(estadoReserva);
+			save(reserva);
+		}
+	}
 	
 	
 	

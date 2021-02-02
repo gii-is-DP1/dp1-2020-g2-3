@@ -3,6 +3,7 @@ package org.springframework.samples.petclinic.web;
 import java.util.Collection;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -14,6 +15,7 @@ import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.UserService;
+import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -137,11 +139,27 @@ public class ClienteController {
 	}
 	
 	@GetMapping("/clientes/{clienteId}/myReservas")
-	public String showReservas(@PathVariable("clienteId") int clienteId, ModelMap model) {
-		Collection<Reserva> reservas = this.reservaService.findReservasByClienteId(clienteId); 
+	public String showReservas(@PathVariable("clienteId") int clienteId, ModelMap modelMap) {
+		String vista="reservas/reservasList";
 		Cliente cliente = this.clienteService.findClienteById(clienteId);
-		model.addAttribute("reserva", reservas);
-		model.addAttribute("cliente", cliente);
-		return "reservas/reservasList";
+		Iterable<Reserva> reservas= reservaService.findAcceptRes(clienteId);
+		modelMap.addAttribute("reservas", reservas);
+		modelMap.addAttribute("cliente", cliente);
+		return vista;
 	}
-}
+	
+	@GetMapping(value= "/clientes/{clienteId}/myReservas/cancelar/{reservaId}")
+	public String cancelarReserva(@PathVariable("clienteId") int clienteId, @PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
+		if(!reservaOptional.isPresent()) {
+			modelMap.addAttribute("error", "Reserva no encontrada");
+			return showReservas(clienteId, modelMap);
+		}else {
+				reservaService.cancelarReserva(reservaOptional.get());
+				modelMap.addAttribute("message", "Reserva cancelada correctamente");
+			}
+			return showReservas(clienteId, modelMap);
+		}
+	}
+	
+
