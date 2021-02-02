@@ -516,21 +516,22 @@ public class ReservaController {
 	public String reservaFactura(@PathVariable("reservaId") int reservaId,ModelMap modelMap) throws DataAccessException, EstadoReservaFacturaException {
 		try {
 			Optional<Reserva> reserva=reservaService.findFacturaReservaById(reservaId);
-		}catch(EstadoReservaFacturaException e){
-			modelMap.addAttribute("error","Estado de reserva no completado");
-			return listadoReservas(modelMap);
-		}
-		Optional<Reserva> reserva=reservaService.findFacturaReservaById(reservaId);
-		Map<String,Double> factura = reservaService.calcularFactura(reservaId);
 		if(reserva.isPresent()) {
-			modelMap.addAttribute("factura",factura);
+			Map<String,Double> factura = reservaService.calcularFactura(reservaId);
+      modelMap.addAttribute("factura",factura);
 			modelMap.addAttribute("reserva",reserva.get());
 			return "reservas/reservaFactura";
 		}else {
 			modelMap.addAttribute("message","No se ha encontrado la factura");
 			return listadoReservas(modelMap);
 		}
-	} 
 	
+		}catch(EstadoReservaFacturaException e){
+			modelMap.addAttribute("error","Estado de reserva no completado");
+			return listadoReservas(modelMap);
+		}
+	
+		
+	}
 }
 

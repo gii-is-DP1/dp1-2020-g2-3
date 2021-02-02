@@ -70,7 +70,7 @@ public class ReservaService {
 	}
 	@Transactional
 	public Map<String,Double> calcularFactura(int id){
-		System.out.println("Hola");
+
 		Reserva reserva = reservaRepo.findById(id).get();
 		Map<String, Double> res = new HashMap<String, Double>();
 		res.put("IVA Repercutido", Math.round((reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal())*100.0)/100.0);
@@ -133,14 +133,15 @@ public class ReservaService {
 	
 	@Transactional(readOnly = true)
 	public Optional<Reserva> findFacturaReservaById(int id) throws DataAccessException, EstadoReservaFacturaException {
-	Reserva reserva = reservaRepo.findById(id).get();
-		if(reserva.getEstadoReserva().getName().equals("Completada")) {
-			System.out.println("La reserva ha sido completada, se muestra la factura");
-		}else {
-			throw new EstadoReservaFacturaException();
+		Optional<Reserva> reserva = reservaRepo.findById(id);
+			if(reserva.get().getEstadoReserva().getName().equals("Completada")) {
+				System.out.println("La reserva ha sido completada, se muestra la factura");
+				return reserva;
+			}else {
+				throw new EstadoReservaFacturaException();
+			}
 		}
-		return reservaRepo.findById(id);
-	}
+
 
 	
 	
