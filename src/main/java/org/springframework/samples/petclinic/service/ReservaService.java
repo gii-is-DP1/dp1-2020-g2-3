@@ -248,7 +248,7 @@ public class ReservaService {
 		reservaEditada.setTarifa(reservaBD.getTarifa());
 		BeanUtils.copyProperties(reservaEditada, reservaBD, "id");
 		save(reservaBD);
-		return reservaBD;
+		return reservaBD; 
 	}
 	@Transactional 
 	public Reserva calcularYConfirmarNuevaReservaCliente(Reserva reserva,String username)throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException{
