@@ -31,6 +31,7 @@ import org.springframework.samples.petclinic.service.EstadoReservaService;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.RutaService;
 import org.springframework.samples.petclinic.service.TarifaService;
+import org.springframework.samples.petclinic.service.TrabajadorService;
 import org.springframework.samples.petclinic.service.TrayectoService;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasInsuficientesException;
@@ -59,10 +60,11 @@ public class ReservaController {
 	private final ClienteService clienteService;
 	private final TarifaService tarifaService;
 	private final AutomovilService autoService;
+	private final TrabajadorService trabajadorService;
 	
 	
 	@Autowired
-	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService,EstadoReservaService estadoReservaService,ClienteService clienteService, TarifaService tarifaService,AutomovilService autoService) {
+	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService,EstadoReservaService estadoReservaService,ClienteService clienteService, TarifaService tarifaService,AutomovilService autoService,TrabajadorService trabajadorService) {
 		this.reservaService=reservaService;
 		this.trayectoService=trayectoService;
 		this.rutaService=rutaService;
@@ -71,6 +73,7 @@ public class ReservaController {
 		this.clienteService=clienteService;
 		this.tarifaService=tarifaService;
 		this.autoService=autoService;
+		this.trabajadorService=trabajadorService;
 	}
 	
 	@GetMapping(value = "/reservasList")
@@ -243,9 +246,15 @@ public class ReservaController {
 					
 					Iterable<Cliente> clientes= clienteService.findAll();
 					modelMap.put("clientes", clientes);
+					
+					Iterable<Trabajador> trabajadores= trabajadorService.findAll();
+					modelMap.put("trabajadores", trabajadores);
+					
+					Iterable<Automovil> automoviles= autoService.findAll();
+					modelMap.put("automoviles",automoviles);
+					
+				
 				}
-				Iterable<EstadoReserva> estadosReserva= estadoReservaService.findAll();
-				modelMap.put("estadosReserva", estadosReserva);
 				
 				Integer numCiudadesIntermedias= trayectosIntermedios.size();
 				modelMap.put("reserva", reserva);
