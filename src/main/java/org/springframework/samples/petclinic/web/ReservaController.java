@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -520,10 +521,10 @@ public class ReservaController {
 			return listadoReservas(modelMap);
 		}
 		Optional<Reserva> reserva=reservaService.findFacturaReservaById(reservaId);
+		Map<String,Double> factura = reservaService.calcularFactura(reservaId);
 		if(reserva.isPresent()) {
+			modelMap.addAttribute("factura",factura);
 			modelMap.addAttribute("reserva",reserva.get());
-			Tarifa tarifa=reserva.get().getTarifa();
-			modelMap.addAttribute("tarifa",tarifa);
 			return "reservas/reservaFactura";
 		}else {
 			modelMap.addAttribute("message","No se ha encontrado la factura");
