@@ -70,6 +70,7 @@ public class ReservaService {
 	}
 	@Transactional
 	public Map<String,Double> calcularFactura(int id){
+
 		Reserva reserva = reservaRepo.findById(id).get();
 		Map<String, Double> res = new HashMap<String, Double>();
 		res.put("IVA Repercutido", Math.round((reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal())*100.0)/100.0);
@@ -140,7 +141,6 @@ public class ReservaService {
 				throw new EstadoReservaFacturaException();
 			}
 		}
-		
 
 
 	

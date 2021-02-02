@@ -518,7 +518,7 @@ public class ReservaController {
 			Optional<Reserva> reserva=reservaService.findFacturaReservaById(reservaId);
 		if(reserva.isPresent()) {
 			Map<String,Double> factura = reservaService.calcularFactura(reservaId);
-			modelMap.addAttribute("factura",factura);
+      modelMap.addAttribute("factura",factura);
 			modelMap.addAttribute("reserva",reserva.get());
 			return "reservas/reservaFactura";
 		}else {
