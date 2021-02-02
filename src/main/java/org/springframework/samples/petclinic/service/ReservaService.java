@@ -26,6 +26,8 @@ import org.springframework.samples.petclinic.repository.RutaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
 import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasInsuficientesException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
+
+import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
 import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
@@ -143,6 +145,13 @@ public class ReservaService {
 		reserva.setFechaLlegada(fechaHoraLlegada);
 		reserva.setHoraLlegada(fechaHoraLlegada);
 		Tarifa tarifa= tarifaService.findTarifaActiva();
+		Optional<Tarifa> tarifaCopia= tarifaService.findCopyOfTarifa(tarifa);
+		if(tarifaCopia.isPresent()) { //Si existe una tarifa copia se utiliza
+			tarifa=tarifaCopia.get();
+		}else { //Si no existe una tarifa copia igual, se crea
+			tarifa= tarifaService.nuevaTarifa(false, false, tarifa.getPorcentajeIvaRepercutido(), tarifa.getPrecioEsperaPorHora(), tarifa.getPrecioPorKm());
+			tarifaService.save(tarifa);
+		}
 		reserva.setTarifa(tarifa);
 		Double precioPorKm= tarifa.getPrecioPorKm();
 		Double precioTotal=calcularPrecioDistancia(nuevaRuta.getNumKmTotales(), precioPorKm);
@@ -238,8 +247,13 @@ public class ReservaService {
 	}
 	*/
 	@Transactional
-	public Reserva guardarReservaEditada(Reserva reservaEditada,Reserva reservaBD) throws DuplicatedParadaException {
-	
+	public Reserva guardarReservaEditada(Reserva reservaEditada,Reserva reservaBD) throws DuplicatedParadaException,FechaLlegadaAnteriorSalidaException{
+		
+		if(reservaEditada.getFechaLlegada().compareTo(reservaEditada.getFechaSalida())<0) { //Si la fecha de llegada es anterior a la de salida se lanza excepción
+			throw new FechaLlegadaAnteriorSalidaException();
+		}else if(reservaEditada.getHoraLlegada().compareTo(reservaEditada.getHoraSalida())<0) {
+			throw new FechaLlegadaAnteriorSalidaException();
+		}
 		Ruta rutaConstruida= trayectoService.calcularYAsignarTrayectos(reservaEditada.getRuta());
 		reservaEditada.setRuta(rutaConstruida);
 		System.out.println("Guardar ruta editada: " + rutaConstruida);

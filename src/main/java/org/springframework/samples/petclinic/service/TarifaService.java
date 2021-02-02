@@ -63,5 +63,22 @@ public class TarifaService {
 		
 		tariRep.save(tari);
 	}
+	
+	@Transactional()
+	public Optional<Tarifa> findCopyOfTarifa(Tarifa tarifa)  { //Busca si hay una tarifa "copia" igual a la dada como parámetro
+		
+		return tariRep.findCopyByTarifa(tarifa.getPrecioPorKm(), tarifa.getPorcentajeIvaRepercutido(), tarifa.getPrecioEsperaPorHora());
+	}
+	
+	@Transactional
+	public  Tarifa nuevaTarifa(boolean activado,boolean original,Integer porcentajeIvaRepercutido,Double precioEsperaPorHora,Double precioPorKm) {
+		Tarifa nuevaTarifa= new Tarifa();
+		nuevaTarifa.setActivado(activado);
+		nuevaTarifa.setOriginal(original);
+		nuevaTarifa.setPorcentajeIvaRepercutido(porcentajeIvaRepercutido);
+		nuevaTarifa.setPrecioEsperaPorHora(precioEsperaPorHora);
+		nuevaTarifa.setPrecioPorKm(precioPorKm);
+		return nuevaTarifa;
+	}
 
 }

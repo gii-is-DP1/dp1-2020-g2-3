@@ -36,6 +36,7 @@ import org.springframework.samples.petclinic.service.TrayectoService;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasInsuficientesException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
+import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
 import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
@@ -378,6 +379,16 @@ public class ReservaController {
 						modelMap.addAttribute("error", "El origen y destino deben ser diferentes."
 								+ " (Dos paradas consecutivas tampoco pueden ser iguales)");
 						return "reservas/editRutaForm";
+					}catch(FechaLlegadaAnteriorSalidaException e2) {
+
+						List<Trayecto> trayectosIntermedios= reserva.getRuta().getTrayectos(); //Si la reserva viene de un formulario sus trayectos siempre serán los trayectos intermedios
+						 if(trayectosIntermedios==null) {
+							 trayectosIntermedios= new ArrayList<Trayecto>();
+						 }
+							modelMap.addAttribute("error", "La fecha de llegada no puede ser anterior a la de salida");
+
+						return mostrarReservaCalculada(reserva,modelMap,"reservas/editReservaForm",trayectosIntermedios,horasRutaCliente,minutosRutaCliente);
+						
 					}
 					
 					
