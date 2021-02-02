@@ -15,10 +15,10 @@
 				 <c:forEach items="${paradas}" var="parada">
 				 <c:choose>
                     <c:when test="${parada == reserva.ruta.origenCliente}">
-                        <option value="${parada}" selected > ${parada}</option>
+                        <option value="${parada}" selected > <c:out value="${parada}"></c:out></option>
                     </c:when>
                     <c:otherwise>
-                        <option value="${parada}"> ${parada}</option>
+                        <option value="${parada}"> <c:out value="${parada}"></c:out></option>
                     </c:otherwise>
                	 </c:choose>
     	        </c:forEach>
@@ -28,7 +28,7 @@
  <c:choose>
 	<c:when test = "${numCiudadesIntermedias>0}">
 		<c:forEach var="i" begin="0" end="${finBucle}" step="1" varStatus ="status">
-		<label for="ruta.trayectos[${i}].origen">Parada ${i}:</label>
+		<label for="ruta.trayectos[${i}].origen">Parada <c:out value="${i+1}:"></c:out></label>
 		<select required="true" name="ruta.trayectos[${i}].origen" id="ruta.trayectos[${i}].origen">
 				 <c:forEach items="${paradas}" var="parada">
 				 <c:choose>
