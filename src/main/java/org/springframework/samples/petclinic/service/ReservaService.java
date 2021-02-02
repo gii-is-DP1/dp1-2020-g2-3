@@ -26,7 +26,9 @@ import org.springframework.samples.petclinic.repository.RutaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
 import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasInsuficientesException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
+
 import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
+import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
 import org.springframework.stereotype.Service;
@@ -111,6 +113,19 @@ public class ReservaService {
 	public Optional<Reserva> findReservaById(int id) throws DataAccessException {
 		return reservaRepo.findById(id);
 	}
+	
+	@Transactional(readOnly = true)
+	public Optional<Reserva> findFacturaReservaById(int id) throws DataAccessException, EstadoReservaFacturaException {
+	Reserva reserva = reservaRepo.findById(id).get();
+		if(reserva.getEstadoReserva().getName().equals("Completada")) {
+			System.out.println("La reserva ha sido completada, se muestra la factura");
+		}else {
+			throw new EstadoReservaFacturaException();
+		}
+		
+		return reservaRepo.findById(id);
+	}
+
 	
 	
 	@Transactional //Este método calculará el precio, la fecha/hora estimada de llegada, los km totales,ruta... de la reserva después del primer formulario de su creación

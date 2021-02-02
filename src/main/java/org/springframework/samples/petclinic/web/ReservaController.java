@@ -37,6 +37,7 @@ import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasInsuficientesException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
+import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
 import org.springframework.stereotype.Controller;
@@ -509,20 +510,26 @@ public class ReservaController {
 		}
 	}
 
+
 	@GetMapping("/reservaFactura/{reservaId}")
-	public String reservaFactura(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
-		Optional<Reserva> reserva=reservaService.findReservaById(reservaId);
+	public String reservaFactura(@PathVariable("reservaId") int reservaId,ModelMap modelMap) throws DataAccessException, EstadoReservaFacturaException {
+		try {
+			Optional<Reserva> reserva=reservaService.findFacturaReservaById(reservaId);
+		}catch(EstadoReservaFacturaException e){
+			modelMap.addAttribute("error","Estado de reserva no completado");
+			return listadoReservas(modelMap);
+		}
+		Optional<Reserva> reserva=reservaService.findFacturaReservaById(reservaId);
 		if(reserva.isPresent()) {
 			modelMap.addAttribute("reserva",reserva.get());
 			Tarifa tarifa=reserva.get().getTarifa();
 			modelMap.addAttribute("tarifa",tarifa);
 			return "reservas/reservaFactura";
 		}else {
-			modelMap.addAttribute("message","No se ha encontrado el servicio a editar");
+			modelMap.addAttribute("message","No se ha encontrado la factura");
 			return listadoReservas(modelMap);
 		}
 	} 
-	
 	
 }
 
