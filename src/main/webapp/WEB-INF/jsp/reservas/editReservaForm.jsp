@@ -64,6 +64,14 @@
 			
 			
  		<petclinic:inputField label="Precio Total" name="precioTotal"/>
+ 		<br><br>
+		 <h2>Tarifa utilizada (Inmutable):</h2>
+     	  <p> Precio por Kilómetro: <c:out value="${reserva.tarifa.precioPorKm} euros"></c:out> </p>
+     	 <p> Precio por horas de espera: <c:out value="${reserva.tarifa.precioEsperaPorHora} euros"></c:out></p>
+     	 <p> Precio por horas de espera: <c:out value="${reserva.tarifa.precioEsperaPorHora} euros"></c:out></p>
+     	 <p> Porcentaje IVA Repercutido: <c:out value="${reserva.tarifa.porcentajeIvaRepercutido} %"></c:out></p>
+     	 <br> <br>
+     	 
  		  <label for="estadoReserva">Estado de la reserva:</label>
 		<select required="true" name="estadoReserva" id="estadoReserva">
 				 <c:forEach items="${estadosReserva}" var="estado">
@@ -94,7 +102,7 @@
 		
 		
 		<label for="trabajador"> Trabajador:</label>
-		<select required="true" name="trabajador" id="trabajador">
+		<select required  name="trabajador" id="trabajador">
 		
 			<option value="" > <c:out value="null"></c:out></option> <!--  Si no hay un trabajador asociado todavía, se mostrará como null -->
 		
@@ -111,7 +119,7 @@
 		</select>
 		
 		<label for="automovil"> Automóvil:</label>
-		<select required="true" name="automovil" id="automovil">
+		<select required  name="automovil" id="automovil">
 			
 				
 				<option value="" > <c:out value="null"></c:out></option> <!--  Si no hay un auto asociado todavía, se mostrará como null -->
@@ -128,8 +136,11 @@
     	        </c:forEach>
 		</select>
 		
+		
 		<br><br>
 	<span> &nbsp;&nbsp;<button class="btn btn-default" type="submit" name="action" value="guardarReserva">Guardar reserva</button> </span> 
+     	 
+     	 
      	 
      	 
     	

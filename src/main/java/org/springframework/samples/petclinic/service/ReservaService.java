@@ -16,6 +16,7 @@ import org.springframework.samples.petclinic.model.Cliente;
 import org.springframework.samples.petclinic.model.EstadoReserva;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
+import org.springframework.samples.petclinic.model.Tarifa;
 import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.AutomovilRepository;
@@ -127,7 +128,9 @@ public class ReservaService {
 		Date fechaHoraLlegada=calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
 		reserva.setFechaLlegada(fechaHoraLlegada);
 		reserva.setHoraLlegada(fechaHoraLlegada);
-		Double precioPorKm=tarifaService.findTarifaActiva().getPrecioPorKm();
+		Tarifa tarifa= tarifaService.findTarifaActiva();
+		reserva.setTarifa(tarifa);
+		Double precioPorKm= tarifa.getPrecioPorKm();
 		Double precioTotal=calcularPrecioDistancia(nuevaRuta.getNumKmTotales(), precioPorKm);
 		reserva.setPrecioTotal(precioTotal);
 		if(confirmarReserva ) { //Solo cuando se confirma la reserva se añadirán los siguientes campos

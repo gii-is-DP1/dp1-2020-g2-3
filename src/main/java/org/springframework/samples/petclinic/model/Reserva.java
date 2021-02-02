@@ -33,6 +33,10 @@ public class Reserva extends BaseEntity {
     @JoinColumn(name = "ruta_id", referencedColumnName = "id")
 	private Ruta ruta;
 	
+	@ManyToOne
+    @JoinColumn(name = "tarifa_id", referencedColumnName = "id")
+	private Tarifa tarifa;
+	
 	@OneToOne(optional=true)
 	@JoinColumn(name="automovil_id", referencedColumnName="id")
 	private Automovil automovil;

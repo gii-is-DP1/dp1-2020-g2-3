@@ -503,7 +503,7 @@ public class ReservaController {
 		Optional<Reserva> reserva=reservaService.findReservaById(reservaId);
 		if(reserva.isPresent()) {
 			modelMap.addAttribute("reserva",reserva.get());
-			Tarifa tarifa=tarifaService.findTarifaActiva();
+			Tarifa tarifa=reserva.get().getTarifa();
 			modelMap.addAttribute("tarifa",tarifa);
 			return "reservas/reservaFactura";
 		}else {
