@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
@@ -65,6 +67,21 @@ public class ReservaService {
 		
 	}
 	@Transactional
+	public Map<String,Double> calcularFactura(int id){
+		System.out.println("Hola");
+		Reserva reserva = reservaRepo.findById(id).get();
+		Map<String, Double> res = new HashMap<String, Double>();
+		res.put("IVA Repercutido", Math.round((reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal())*100.0)/100.0);
+		res.put("Precio Distancia", Math.round((reserva.getTarifa().getPrecioPorKm() * reserva.getNumKmTotales())*100.0)/100.0);
+		res.put("Precio Extra Espera", Math.round((reserva.getHorasEspera() * reserva.getTarifa().getPrecioEsperaPorHora())*100.0)/100.0);
+        res.put("Base Imponible", Math.round((reserva.getPrecioTotal() - (reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal()))*100.0)/100.0);
+		 
+        
+		return res;
+		
+		
+	}
+	@Transactional
 	public Date calcularFechaYHoraLlegada(Date fechaSalida, Date horaSalida, Double horasEstimadasCliente) {
 		int minutosSumar= (int)Math.round(horasEstimadasCliente*60); //Devolvemos un Date con la fecha y hora de llegada
 		fechaSalida.setHours(horaSalida.getHours());
@@ -120,7 +137,6 @@ public class ReservaService {
 		}else {
 			throw new EstadoReservaFacturaException();
 		}
-		
 		return reservaRepo.findById(id);
 	}
 
