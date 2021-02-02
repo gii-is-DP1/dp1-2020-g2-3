@@ -259,6 +259,7 @@ public class ReservaService {
 		System.out.println("Guardar ruta editada: " + rutaConstruida);
 		reservaEditada= asignarRutaExistenteOCrearla(reservaEditada);
 		System.out.println(reservaEditada.getRuta());
+		reservaEditada.setTarifa(reservaBD.getTarifa());
 		BeanUtils.copyProperties(reservaEditada, reservaBD, "id");
 		save(reservaBD);
 		return reservaBD;
