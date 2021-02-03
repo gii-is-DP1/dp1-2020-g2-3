@@ -155,7 +155,6 @@ public class ClienteController {
 		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
 		if(!reservaOptional.isPresent()) {
 			modelMap.addAttribute("error", "Reserva no encontrada");
-			System.out.println(modelMap + "===================================================================================");
 			return showReservas(modelMap,p);
 		}else {
 			try {
