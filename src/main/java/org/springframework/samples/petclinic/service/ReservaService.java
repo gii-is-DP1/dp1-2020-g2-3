@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,9 +48,10 @@ public class ReservaService {
 	private RutaService rutaService;
 	private TarifaService tarifaService;
 	private TrabajadorService trabajadorService;
+	private AuthoritiesService authoService;
 	
 	@Autowired
-	public ReservaService(ReservaRepository reservaRepo,TrayectoService trayectoService,EstadoReservaService estadoService,ClienteService clienteService,RutaService rutaService,TarifaService tarifaService,TrabajadorService trabajadorService) {
+	public ReservaService(ReservaRepository reservaRepo,TrayectoService trayectoService,EstadoReservaService estadoService,ClienteService clienteService,RutaService rutaService,TarifaService tarifaService,TrabajadorService trabajadorService,AuthoritiesService authoService) {
 		this.reservaRepo=reservaRepo;
 		this.trayectoService=trayectoService;
 		this.estadoService=estadoService;
@@ -57,6 +59,7 @@ public class ReservaService {
 		this.rutaService=rutaService;
 		this.tarifaService=tarifaService;
 		this.trabajadorService=trabajadorService;
+		this.authoService=authoService;
 	}
 	
 	@Transactional
@@ -77,8 +80,6 @@ public class ReservaService {
 		res.put("Precio Distancia", Math.round((reserva.getTarifa().getPrecioPorKm() * reserva.getNumKmTotales())*100.0)/100.0);
 		res.put("Precio Extra Espera", Math.round((reserva.getHorasEspera() * reserva.getTarifa().getPrecioEsperaPorHora())*100.0)/100.0);
         res.put("Base Imponible", Math.round((reserva.getPrecioTotal() - (reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal()))*100.0)/100.0);
-		 
-        
 		return res;
 		
 		
@@ -282,10 +283,18 @@ public class ReservaService {
 		return reservaBD;
 	}
 	@Transactional 
-	public Reserva calcularYConfirmarNuevaReservaCliente(Reserva reserva,String username)throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException{
+	public Reserva calcularYConfirmarNuevaReserva(Reserva reserva,String username)throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException{
+		
 		Reserva reservaCalculada= calcularReservaAPartirDeRuta(reserva,true,true);
-		Cliente cliente= clienteService.findClienteByUsername(username);
-		reservaCalculada.setCliente(cliente);
+		Set<String> authorities= authoService.findAuthoritiesByUsername(username);
+		//Si la reserva la solicita un taxista, el cliente ya viene desde el formulario construido
+		
+		//Si la reserva la solicita un cliente desde su cuenta, se le asocia a él.
+		
+		if (!(authorities.contains("admin") || authorities.contains("taxista"))) { 
+			Cliente cliente= clienteService.findClienteByUsername(username);
+			reservaCalculada.setCliente(cliente);
+		}
 		this.save(reservaCalculada);
 		return reservaCalculada;
 	}

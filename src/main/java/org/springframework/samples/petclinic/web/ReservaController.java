@@ -110,7 +110,7 @@ public class ReservaController {
 	
 	
 	@PostMapping("/redirigirNewReservaForm")
-	public String redirigirNewReservaForm(@Valid Reserva reserva,BindingResult binding,ModelMap modelMap,@RequestParam("action") String action,@RequestParam("numCiudadesIntermedias") Integer numCiudadesIntermedias) {
+	public String redirigirNewReservaForm(@Valid Reserva reserva,BindingResult binding,ModelMap modelMap,@RequestParam("action") String action,@RequestParam("numCiudadesIntermedias") Integer numCiudadesIntermedias,Principal p) {
 		
 		//necesitamos este método porque tenemos varios botones para un mismo formulario
 		//Se decidirá entre añadir una nueva parada o calcular el precio, fecha/hora estimada de llegada de la reserva
@@ -126,7 +126,7 @@ public class ReservaController {
 				modelMap.put("finBucle", numCiudadesIntermedias-1);
 				return "reservas/newReservaForm";
 			}else {
-				return calcularMostrarReserva(reserva, modelMap,paradas,numCiudadesIntermedias,"reservas/newReservaForm","reservas/precioReserva",true,false);
+				return calcularMostrarReserva(reserva, modelMap,paradas,numCiudadesIntermedias,"reservas/newReservaForm","reservas/precioReserva",true,false,p);
 				
 			}
 			
@@ -148,9 +148,9 @@ public class ReservaController {
 		//necesitamos este método porque tenemos varios botones para un mismo formulario
 		// se decidirá entre volver al anterior formulario o solicitar la reserva
 		
-		Iterable<String> paradas= trayectoService.findDistinctParadas();	
+		Iterable<String> paradas= trayectoService.findDistinctParadas(); //se usará si hay errores de binding o si se pulsa en el botón "atrás"
 		if (action.equals("confirmarReserva")) {
-			Set<String> authorities= authoService.findAuthoritiesByUsername(p.getName());
+			
 		//Comprobamos otra vez el binding por si se ha intentado modificar manualmente algún atributo desde el jsp
 			if(binding.hasErrors()) {
 				modelMap.put("reserva",reserva);
@@ -158,15 +158,6 @@ public class ReservaController {
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
 				modelMap.put("finBucle", numCiudadesIntermedias-1);
 				return "reservas/newReservaForm";
-			}else if (authorities.contains("admin") || authorities.contains("taxista")){
-				//Un taxista de la empresa no puede solicitar un viaje
-					modelMap.put("reserva",reserva);
-					modelMap.put("paradas", paradas);
-					modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
-					modelMap.put("finBucle", numCiudadesIntermedias-1);
-					modelMap.put("error", "No puedes solicitar una reserva siendo un trabajador de la empresa");
-					return "reservas/newReservaForm";	
-					
 			}else {
 				
 				return confirmarNuevaReserva(reserva,modelMap,paradas,numCiudadesIntermedias,p);
@@ -200,7 +191,7 @@ public class ReservaController {
 	//No tiene url, viene desde /redirigir porque el mismo formulario tiene varios botones, y "redirigir" llama a un sitio u otro 
 	// dependiendo del botón pulsado
 	
-	public String calcularMostrarReserva(Reserva reserva, ModelMap modelMap, Iterable<String> paradas,Integer numCiudadesIntermedias,String formularioError, String formularioExito,boolean nuevaReserva,boolean confirmarReserva) {
+	public String calcularMostrarReserva(Reserva reserva, ModelMap modelMap, Iterable<String> paradas,Integer numCiudadesIntermedias,String formularioError, String formularioExito,boolean nuevaReserva,boolean confirmarReserva,Principal p) {
 		
 		try {
 			
@@ -215,7 +206,7 @@ public class ReservaController {
 		   System.out.println("Reserva recalculada: " +  reservaCalculada.getNumKmTotales());
 		    int horasRutaCliente=rutaService.calcularHorasRutaCliente(reserva.getRuta());
 		    int minutosRutaCliente= rutaService.calcularMinutosRutaCliente(reserva.getRuta());
-			return mostrarReservaCalculada(reservaCalculada,modelMap,formularioExito,trayectosIntermedios,horasRutaCliente,minutosRutaCliente);
+			return mostrarReservaCalculada(reservaCalculada,modelMap,formularioExito,trayectosIntermedios,horasRutaCliente,minutosRutaCliente,p);
 			
 		}catch(DuplicatedParadaException e){
 		
@@ -240,8 +231,9 @@ public class ReservaController {
 		}
 	}
 	
-	public String mostrarReservaCalculada(Reserva reserva, ModelMap modelMap,String formularioExito,List<Trayecto> trayectosIntermedios,int horasRutaCliente,int minutosRutaCliente) {
+	public String mostrarReservaCalculada(Reserva reserva, ModelMap modelMap,String formularioExito,List<Trayecto> trayectosIntermedios,int horasRutaCliente,int minutosRutaCliente,Principal p) {
 				
+		Set<String> authorities= authoService.findAuthoritiesByUsername(p.getName());
 			
 				if(formularioExito.equals("reservas/editReservaForm")) { //Si hemos solicitado EDITAR la ruta, aparecerán más campos en el formulario
 					Iterable<EstadoReserva> estadosReserva= estadoReservaService.findAll();
@@ -257,13 +249,17 @@ public class ReservaController {
 					modelMap.put("automoviles",automoviles);
 					
 				
+				}else if(authorities.contains("admin") || authorities.contains("taxista")) { //Un trabajador está solicitando una NUEVA RESERVA
+					//debe aparecer el campo "cliente" en el formulario
+					Iterable<Cliente> clientes= clienteService.findAll();
+					modelMap.put("clientes", clientes);
 				}
 				
-				Integer numCiudadesIntermedias= trayectosIntermedios.size();
 				modelMap.put("reserva", reserva);
 				modelMap.put("trayectosIntermedios", trayectosIntermedios);
 				modelMap.put("horasRutaCliente", horasRutaCliente);
 				modelMap.put("minutosRutaCliente", minutosRutaCliente);
+				Integer numCiudadesIntermedias= trayectosIntermedios.size();
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
 				modelMap.put("finBucle",numCiudadesIntermedias-1);				
 				return formularioExito;
@@ -272,21 +268,9 @@ public class ReservaController {
 	//Cambiar
 	public String confirmarNuevaReserva(Reserva reserva,ModelMap modelMap,Iterable<String> paradas,Integer numCiudadesIntermedias,Principal p) {
 		try {
-			Set<String> authorities= authoService.findAuthoritiesByUsername(p.getName());
-			if (authorities.contains("admin") || authorities.contains("taxista")) { //Un taxista de la empresa no puede solicitar un viaje
-				modelMap.put("reserva",reserva);
-				modelMap.put("paradas", paradas);
-				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
-				modelMap.put("finBucle", numCiudadesIntermedias-1);
-				modelMap.put("error", "No puedes solicitar una reserva siendo un trabajador de la empresa");
-				return "reservas/newReservaForm";	
-				
-			}else { //Es un cliente el que realiza la reserva y su entidad se obtiene  desde la sesión iniciada
-				reservaService.calcularYConfirmarNuevaReservaCliente(reserva,p.getName());
+				reservaService.calcularYConfirmarNuevaReserva(reserva,p.getName());
 				modelMap.addAttribute("message", "¡Reserva solicitada con éxito!");
 				return newReserva(modelMap);
-				
-			}
 
 		}catch(DuplicatedParadaException e) {
 			modelMap.put("reserva", reserva);
@@ -324,7 +308,7 @@ public class ReservaController {
 	}
 	
 	@GetMapping(value= "/edit/{reservaId}")
-	public String editReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+	public String editReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap,Principal p) {
 		
 		Optional<Reserva> reservaOptional=reservaService.findReservaById(reservaId);
 		if(reservaOptional.isPresent()) {
@@ -332,7 +316,7 @@ public class ReservaController {
 			List<Trayecto> trayectosIntermedios= rutaService.obtenerTrayectosIntermedios(reserva.getRuta()); //La reserva viene construida totalmente desde la base de datos, por ello tenemos que detectar cuáles de sus trayectos son los intermedios
 			int horasRutaCliente=rutaService.calcularHorasRutaCliente(reserva.getRuta());
 		    int minutosRutaCliente= rutaService.calcularMinutosRutaCliente(reserva.getRuta());
-			return mostrarReservaCalculada(reserva, modelMap,"reservas/editReservaForm",trayectosIntermedios,horasRutaCliente,minutosRutaCliente);
+			return mostrarReservaCalculada(reserva, modelMap,"reservas/editReservaForm",trayectosIntermedios,horasRutaCliente,minutosRutaCliente,p);
 		}else {
 			modelMap.addAttribute("message","No se ha encontrado la reserva a editar");
 			return listadoReservas(modelMap);
@@ -341,7 +325,7 @@ public class ReservaController {
 	
 	
 	@PostMapping("/redirigirEditReservaForm")
-	public String redirigirEditReservaForm(@Valid Reserva reserva,BindingResult binding,ModelMap modelMap,@RequestParam("action") String action,@RequestParam("numCiudadesIntermedias") Integer numCiudadesIntermedias,@RequestParam("horasRutaCliente") int horasRutaCliente,@RequestParam("minutosRutaCliente") int minutosRutaCliente) {
+	public String redirigirEditReservaForm(@Valid Reserva reserva,BindingResult binding,ModelMap modelMap,@RequestParam("action") String action,@RequestParam("numCiudadesIntermedias") Integer numCiudadesIntermedias,@RequestParam("horasRutaCliente") int horasRutaCliente,@RequestParam("minutosRutaCliente") int minutosRutaCliente,Principal p) {
 		//necesitamos este método porque tenemos varios botones para un mismo formulario
 		//Se decidirá entre añadir una nueva parada al jsp de la reserva o recalcular la reserva en base  a la ruta editada
 		
@@ -351,7 +335,7 @@ public class ReservaController {
 			 if(trayectosIntermedios==null) {
 				 trayectosIntermedios= new ArrayList<Trayecto>();
 			 }
-			return mostrarReservaCalculada(reserva,modelMap,"reservas/editReservaForm",trayectosIntermedios,horasRutaCliente,minutosRutaCliente);
+			return mostrarReservaCalculada(reserva,modelMap,"reservas/editReservaForm",trayectosIntermedios,horasRutaCliente,minutosRutaCliente,p);
 			
 		}else {
 			if(action.equals("editarRuta")) {	
@@ -388,7 +372,7 @@ public class ReservaController {
 						 }
 							modelMap.addAttribute("error", "La fecha de llegada no puede ser anterior a la de salida");
 
-						return mostrarReservaCalculada(reserva,modelMap,"reservas/editReservaForm",trayectosIntermedios,horasRutaCliente,minutosRutaCliente);
+						return mostrarReservaCalculada(reserva,modelMap,"reservas/editReservaForm",trayectosIntermedios,horasRutaCliente,minutosRutaCliente,p);
 						
 					}
 					
@@ -410,7 +394,7 @@ public class ReservaController {
 	}
 
 	@PostMapping("/redirigirEditRutaForm")
-	public String redirigirEditRutaForm(@Valid Reserva reserva,BindingResult binding,ModelMap modelMap,@RequestParam("action") String action,@RequestParam("numCiudadesIntermedias") Integer numCiudadesIntermedias) {
+	public String redirigirEditRutaForm(@Valid Reserva reserva,BindingResult binding,ModelMap modelMap,@RequestParam("action") String action,@RequestParam("numCiudadesIntermedias") Integer numCiudadesIntermedias,Principal p) {
 		
 		
 		Iterable<String> paradas= trayectoService.findDistinctParadas();	
@@ -425,7 +409,7 @@ public class ReservaController {
 				return "reservas/editRutaForm";
 			}else {
 				
-				return calcularMostrarReserva(reserva, modelMap,paradas,numCiudadesIntermedias,"reservas/editRutaForm","reservas/editReservaForm",false,false);
+				return calcularMostrarReserva(reserva, modelMap,paradas,numCiudadesIntermedias,"reservas/editRutaForm","reservas/editReservaForm",false,false,p);
 			}
 			
 		}else if(action.equals("addParada")) {
