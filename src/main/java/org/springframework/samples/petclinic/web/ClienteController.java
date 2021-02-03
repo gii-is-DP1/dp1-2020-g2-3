@@ -155,6 +155,7 @@ public class ClienteController {
 		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
 		if(!reservaOptional.isPresent()) {
 			modelMap.addAttribute("error", "Reserva no encontrada");
+			System.out.println(modelMap + "===================================================================================");
 			return showReservas(modelMap,p);
 		}else {
 			try {
@@ -162,7 +163,7 @@ public class ClienteController {
 				modelMap.addAttribute("message", "Reserva cancelada correctamente");
 			}catch(CancelacionViajeAntelacionException e) {
 				modelMap.addAttribute("error", "No puedes cancelar una reserva con una antelación menor a 24 horas");
-			}catch(ReservasSoliAceptException e2) {
+			}catch(ReservasSoliAceptException e) {
 				modelMap.addAttribute("error", "No puedes cancelar una reserva que no tenga un estado Solicitada o Aceptada");
 			}
 		}
