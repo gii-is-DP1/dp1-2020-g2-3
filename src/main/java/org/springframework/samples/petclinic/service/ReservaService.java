@@ -329,20 +329,23 @@ public class ReservaService {
 	
 	@Transactional
 	public void cancelarReserva(Reserva reserva) throws DataAccessException, CancelacionViajeAntelacionException, ReservasSoliAceptException {
-		EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
-		reserva.setEstadoReserva(estadoReserva);
+		
 		Date today = new Date();
 		Date fechaSalida = reserva.getFechaSalida();
 		Date horaSalida = reserva.getHoraSalida();
 		fechaSalida.setHours(horaSalida.getHours());
 		fechaSalida.setMinutes(horaSalida.getMinutes());
 		if(reserva.getEstadoReserva().getName().equals("Solicitada")) {
+			EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
+			reserva.setEstadoReserva(estadoReserva);
 			save(reserva);
 		}else if(reserva.getEstadoReserva().getName().equals("Aceptada")) {
 			if(fechaSalida.compareTo(today) < fechaSalida.getHours() + 24) {
 				throw new CancelacionViajeAntelacionException();
 			}else{
-				save(reserva);
+				EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
+				reserva.setEstadoReserva(estadoReserva);
+				save(reserva);	
 			}
 		}else {
 			throw new ReservasSoliAceptException();

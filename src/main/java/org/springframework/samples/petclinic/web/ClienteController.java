@@ -144,7 +144,7 @@ public class ClienteController {
 	@GetMapping("/clientes/myReservas")
 	public String showReservas(ModelMap modelMap, Principal p) {
 		String username = p.getName();
-		String vista="reservas/reservasList";
+		String vista="reservas/misReservas";
 		Iterable<Reserva> reservas= reservaService.findReservasByUsername(username);
 		modelMap.addAttribute("reservas", reservas);
 		return vista;
