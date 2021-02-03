@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Cliente;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
@@ -18,6 +19,7 @@ import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
+import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
 import org.springframework.samples.petclinic.service.exceptions.ReservasSoliAceptException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -151,18 +153,18 @@ public class ClienteController {
 	}
 	
 	@GetMapping(value= "/clientes/myReservas/cancelar/{reservaId}")
-	public String cancelarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap, Principal p){
+	public String cancelarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap, Principal p) throws DataAccessException, ReservaYaRechazada{
 		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
 		if(!reservaOptional.isPresent()) {
 			modelMap.addAttribute("error", "Reserva no encontrada");
 			return showReservas(modelMap,p);
 		}else {
 			try {
-				reservaService.cancelarReserva(reservaOptional.get());
+				reservaService.cancelarReserva1(reservaOptional.get());
 				modelMap.addAttribute("message", "Reserva cancelada correctamente");
-			}catch(CancelacionViajeAntelacionException e) {
-				modelMap.addAttribute("error", "No puedes cancelar una reserva con una antelación menor a 24 horas");
-			}catch(ReservasSoliAceptException e) {
+	//		}catch(CancelacionViajeAntelacionException e) {
+	//			modelMap.addAttribute("error", "No puedes cancelar una reserva con una antelación menor a 24 horas");
+			}catch(ReservaYaRechazada e) {
 				modelMap.addAttribute("error", "No puedes cancelar una reserva que no tenga un estado Solicitada o Aceptada");
 			}
 		}

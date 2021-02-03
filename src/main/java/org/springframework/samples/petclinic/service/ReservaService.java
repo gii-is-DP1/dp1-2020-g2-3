@@ -30,6 +30,7 @@ import org.springframework.samples.petclinic.service.exceptions.DuplicatedParada
 import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
+import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
 import org.springframework.samples.petclinic.service.exceptions.ReservasSoliAceptException;
 import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.stereotype.Service;
@@ -351,6 +352,22 @@ public class ReservaService {
 			throw new ReservasSoliAceptException();
 		}
 	}
+	
+	
+	
+	@Transactional
+    public void cancelarReserva1(Reserva reserva) throws DataAccessException, ReservaYaRechazada {
+
+        if(reserva.getEstadoReserva().getName().equals("Rechazada")) {
+            throw new ReservaYaRechazada();
+            
+        }else {
+            reserva.setEstadoReserva(estadoService.findEstadoById(3).get());
+            reservaRepo.save(reserva);
+
+        }
+
+    }
 	
 	
 	
