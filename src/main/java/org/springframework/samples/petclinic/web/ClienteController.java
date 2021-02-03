@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.web;
 
+import java.security.Principal;
 import java.util.Collection;
 
 import java.util.Map;
@@ -15,7 +16,9 @@ import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.UserService;
+import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
+import org.springframework.samples.petclinic.service.exceptions.ReservasSoliAceptException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -138,27 +141,32 @@ public class ClienteController {
 		return mav;
 	}
 	
-	@GetMapping("/clientes/{clienteId}/myReservas")
-	public String showReservas(@PathVariable("clienteId") int clienteId, ModelMap modelMap) {
+	@GetMapping("/clientes/myReservas")
+	public String showReservas(ModelMap modelMap, Principal p) {
+		String username = p.getName();
 		String vista="reservas/reservasList";
-		Cliente cliente = this.clienteService.findClienteById(clienteId);
-		Iterable<Reserva> reservas= reservaService.findAcceptRes(clienteId);
+		Iterable<Reserva> reservas= reservaService.findReservasByUsername(username);
 		modelMap.addAttribute("reservas", reservas);
-		modelMap.addAttribute("cliente", cliente);
 		return vista;
 	}
 	
-	@GetMapping(value= "/clientes/{clienteId}/myReservas/cancelar/{reservaId}")
-	public String cancelarReserva(@PathVariable("clienteId") int clienteId, @PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+	@GetMapping(value= "/clientes/myReservas/cancelar/{reservaId}")
+	public String cancelarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap, Principal p){
 		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
 		if(!reservaOptional.isPresent()) {
 			modelMap.addAttribute("error", "Reserva no encontrada");
-			return showReservas(clienteId, modelMap);
+			return showReservas(modelMap,p);
 		}else {
+			try {
 				reservaService.cancelarReserva(reservaOptional.get());
 				modelMap.addAttribute("message", "Reserva cancelada correctamente");
+			}catch(CancelacionViajeAntelacionException e) {
+				modelMap.addAttribute("error", "No puedes cancelar una reserva con una antelación menor a 24 horas");
+			}catch(ReservasSoliAceptException e2) {
+				modelMap.addAttribute("error", "No puedes cancelar una reserva que no tenga un estado Solicitada o Aceptada");
 			}
-			return showReservas(clienteId, modelMap);
+		}
+			return showReservas(modelMap, p);
 		}
 	}
 	

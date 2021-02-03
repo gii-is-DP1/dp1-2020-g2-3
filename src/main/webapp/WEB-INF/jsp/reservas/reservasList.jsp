@@ -32,8 +32,6 @@
             <th style="width: 200px;">Precio total</th>
             <th style="width: 200px;">Estado Reserva</th>
             <th style="width: 200px;">Factura</th>
-             <th style="width: 200px;">Detalles/Editar</th>
-              <th style="width: 200px;">Eliminar</th>
               <th style="width: 200px;">¿Cancelar?</th>
         </tr>
         </thead>
@@ -76,7 +74,7 @@
                 </spring:url>
                   <a class="editFacturaReserva" href="${fn:escapeXml(reservaFacturaEditUrl)}"> Ver</a>
                 </td>
-                 <td>
+       <!--           <td>
                    <spring:url value="/reservas/edit/{reservaId}" var="reservaEditUrl">
                    <spring:param name="reservaId" value="${reserva.id}"/>                  
                 </spring:url>
@@ -91,15 +89,13 @@
                 </spring:url>
 				<a class="btn btn-danger" href="${fn:escapeXml(reservaDeleteUrl)}"> <span class="glyphicon glyphicon-trash" aria-hidden="false"></a>
                 </td>
+                --> 
                 <td>
-                <spring:url value="/cliente/{clienteId}/myReservas/cancelar/{reservaId}" var="cancelarReservaUrl">
+              <spring:url value="/cliente/myReservas/cancelar/{reservaId}" var="cancelarReservaUrl">
                 <spring:param name="reservaId" value="${reserva.id}"/>
-                <spring:param name="clienteId" value="${reserva.cliente.id}"/>
                 </spring:url>
                 <a class="btn btn-danger" href="${fn:escapeXml(cancelarReservaUrl)}"><span class="glyphicon glyphicon-remove" aria-hidden="false"></span></a>
-                </td>
-                
-            <td>
+                </td>     
             
         </c:forEach>
         </tbody>

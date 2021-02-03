@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.service;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -29,6 +30,8 @@ import org.springframework.samples.petclinic.service.exceptions.DuplicatedParada
 import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
+import org.springframework.samples.petclinic.service.exceptions.ReservasSoliAceptException;
+import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -306,10 +309,6 @@ public class ReservaService {
 		
 		
 	}
-	@Transactional
-	public Collection<Reserva> findReservasByClienteId(int id) throws DataAccessException {
-	return reservaRepo.findReservasByClienteId(id);
-	}
 	
 	@Transactional
 	public void delete(Reserva reserva) throws DataAccessException  {
@@ -323,17 +322,30 @@ public class ReservaService {
 	}
 
 	@Transactional
-	public Iterable<Reserva> findAcceptRes(int id) throws DataAccessException {
-		 return reservaRepo.findAcceptResById(id);
+	public Iterable<Reserva> findReservasByUsername(String username) throws DataAccessException {
+		 return reservaRepo.findReservasByUsername(username);
 		
 	}
 	
 	@Transactional
-	public void cancelarReserva(Reserva reserva) throws DataAccessException {
-		if(reserva.getEstadoReserva().getName().equals("Aceptada")) {
-			EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
-			reserva.setEstadoReserva(estadoReserva);
+	public void cancelarReserva(Reserva reserva) throws DataAccessException, CancelacionViajeAntelacionException, ReservasSoliAceptException {
+		EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
+		reserva.setEstadoReserva(estadoReserva);
+		Date today = new Date();
+		Date fechaSalida = reserva.getFechaSalida();
+		Date horaSalida = reserva.getHoraSalida();
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
+		if(reserva.getEstadoReserva().getName().equals("Solicitada")) {
 			save(reserva);
+		}else if(reserva.getEstadoReserva().getName().equals("Aceptada")) {
+			if(fechaSalida.compareTo(today) < fechaSalida.getHours() + 24) {
+				throw new CancelacionViajeAntelacionException();
+			}else{
+				save(reserva);
+			}
+		}else {
+			throw new ReservasSoliAceptException();
 		}
 	}
 	
