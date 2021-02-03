@@ -1,21 +1,32 @@
 package org.springframework.samples.petclinic.web;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Contrato;
+import org.springframework.samples.petclinic.model.Reserva;
+import org.springframework.samples.petclinic.model.Servicio;
+import org.springframework.samples.petclinic.model.Taller;
 import org.springframework.samples.petclinic.model.Trabajador;
+import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.service.TipoTrabajadorService;
 import org.springframework.samples.petclinic.service.TrabajadorService;
+import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.samples.petclinic.service.exceptions.FechaFinAnteriorInicioException;
+import org.springframework.samples.petclinic.service.exceptions.TrabajadorNoActivo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -25,14 +36,15 @@ public class TrabajadorController {
 	
 	private final TrabajadorService trabajadorService;
 	private final TipoTrabajadorService tipoTrabajadorService;
+	private final UserService userService;
 
 	
 	
 	@Autowired
-	public TrabajadorController(TrabajadorService trabajadorService, TipoTrabajadorService tipoTrabajadorService) {
+	public TrabajadorController(TrabajadorService trabajadorService, TipoTrabajadorService tipoTrabajadorService, UserService userService) {
 		this.trabajadorService = trabajadorService;
 		this.tipoTrabajadorService = tipoTrabajadorService;
-
+		this.userService = userService;
 	}
 	
 	
@@ -72,4 +84,24 @@ public class TrabajadorController {
 			return listadoTrabajadores(modelMap);
 		}
 }
+	
+	
+	@GetMapping("/despedir/{trabajadorId}")
+	public String despedirTrabajador(@PathVariable("trabajadorId") int trabajadorId,ModelMap modelMap) throws DataAccessException, TrabajadorNoActivo {
+		
+		try {	
+			Trabajador trabajador=trabajadorService.findById(trabajadorId);
+			User user = trabajador.getUser();
+			userService.despedirTrabajador(user);
+		} catch(TrabajadorNoActivo e) {
+			modelMap.addAttribute("error", "El trabajador seleccionado no está activo");
+			return listadoTrabajadores(modelMap);
+		}
+		
+			modelMap.addAttribute("message", "Trabajador despedido");
+		return listadoTrabajadores(modelMap);
+	}
+	
+	
+
 }
