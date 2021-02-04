@@ -37,25 +37,6 @@ public class EconomiaController {
 		return "economias/findEconomias";
 	}
 	
-//	@GetMapping(value = "/calcular")
-//	public String processFindForm(final BindingResult binding, final ModelMap model) {
-//		
-//		if(binding.hasErrors()) {
-//			model.put("error", "Debes introducir una fecha correcta.");
-//			return "economias/findEconomias";
-//		}else {
-//			LocalDate fecha1 = LocalDate.parse(model.get("fecha1").toString());
-//			LocalDate fecha2 = LocalDate.parse(model.get("fecha2").toString());
-//			Double ingresos = reservaService.calcularIngresos(asDate(fecha1), asDate(fecha2));
-//			Double gastos = servicioService.calcularGastos(fecha1, fecha2);
-//			model.put("ingresos", ingresos);
-//			model.put("gastos", gastos);
-//			return "economias/listEconomias";
-//		}
-//		
-//		
-//	}
-	
 	@GetMapping(value = "/calcular")
 	public String processFindForm(@RequestParam("fecha1") String fecha1, @RequestParam("fecha2") String fecha2, final ModelMap model) {
 		
@@ -67,7 +48,7 @@ public class EconomiaController {
 				return "economias/findEconomias";
 			}else {
 				Double ingresos = reservaService.calcularIngresos(asDate(fechaInicial), asDate(fechaFin));
-				Double gastos = servicioService.calcularGastos(fechaInicial, fechaFin);
+				Double gastos = servicioService.calcularGastos(asDate(fechaInicial), asDate(fechaFin));
 				model.put("ingresos", ingresos);
 				model.put("gastos", gastos);
 				return "economias/listEconomias";

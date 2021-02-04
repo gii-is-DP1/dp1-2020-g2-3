@@ -39,6 +39,7 @@ import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasI
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
 import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
+import org.springframework.samples.petclinic.service.exceptions.ExisteViajeEnEsteHorarioException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
 import org.springframework.samples.petclinic.service.exceptions.HoraSalidaSinAntelacionException;
@@ -486,6 +487,8 @@ public class ReservaController {
 					modelMap.addAttribute("error", "La reserva que se intenta aceptar ya ha sido aceptada/rechazada anteriormente");
 				}catch(AutomovilPlazasInsuficientesException e) {
 					modelMap.addAttribute("error", "El automóvil que ha seleccionado no tiene suficientes plazas para realizar la reserva");
+				}catch(ExisteViajeEnEsteHorarioException e) {
+					modelMap.addAttribute("error", "El taxista ya tiene una reserva aceptada en este periodo de tiempo.");
 				}
 				return listadoPeticionesReservas(modelMap);
 			}

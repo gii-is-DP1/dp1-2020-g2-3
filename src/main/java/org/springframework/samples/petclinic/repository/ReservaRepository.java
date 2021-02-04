@@ -13,6 +13,9 @@ public interface ReservaRepository extends CrudRepository<Reserva, Integer> {
 	@Query("SELECT reserva FROM Reserva reserva WHERE reserva.cliente.id = :id")
 	public Collection<Reserva> findReservasByClienteId(@Param("id") int id);
 	
+	@Query("SELECT reserva FROM Reserva reserva WHERE reserva.estadoReserva = '2' and reserva.trabajador.id = :id")
+	public Collection<Reserva> findReservasAceptadasByTrabajadorId(@Param("id") int id);
+	
 	@Query("SELECT  res FROM Reserva res where res.estadoReserva.name = 'Solicitada' ")
 	Iterable<Reserva> findPeticionesReserva() throws DataAccessException;
 	

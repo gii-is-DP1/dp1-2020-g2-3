@@ -32,6 +32,7 @@ import org.springframework.samples.petclinic.service.exceptions.DuplicatedParada
 import org.springframework.samples.petclinic.service.exceptions.HoraSalidaSinAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
 import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
+import org.springframework.samples.petclinic.service.exceptions.ExisteViajeEnEsteHorarioException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
 import org.springframework.stereotype.Service;
@@ -134,6 +135,38 @@ public class ReservaService {
 			System.out.println("la fecha de salida es posterior o igual a la actual, no se lanza excepción");
 		}
 		
+	}
+	
+	@Transactional
+	public void existeViajeEnEsteHorario(Date horaSalida, Date horaLlegada, Date fechaSalida, int trabajadorId) throws ExisteViajeEnEsteHorarioException{
+		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(trabajadorId);
+		
+		for (Reserva r: reservasTrabajador) {
+			Boolean cond1 = horaSalida.before(r.getHoraSalida()) && horaLlegada.before(r.getHoraSalida());
+			Boolean cond2 = horaSalida.after(r.getHoraSalida()) && horaLlegada.after(r.getHoraLlegada());
+			if((r.getFechaSalida().equals(fechaSalida)) && !(cond1 || cond2)){
+				System.out.println("El taxista ya tiene un viaje aceptado en ese periodo de tiempo.");
+				throw new ExisteViajeEnEsteHorarioException();
+			}else {
+				System.out.println("El taxista acepta el viaje.");
+			}
+		}
+	}
+	
+	//Comprueba si un taxista ya tiene una reserva aceptada en el horario en el que esta intentando aceptar otra reserva.
+	public boolean taxistaConViaje(int taxistaId, Reserva reserva) {
+		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(taxistaId);
+		boolean res = false;
+		for (Reserva r: reservasTrabajador) {
+			Date horaSalida = reserva.getHoraSalida();
+			Date horaLlegada = reserva.getHoraLlegada();
+			Boolean cond1 = horaSalida.before(r.getHoraSalida()) && horaLlegada.before(r.getHoraSalida());
+			Boolean cond2 = horaSalida.after(r.getHoraLlegada()) && horaLlegada.after(r.getHoraLlegada());
+			if((r.getFechaSalida().equals(reserva.getFechaSalida())) && !(cond1 || cond2)){
+				res = true;
+			}
+		}
+		return res;
 	}
 	
 	
@@ -349,7 +382,7 @@ public class ReservaService {
 		
 	}
 	@Transactional
-	public void aceptarReserva(Reserva reserva,Automovil auto,Principal p) throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException {
+	public void aceptarReserva(Reserva reserva,Automovil auto,Principal p) throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException,ExisteViajeEnEsteHorarioException {
 	
 		if(!reserva.getEstadoReserva().getName().equals("Solicitada")) {
 			throw new ParadaYaAceptadaRechazadaException();
@@ -359,8 +392,9 @@ public class ReservaService {
 			
 			if(auto.getNumPlazas()-1<reserva.getPlazas_Ocupadas()){
 				throw new AutomovilPlazasInsuficientesException();
-			} //Añadir con else if las comprobaciones de las RN-02 Automóvil en uso  y RN-04- Rechazar viajes en un mismo horario
-			else {
+			}else if(taxistaConViaje(trabajador.getId(),reserva)){
+				throw new ExisteViajeEnEsteHorarioException();			
+			}else {//Añadir con else if las comprobaciones de las RN-02 Automóvil en uso
 				
 				
 				EstadoReserva estadoReserva=estadoService.findEstadoById(2).get(); //Estado 2= Aceptada
