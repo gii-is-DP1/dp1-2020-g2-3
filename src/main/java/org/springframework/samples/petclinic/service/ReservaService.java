@@ -328,39 +328,47 @@ public class ReservaService {
 		
 	}
 	
+//	@Transactional
+//	public void cancelarReserva(Reserva reserva) throws DataAccessException, CancelacionViajeAntelacionException, ReservasSoliAceptException {
+//		
+//		Date today = new Date();
+//		Date fechaSalida = reserva.getFechaSalida();
+//		Date horaSalida = reserva.getHoraSalida();
+//		fechaSalida.setHours(horaSalida.getHours());
+//		fechaSalida.setMinutes(horaSalida.getMinutes());
+//		if(reserva.getEstadoReserva().getName().equals("Solicitada")) {
+//			EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
+//			reserva.setEstadoReserva(estadoReserva);
+//			save(reserva);
+//		}else if(reserva.getEstadoReserva().getName().equals("Aceptada")) {
+//			if(fechaSalida.compareTo(today) < fechaSalida.getHours() + 24) {
+//				throw new CancelacionViajeAntelacionException();
+//			}else{
+//				EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
+//				reserva.setEstadoReserva(estadoReserva);
+//				save(reserva);	
+//			}
+//		}else {
+//			throw new ReservasSoliAceptException();
+//		}
+//	}
+	
+	
+	
 	@Transactional
-	public void cancelarReserva(Reserva reserva) throws DataAccessException, CancelacionViajeAntelacionException, ReservasSoliAceptException {
-		
+    public void cancelarReserva(Reserva reserva) throws DataAccessException, ReservaYaRechazada, CancelacionViajeAntelacionException {
+	
 		Date today = new Date();
 		Date fechaSalida = reserva.getFechaSalida();
-		Date horaSalida = reserva.getHoraSalida();
-		fechaSalida.setHours(horaSalida.getHours());
-		fechaSalida.setMinutes(horaSalida.getMinutes());
-		if(reserva.getEstadoReserva().getName().equals("Solicitada")) {
-			EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
-			reserva.setEstadoReserva(estadoReserva);
-			save(reserva);
-		}else if(reserva.getEstadoReserva().getName().equals("Aceptada")) {
-			if(fechaSalida.compareTo(today) < fechaSalida.getHours() + 24) {
-				throw new CancelacionViajeAntelacionException();
-			}else{
-				EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
-				reserva.setEstadoReserva(estadoReserva);
-				save(reserva);	
-			}
-		}else {
-			throw new ReservasSoliAceptException();
-		}
-	}
+//		fechaSalida.setHours(reserva.getFechaSalida().getHours());
+//		fechaSalida.setMinutes(reserva.getFechaSalida().getMinutes());
+		Date fechaAux = this.addFecha(fechaSalida, Calendar.HOUR_OF_DAY, - 24);
+		
 	
-	
-	
-	@Transactional
-    public void cancelarReserva1(Reserva reserva) throws DataAccessException, ReservaYaRechazada {
-
         if(reserva.getEstadoReserva().getName().equals("Rechazada")) {
             throw new ReservaYaRechazada();
-            
+        }else if(reserva.getEstadoReserva().getName().equals("Aceptada") && fechaSalida.compareTo(today) < fechaAux.compareTo(fechaSalida)) {
+        	throw new CancelacionViajeAntelacionException();
         }else {
             reserva.setEstadoReserva(estadoService.findEstadoById(3).get());
             reservaRepo.save(reserva);

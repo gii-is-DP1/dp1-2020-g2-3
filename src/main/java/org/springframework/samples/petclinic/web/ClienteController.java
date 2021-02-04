@@ -160,10 +160,10 @@ public class ClienteController {
 			return showReservas(modelMap,p);
 		}else {
 			try {
-				reservaService.cancelarReserva1(reservaOptional.get());
+				reservaService.cancelarReserva(reservaOptional.get());
 				modelMap.addAttribute("message", "Reserva cancelada correctamente");
-	//		}catch(CancelacionViajeAntelacionException e) {
-	//			modelMap.addAttribute("error", "No puedes cancelar una reserva con una antelación menor a 24 horas");
+			}catch(CancelacionViajeAntelacionException e) {
+				modelMap.addAttribute("error", "No puedes cancelar una reserva con una antelación menor a 24 horas");
 			}catch(ReservaYaRechazada e) {
 				modelMap.addAttribute("error", "No puedes cancelar una reserva que no tenga un estado Solicitada o Aceptada");
 			}
