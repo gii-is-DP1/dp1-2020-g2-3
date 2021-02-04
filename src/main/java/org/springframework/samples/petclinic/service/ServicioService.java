@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.service;
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 import java.util.Optional;
@@ -59,6 +60,18 @@ public class ServicioService {
 	@Transactional(readOnly = true)
 	public Optional<Servicio> findServicioById(int id) throws DataAccessException {
 		return servicioRepository.findById(id);
+	}
+	
+	@Transactional
+	public Double calcularGastos(LocalDate fecha1, LocalDate fecha2) {
+		Collection<Servicio> servicios = servicioRepository.findAllServicios();
+		Double gastos = 0.0;
+		for(Servicio s: servicios) {
+			if(s.getFecha().isAfter(fecha1) && s.getFecha().isBefore(fecha2)) {
+				gastos = gastos + s.getPrecio();
+			}
+		}
+		return gastos;
 	}
 	
 	@Transactional()

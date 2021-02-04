@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.springframework.samples.petclinic.repository.RutaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
+import org.springframework.samples.petclinic.service.exceptions.HoraSalidaSinAntelacionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,6 +68,14 @@ public class ReservaService {
 	}
 	
 	@Transactional
+	public Date addFecha(Date fechaBase, int tipoFecha, int cantidadSumar ) {
+		   Calendar calendar = Calendar.getInstance();
+		      calendar.setTime(fechaBase); 
+		      calendar.add(tipoFecha, cantidadSumar);
+		      return calendar.getTime();
+	   }
+	
+	@Transactional
 	public void fechaSalidaAnteriorActual(Date fechaSalida, Date horaSalida) throws FechaSalidaAnteriorActualException  {
 		Date today= new Date();
 		fechaSalida.setHours(horaSalida.getHours());
@@ -80,6 +90,21 @@ public class ReservaService {
 		
 	}
 	
+	@Transactional
+	public void fechaSalidaSinAntelacion(Date fechaSalida, Date horaSalida) throws HoraSalidaSinAntelacionException{
+		Date today = new Date();
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
+		fechaSalida = this.addFecha(fechaSalida, Calendar.MINUTE, -40);
+		
+		if(fechaSalida.compareTo(today)<0) {
+			System.out.println("hora de salida con menos de 40 minutos de antelación, se lanza excepción");
+			throw new HoraSalidaSinAntelacionException();
+		}else {
+			System.out.println("la hora de salida tiene al menos 40 minutos de antelación, no se lanza excepción");
+		}
+	}
+	
 	
 	@Transactional
 	public Iterable<Reserva> findAll(){
@@ -92,11 +117,12 @@ public class ReservaService {
 	}
 	
 	@Transactional //Este método calculará el precio, la fecha/hora estimada de llegada, los km totales,ruta... de la reserva.
-	public Reserva calcularReserva(Reserva reserva,boolean confirmarReserva) throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException {
+	public Reserva calcularReserva(Reserva reserva,boolean confirmarReserva) throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException,HoraSalidaSinAntelacionException {
 		
 		//Si confirmarReserva= false solo se calcularán los campos estrictamente necesarios para mostrar la reserva en el precioReserva.jsp
 		
 		fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha 
+		fechaSalidaSinAntelacion(reserva.getFechaSalida(), reserva.getHoraSalida());
 		Reserva reservaCalculada= new Reserva();
 		reservaCalculada.setDescripcionEquipaje(reserva.getDescripcionEquipaje());
 		reservaCalculada.setFechaSalida(reserva.getFechaSalida());
@@ -144,11 +170,23 @@ public class ReservaService {
 		
 	}
 	@Transactional 
-	public void calcularYConfirmarReserva(Reserva reserva,String username)throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException{
+	public void calcularYConfirmarReserva(Reserva reserva,String username)throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException,HoraSalidaSinAntelacionException{
 		Reserva reservaCalculada= calcularReserva(reserva,true);
 		Cliente cliente= clienteService.findClienteByUsername(username);
 		reservaCalculada.setCliente(cliente);
 		save(reservaCalculada);
+	}
+	
+	@Transactional
+	public Double calcularIngresos(Date fecha1, Date fecha2) {
+		Collection<Reserva> reservas = reservaRepo.findByEstadoReservaCompletadaOAceptada();
+		Double ingresos = 0.0;
+		for(Reserva r:reservas) {
+			if(r.getFechaSalida().after(fecha1) && r.getFechaSalida().before(fecha2)) {
+				ingresos = ingresos + r.getPrecioTotal();
+			}
+		}
+		return ingresos;
 	}
 	
 	@Transactional
@@ -157,9 +195,8 @@ public class ReservaService {
 	}
 
 	@Transactional
-	public void save(Reserva reserva)  {
-		
-		reservaRepo.save(reserva);
+	public void save(Reserva reserva){
+			reservaRepo.save(reserva);
 	}
 	
 }

@@ -1,5 +1,7 @@
 package org.springframework.samples.petclinic.repository;
 
+import java.util.Collection;
+
 import org.springframework.data.jpa.repository.Query;
 
 import org.springframework.data.repository.CrudRepository;
@@ -8,4 +10,6 @@ import org.springframework.samples.petclinic.model.Reserva;
 
 public interface ReservaRepository extends CrudRepository<Reserva,Integer> {
 	
+	@Query("SELECT reserva FROM Reserva reserva WHERE reserva.estadoReserva = '2' or reserva.estadoReserva = '4'")
+	public Collection<Reserva> findByEstadoReservaCompletadaOAceptada();
 }
