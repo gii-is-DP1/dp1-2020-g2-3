@@ -9,8 +9,10 @@ import javax.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.model.Cliente;
+import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.ClienteService;
+import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,9 +32,12 @@ public class ClienteController {
 
 	private final ClienteService clienteService;
 	
+	private final ReservaService reservaService;
+	
 	@Autowired
-	public ClienteController(ClienteService clienteService, UserService userService, AuthoritiesService authoritiesService) {
+	public ClienteController(ClienteService clienteService, ReservaService reservaService, UserService userService, AuthoritiesService authoritiesService) {
 		this.clienteService = clienteService;
+		this.reservaService = reservaService;
 	}
 	
 	@InitBinder
@@ -129,5 +134,14 @@ public class ClienteController {
 		ModelAndView mav = new ModelAndView("clientes/clienteDetails");
 		mav.addObject(this.clienteService.findClienteById(clienteId));
 		return mav;
+	}
+	
+	@GetMapping("/clientes/{clienteId}/myReservas")
+	public String showReservas(@PathVariable("clienteId") int clienteId, ModelMap model) {
+		Collection<Reserva> reservas = this.reservaService.findReservasByClienteId(clienteId); 
+		Cliente cliente = this.clienteService.findClienteById(clienteId);
+		model.addAttribute("reserva", reservas);
+		model.addAttribute("cliente", cliente);
+		return "reservas/reservasList";
 	}
 }

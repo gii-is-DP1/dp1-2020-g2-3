@@ -16,6 +16,13 @@
             <th style="width: 200px;">Apellidos</th>
             <th style="width: 200px;">Correo Electronico</th>
             <th style="width: 200px;">Telefono</th>
+            <th style="width: 200px;">Username</th>
+            <th style="width: 200px;">Password</th>
+            <th style="width: 200px;">Activo</th>
+            <th style="width: 200px;">Inicio Contrato</th>
+            <th style="width: 200px;">Fin Contrato</th>
+            <th style="width: 200px;">Sueldo</th>
+            <th style="width: 200px;">Despedir</th>
         </tr>
         </thead>
         <tbody>
@@ -36,6 +43,31 @@
                  <td>
                     <c:out value="${trabajador.telefono}"/>
                 </td>
+                 <td>
+                    <c:out value="${trabajador.user.username}"/>
+                </td>
+                  <td>
+                    <c:out value="${trabajador.user.password}"/>
+                </td>
+                  <td>
+                    <c:out value="${trabajador.user.enabled}"/>
+                </td>
+               <td>
+                    <c:out value="${trabajador.contrato.fechaInicio}"/>
+                </td>
+                <td>
+                    <c:out value="${trabajador.contrato.fechaFin}"/>
+                </td>
+                <td>
+                    <c:out value="${trabajador.contrato.salarioMensual}"/>
+                </td>
+                <td>
+                 <spring:url value="/trabajadores/despedir/{trabajadorId}" var="despedirTrabajadorUrl">
+                <spring:param name="trabajadorId" value="${trabajador.id}"/>
+                </spring:url>
+				<a class="despedirTrabajador" href="${fn:escapeXml(despedirTrabajadorUrl)}"> Despedir</a>
+                </td>
+            
             </tr>
         </c:forEach>
         </tbody>

@@ -38,7 +38,7 @@ public class RutaService {
 	public Optional<Ruta> findRutaByRuta(Ruta ruta){//Nos intentará devolver una ruta existente en la BD igual que la dada como parámetro 
 													// comparando también sus TRAYECTOS asociados (Relación ManyToMany)
 		List<Trayecto> trayectosRutaParametro= ruta.getTrayectos();
-		Collection<Ruta> rutasPosibles=findRutasByAttributes(ruta.getOrigenCliente(),ruta.getDestinoCliente(),ruta.getNumKmTotales(),ruta.getHorasEstimadasCliente());
+		Collection<Ruta> rutasPosibles=findRutasByAttributes(ruta.getOrigenCliente(),ruta.getDestinoCliente(),ruta.getNumKmTotales(),ruta.getHorasEstimadasCliente(),ruta.getHorasEstimadasTaxista());
 		Optional<Ruta> resultado= Optional.ofNullable(null);
 		
 	if(rutasPosibles.size()!=0 && rutasPosibles!=null) {
@@ -86,6 +86,37 @@ public class RutaService {
 		int minutosRealesAproximados= (int)Math.round((totalHoras%1)*60);
 		return minutosRealesAproximados;
 	}
+	@Transactional 
+	public List<Trayecto> obtenerTrayectosIntermedios(Ruta ruta){ //obtenemos los trayectos intermedios empezando por el que tenga como origen la primera parada intermedia
+		List<Trayecto> trayectosIntermedios= new ArrayList<Trayecto>();
+		List<Trayecto> listaTrayectos= ruta.getTrayectos();
+		
+		boolean origenEncontrado= false;
+		int i=0;
+			while(i<listaTrayectos.size()) {
+				
+				Trayecto tr= listaTrayectos.get(i);
+				
+				if(!origenEncontrado && tr.getOrigen().equals(ruta.getOrigenCliente()) && tr.getDestino().equals(ruta.getDestinoCliente())) { //No hay paradas intermedias
+					break;
+				}else if(!origenEncontrado && tr.getOrigen().equals(ruta.getOrigenCliente())) {
+					origenEncontrado=true;
+					
+				}else if(origenEncontrado) {
+					trayectosIntermedios.add(tr);
+					
+					if(tr.getDestino().equals(ruta.getDestinoCliente())) {
+						
+						break;
+					}
+					
+					
+				}
+				i++;
+			}
+		
+		return trayectosIntermedios;
+	}
 	@Transactional(readOnly = true)
 	public Optional<Ruta> findRutaById(int id) throws DataAccessException {
 		return rutaRepo.findById(id);
@@ -103,9 +134,9 @@ public class RutaService {
 	
 	@Transactional()
 	public Collection<Ruta> findRutasByAttributes(String origenCliente, String destinoCliente,
-			Double numKmTotales, Double horasEstimadasCliente)  {
+			Double numKmTotales, Double horasEstimadasCliente, Double horasEstimadasTaxista)  {
 		
-		return rutaRepo.findRutasByAttributes(origenCliente, destinoCliente, numKmTotales, horasEstimadasCliente);
+		return rutaRepo.findRutasByAttributes(origenCliente, destinoCliente, numKmTotales, horasEstimadasCliente,horasEstimadasTaxista);
 	}
 	
 	

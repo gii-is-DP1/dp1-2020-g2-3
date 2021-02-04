@@ -14,5 +14,9 @@ public interface TrabajadorRepository extends CrudRepository<Trabajador,Integer>
 	//@Query("SELECT trabajador FROM Trabajador trabajador WHERE trabajador.id =:id")
 	//public Collection<Trabajador> findAllActivos();
 
+	@Query("SELECT trabajador FROM Trabajador trabajador WHERE trabajador.user.username =:username")
+	public Trabajador findByUsername(@Param("username") String username);
+
+
 }
 

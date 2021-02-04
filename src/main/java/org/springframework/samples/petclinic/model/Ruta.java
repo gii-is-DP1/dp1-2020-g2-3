@@ -15,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
 import java.time.LocalDate;
@@ -59,7 +60,15 @@ public class Ruta extends BaseEntity {
 	@NotNull
 	private  Double horasEstimadasCliente;
 	
+	@Min(0)
+	@Digits(fraction=2,integer=3)
+	@Column(name = "horas_Estimadas_Taxista")
+	@NotNull
+	private  Double horasEstimadasTaxista;
+	
+	
 	@ManyToMany
+	@OrderColumn
 	List<Trayecto> trayectos;
 	
 	@Override

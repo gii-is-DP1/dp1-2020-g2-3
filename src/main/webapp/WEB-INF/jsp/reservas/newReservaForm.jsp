@@ -8,63 +8,13 @@
 
 
 <petclinic:layout pageName="reservas">
-    <form:form modelAttribute="reserva" class="form-horizontal" id="add-reserva-form" action="/reservas/redirigir">
+    <form:form modelAttribute="reserva" class="form-horizontal" id="add-reserva-form" action="/reservas/redirigirNewReservaForm">
         
          <input type="hidden" name="numCiudadesIntermedias" value="${numCiudadesIntermedias}"/>
         <p> ${usuario}</p>
        
-        <label for="ruta.origenCliente">Ciudad Origen:</label>
-		<select required="true" name="ruta.origenCliente" id="ruta.origenCliente">
-				 <c:forEach items="${paradas}" var="parada">
-				 <c:choose>
-                    <c:when test="${parada == reserva.ruta.origenCliente}">
-                        <option value="${parada}" selected > ${parada}</option>
-                    </c:when>
-                    <c:otherwise>
-                        <option value="${parada}"> ${parada}</option>
-                    </c:otherwise>
-               	 </c:choose>
-    	        </c:forEach>
-		</select>
-		<br> <br>
+      <jsp:include page="/WEB-INF/jsp/reservas/rutaForm.jsp"/>
 
- <c:choose>
-	<c:when test = "${numCiudadesIntermedias>0}">
-		<c:forEach var="i" begin="0" end="${finBucle}" step="1" varStatus ="status">
-		<label for="ruta.trayectos[${i}].origen">Parada ${i}:</label>
-		<select required="true" name="ruta.trayectos[${i}].origen" id="ruta.trayectos[${i}].origen">
-				 <c:forEach items="${paradas}" var="parada">
-				 <c:choose>
-                    <c:when test="${parada == reserva.ruta.trayectos[i].origen}">
-                        <option value="${parada}" selected > ${parada}</option>
-                    </c:when>
-                    <c:otherwise>
-                        <option value="${parada}"> ${parada}</option>
-                    
-                    </c:otherwise>
-               	 </c:choose>
-    	        </c:forEach>
-		</select>
-		<br> 
-		</c:forEach>	
-	</c:when>
-</c:choose>
-    	    <br> 
-		<button class="btn btn-default" type="submit" name="action" value="addParada">Añadir parada intermedia +</button> 		 
-		 <br><br>
-        <label for="ruta.destinoCliente">Ciudad Destino:</label>
-		<select required="true" name="ruta.destinoCliente" id="ruta.destinoCliente">
-		 	<c:forEach items="${paradas}" var="parada">
-		 		<c:choose>
-                    <c:when test="${parada == reserva.ruta.destinoCliente}">
-                        <option value="${parada}" selected > ${parada}</option>
-                    </c:when>
-                    <c:otherwise>
-                        <option value="${parada}"> ${parada}</option>
-                    </c:otherwise>
-               	 </c:choose>
-    		 </c:forEach>
-		</select>
 		<br><br>
            
         <!--  Meter dentro del binding la fecha y hora de salida aquí porque en el tag hay conflictos -->
@@ -82,7 +32,7 @@
      		
     	    <!-- Vamos a tener 2 botones submit  en el mismo formulario  -->
     	       
-		<button class="btn btn-default" type="submit" name="action" value="continuar">Calcular Precio</button> 		 
+		<button class="btn btn-default" type="submit" name="action" value="continuar"> Calcular Precio <span class="glyphicon glyphicon-menu-right" aria-hidden="false"></span></button> 		 
     </form:form>    
     
 </petclinic:layout>

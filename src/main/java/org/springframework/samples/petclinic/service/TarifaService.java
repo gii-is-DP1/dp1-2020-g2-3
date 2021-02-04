@@ -11,9 +11,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TarifaService {
-	@Autowired
+	
 	private TarifaRepository tariRep;
-	private Tarifa tarifa;
+
+	@Autowired
+	public TarifaService(TarifaRepository tariRep) {
+		this.tariRep=tariRep;
+		
+	}
+	
+	@Transactional
+	public Tarifa findTarifaActiva() {
+		
+		return tariRep.findTarifaActiva();
+		
+	}
 	
 	@Transactional
 	public long tarifaCount() {
@@ -50,6 +62,23 @@ public class TarifaService {
 	public void save(Tarifa tari)  {
 		
 		tariRep.save(tari);
+	}
+	
+	@Transactional()
+	public Optional<Tarifa> findCopyOfTarifa(Tarifa tarifa)  { //Busca si hay una tarifa "copia" igual a la dada como parámetro
+		
+		return tariRep.findCopyByTarifa(tarifa.getPrecioPorKm(), tarifa.getPorcentajeIvaRepercutido(), tarifa.getPrecioEsperaPorHora());
+	}
+	
+	@Transactional
+	public  Tarifa nuevaTarifa(boolean activado,boolean original,Integer porcentajeIvaRepercutido,Double precioEsperaPorHora,Double precioPorKm) {
+		Tarifa nuevaTarifa= new Tarifa();
+		nuevaTarifa.setActivado(activado);
+		nuevaTarifa.setOriginal(original);
+		nuevaTarifa.setPorcentajeIvaRepercutido(porcentajeIvaRepercutido);
+		nuevaTarifa.setPrecioEsperaPorHora(precioEsperaPorHora);
+		nuevaTarifa.setPrecioPorKm(precioPorKm);
+		return nuevaTarifa;
 	}
 
 }

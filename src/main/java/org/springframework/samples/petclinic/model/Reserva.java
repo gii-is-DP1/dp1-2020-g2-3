@@ -1,40 +1,28 @@
 package org.springframework.samples.petclinic.model;
-import org.springframework.beans.support.MutableSortDefinition;
-import org.springframework.beans.support.PropertyComparator;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-@Data
+@Getter
+@Setter
 @Entity
-@Table(name = "Reserva")
+@Table(name = "reserva")
 public class Reserva extends BaseEntity {
 	
 	@ManyToOne
@@ -44,6 +32,18 @@ public class Reserva extends BaseEntity {
 	@ManyToOne
     @JoinColumn(name = "ruta_id", referencedColumnName = "id")
 	private Ruta ruta;
+	
+	@ManyToOne
+    @JoinColumn(name = "tarifa_id", referencedColumnName = "id")
+	private Tarifa tarifa;
+	
+	@OneToOne(optional=true)
+	@JoinColumn(name="automovil_id", referencedColumnName="id")
+	private Automovil automovil;
+	
+	@OneToOne(optional=true)
+	@JoinColumn(name="trabajador_id", referencedColumnName="id")
+	private Trabajador trabajador;
 	
 	@Column(name = "fecha_Salida")
 	@Temporal(TemporalType.DATE)
@@ -105,26 +105,13 @@ public class Reserva extends BaseEntity {
 	@Column(name = "num_Km_Totales")
 	private  Double numKmTotales;
 	
-	@Min(0)
-	@Digits(fraction=2,integer=5)
-	@Column(name = "precio_Distancia")
-	private  Double precioDistancia;
-	
-	
-	@Min(0)
-	@Digits(fraction=2,integer=5)
-	@Column(name = "precio_Espera")
-	private  Double precioEspera;
-	
-	@Min(0)
-	@Digits(fraction=2,integer=5)
-	@Column(name = "precio_IVA_Repercutivo")
-	private  Double precioIVA;
-	
-	@Min(0)
-	@Digits(fraction=2,integer=5)
-	@Column(name = "base_Imponible")
-	private  Double baseImponible;
-	
+	public static Reserva newReservaSinCalcular(Date fechaSalida,Date horaSalida, Integer plazasOcupadas,String descripcionEquipaje) {
+		Reserva nuevaReserva= new Reserva();
+		nuevaReserva.setFechaSalida(fechaSalida);
+		nuevaReserva.setHoraSalida(horaSalida);
+		nuevaReserva.setPlazas_Ocupadas(plazasOcupadas);
+		nuevaReserva.setDescripcionEquipaje(descripcionEquipaje);
+		return nuevaReserva;
+	}
 	
 }

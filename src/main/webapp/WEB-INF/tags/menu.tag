@@ -41,11 +41,14 @@
 					<span>Automóviles</span>
 				</petclinic:menuItem>
 				
+			<sec:authorize access="hasAnyAuthority('admin')">  
 				<petclinic:menuItem active="${name eq 'trabajadores'}" url="/trabajadores/trabajadoresList"
 					title="Trabajadores">
 					<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
 					<span>Trabajadores</span>
 				</petclinic:menuItem>
+				
+			</sec:authorize>
 
 				<petclinic:menuItem active="${name eq 'servicios'}" url="/servicios/listado"
 					title="Servicios">
@@ -58,18 +61,22 @@
 					<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
 					<span>Reservas</span>
 				</petclinic:menuItem>
+			
+			<sec:authorize access="hasAnyAuthority('admin')">  
 				
 				<petclinic:menuItem active="${name eq 'tarifas'}" url="/tarifas/listado"
 					title="Tarifas">
 					<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
 					<span>Tarifas</span>
 				</petclinic:menuItem>
-
-				<petclinic:menuItem active="${name eq 'error'}" url="/oups"
-					title="trigger a RuntimeException to see how it is handled">
-					<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
-					<span>Error</span>
+			</sec:authorize>
+			
+				<petclinic:menuItem active="${name eq 'miPerfil'}" url=""
+					title="clientes">
+					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+					<span>Mi perfil</span>
 				</petclinic:menuItem>
+				
 
 			</ul>
 

@@ -49,6 +49,7 @@ public class TrayectoService {
 			List<Trayecto> nuevaListaTrayectos= new ArrayList<Trayecto>();
 			Double numKmTotal=0.0;
 			Double horasEstimadasCliente=0.0;
+			Double horasEstimadasTaxista=0.0;
 			if(rutaFormulario.getTrayectos()==null || rutaFormulario.getTrayectos().size()==0) { //No hay paradas intermedias
 
 					
@@ -59,7 +60,9 @@ public class TrayectoService {
 					nuevaListaTrayectos.add(trayecto);
 					numKmTotal+=trayecto.getNumKmTotales();
 					horasEstimadasCliente+=trayecto.getHorasEstimadas();
-				
+					
+					horasEstimadasTaxista+=trayecto.getHorasEstimadas();
+					
 				
 			}else { //Hay paradas intermedias
 				
@@ -75,6 +78,9 @@ public class TrayectoService {
 					nuevaListaTrayectos.add(trayectoInicial);
 					numKmTotal+=trayectoInicial.getNumKmTotales();
 					horasEstimadasCliente+=trayectoInicial.getHorasEstimadas();
+					System.out.println(horasEstimadasTaxista + " + " +  trayectoInicial.getHorasEstimadas() + "=");
+					horasEstimadasTaxista+=trayectoInicial.getHorasEstimadas();
+					System.out.println(horasEstimadasTaxista);
 					
 					int i=0;
 					int listaSize= listaTrayectos.size();
@@ -88,6 +94,7 @@ public class TrayectoService {
 							nuevaListaTrayectos.add(trayectoIntermedio);
 							numKmTotal+=trayectoIntermedio.getNumKmTotales();
 							horasEstimadasCliente+=trayectoIntermedio.getHorasEstimadas();
+							horasEstimadasTaxista+=trayectoIntermedio.getHorasEstimadas();
 							i++;
 						}
 						
@@ -101,6 +108,8 @@ public class TrayectoService {
 						nuevaListaTrayectos.add(trayectoFinal);
 						numKmTotal+=trayectoFinal.getNumKmTotales();
 						horasEstimadasCliente+=trayectoFinal.getHorasEstimadas();
+						horasEstimadasTaxista+=trayectoFinal.getHorasEstimadas();
+
 					}
 					
 					
@@ -114,20 +123,23 @@ public class TrayectoService {
 				Trayecto trayectoIdaTaxista= trayectoRepo.findByOrigenAndDestino("Zahinos", rutaFormulario.getOrigenCliente());
 				nuevaListaTrayectos.add(0, trayectoIdaTaxista);
 				numKmTotal+=trayectoIdaTaxista.getNumKmTotales();
-				//en este caso no sumamos las horas estimadas porque el cliente no estará en el coche en este trayecto
-			}
-			if(!rutaFormulario.getDestinoCliente().equals("Zahinos")) {
+				//en este caso no sumamos las horas estimadas porque el cliente no estará en el coche en este trayecto, pero sí las horas del taxista
+				horasEstimadasTaxista+=trayectoIdaTaxista.getHorasEstimadas();
+
+			}if(!rutaFormulario.getDestinoCliente().equals("Zahinos")) {
 				Trayecto trayectoVueltaTaxista= trayectoRepo.findByOrigenAndDestino(rutaFormulario.getDestinoCliente(),"Zahinos");
 				nuevaListaTrayectos.add(trayectoVueltaTaxista);
 				numKmTotal+=trayectoVueltaTaxista.getNumKmTotales();
-				//en este caso no sumamos las horas estimadas porque el cliente no estará en el coche en este trayecto
+				//en este caso no sumamos las horas estimadas porque el cliente no estará en el coche en este trayecto, pero sí las del taxista
+				horasEstimadasTaxista+=trayectoVueltaTaxista.getHorasEstimadas();
 
 			}
 			Ruta nuevaRuta= new Ruta();
 			double numKmTotalAproximado=Math.round(numKmTotal*100)/100;
-
+			double horasTaxistaAproximadas= Math.round(horasEstimadasTaxista*100)/100;
 			nuevaRuta.setTrayectos(nuevaListaTrayectos);
 			nuevaRuta.setHorasEstimadasCliente(horasEstimadasCliente);
+			nuevaRuta.setHorasEstimadasTaxista(horasTaxistaAproximadas);
 			nuevaRuta.setNumKmTotales(numKmTotalAproximado);
 			nuevaRuta.setOrigenCliente(rutaFormulario.getOrigenCliente());
 			nuevaRuta.setDestinoCliente(rutaFormulario.getDestinoCliente());

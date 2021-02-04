@@ -25,4 +25,5 @@ public interface ClienteRepository extends CrudRepository<Cliente, Integer>{
 	public Cliente findClienteByUsername(String username);
 	
 
+	
 }

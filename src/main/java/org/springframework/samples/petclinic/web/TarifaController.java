@@ -72,6 +72,7 @@ public class TarifaController {
 				
 				BeanUtils.copyProperties(modifiedTarifa, tarifa.get(), "tarifaId");
 				tariService.save(tarifa.get());
+				tariService.saveTarifa(tarifa.get());
 				modelMap.addAttribute("message","Tarifa actualizada correctamente");
 				return listadoTarifas(modelMap);
 			}

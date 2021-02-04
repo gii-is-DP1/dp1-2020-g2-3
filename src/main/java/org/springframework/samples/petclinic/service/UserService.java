@@ -21,8 +21,11 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.repository.UserRepository;
+import org.springframework.samples.petclinic.service.exceptions.FechaFinAnteriorInicioException;
+import org.springframework.samples.petclinic.service.exceptions.TrabajadorNoActivo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +51,25 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
+	@Transactional
+	public void despedirTrabajador(User user) throws DataAccessException,TrabajadorNoActivo {
+		
+		if(!user.isEnabled()) {
+			throw new TrabajadorNoActivo();
+		}else {
+			user.setEnabled(false);
+			userRepository.save(user);
+			
+		}
+		
+	}
+	
 	public Optional<User> findUser(String username) {
 		return userRepository.findById(username);
+	}
+	
+	@Transactional
+	public Iterable<User> findAll() throws DataAccessException {
+		return userRepository.findAll();
 	}
 }
