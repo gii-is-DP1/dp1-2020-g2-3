@@ -51,10 +51,24 @@
         <input type="hidden" name="descripcionEquipaje" id="descripcionEquipaje" value="${reserva.descripcionEquipaje}"/>
 
  		<h2>Precio Total: </h2> <span> ${reserva.precioTotal} euros</span>
+ 		
+ 		<c:choose>
+     	  	<c:when test = "${not empty clientes}"> 
+     	  	
+     	  		<select required  name="cliente" id="cliente">
+				
+				 <c:forEach items="${clientes}" var="cliente">
+                 <option value="${cliente.id}"  > <c:out value=" ${cliente.nombre} ${cliente.apellidos} (${cliente.user.username}) ${cliente.dni}"></c:out></option>
+    	        </c:forEach>
+		</select>
+     	  	
+     	  	
+     	 	 </c:when>
+    	</c:choose>
+    	
 		<br><br>
      	<button class="btn btn-default" type="submit" name="action" value="atras"><span class="glyphicon glyphicon-menu-left" aria-hidden="false"></span>Atrás</button> <span> &nbsp;&nbsp;		<button class="btn btn-default" type="submit" name="action" value="confirmarReserva">Reservar viaje</button> </span>	 
-     	 
-    	
+     	  
     </form:form>    
     
 </petclinic:layout>

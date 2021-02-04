@@ -75,14 +75,15 @@ class ReservaServiceMockedTests {
     
     @Mock
     private TrabajadorService trabajadorService;
-   
+    @Mock
+    private AuthoritiesService authoService;
 
     protected ReservaService reservaService;
 
     @BeforeEach
     void setup() {
     	
-    	reservaService= new ReservaService(reservaRepository,trayectoService,estadoService,clienteService,rutaService,tarifaService,trabajadorService);
+    	reservaService= new ReservaService(reservaRepository,trayectoService,estadoService,clienteService,rutaService,tarifaService,trabajadorService,authoService);
     	
     }
     
