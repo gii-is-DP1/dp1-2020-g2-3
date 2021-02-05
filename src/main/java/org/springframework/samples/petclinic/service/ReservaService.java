@@ -41,6 +41,8 @@ import org.springframework.samples.petclinic.service.exceptions.CancelacionViaje
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class ReservaService {
 	//Repositorio
@@ -404,8 +406,10 @@ public class ReservaService {
 		fechaSalida.setMinutes(reserva.getHoraSalida().getMinutes());
 		Date fechaAux = utilService.addFecha(fechaSalida, Calendar.HOUR_OF_DAY, -24); //REstamos 24 horas
         if(!(reserva.getEstadoReserva().getName().equals("Solicitada") || reserva.getEstadoReserva().getName().equals("Aceptada"))) {
-            throw new ReservaYaRechazada();
+        	log.error("El estado de la reserva tiene que ser 'Solicitada' o 'Aceptada' para poder cancelarla");
+        	throw new ReservaYaRechazada();
         }else if(today.compareTo(fechaAux)>0) {
+        	log.error("La reserva tiene una fecha de salida con un intervalo de tiempo menor a 24 horas desde la actualidad o es anterior a la fecha actual, por lo que no puede ser cancelada");
         	throw new CancelacionViajeAntelacionException();
         }else {
         	

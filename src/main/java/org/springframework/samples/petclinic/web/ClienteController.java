@@ -32,6 +32,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Controller
 public class ClienteController {
 
@@ -149,6 +151,7 @@ public class ClienteController {
 		String vista="reservas/misReservas";
 		Iterable<Reserva> reservas= reservaService.findReservasByUsername(username);
 		modelMap.addAttribute("reservas", reservas);
+		log.info("Mostrando su lista de reservas");
 		return vista;
 	}
 	
@@ -162,6 +165,7 @@ public class ClienteController {
 			try {
 				reservaService.cancelarReserva(reservaOptional.get());
 				modelMap.addAttribute("message", "Reserva cancelada correctamente");
+				log.info("La reserva ha sido cancelada con éxito");
 				return showReservas(modelMap, p);
 			}catch(CancelacionViajeAntelacionException e) {
 				modelMap.addAttribute("error", "No puedes cancelar una reserva con una antelación menor a 24 horas a la fecha de salida, ni después de dicha fecha");

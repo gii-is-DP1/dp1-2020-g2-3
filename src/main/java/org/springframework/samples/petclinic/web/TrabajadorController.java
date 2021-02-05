@@ -1,18 +1,9 @@
 package org.springframework.samples.petclinic.web;
 
-import java.util.Map;
-import java.util.Optional;
-
 import javax.validation.Valid;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.petclinic.model.Automovil;
-import org.springframework.samples.petclinic.model.Contrato;
-import org.springframework.samples.petclinic.model.Reserva;
-import org.springframework.samples.petclinic.model.Servicio;
-import org.springframework.samples.petclinic.model.Taller;
 import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.service.TipoTrabajadorService;
@@ -23,13 +14,13 @@ import org.springframework.samples.petclinic.service.exceptions.TrabajadorNoActi
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Controller
 @RequestMapping("/trabajadores")
 public class TrabajadorController {
@@ -53,6 +44,7 @@ public class TrabajadorController {
 		String vista="trabajadores/trabajadoresList";
 		Iterable<Trabajador> trabajadores= trabajadorService.findAll();
 		modelMap.addAttribute("trabajadores", trabajadores);
+		log.info("Mostrando el listado de trabajadores");
 		return vista;
 	}
 	
