@@ -75,8 +75,6 @@ public class ClienteServiceTests {
 //		Iterable<Reserva> reserva = reservaService.findReservasByUsername(username);
 //		Iterable<Reserva> reserva2 = reservaService.findReservasByUsername("Pedro");
 //		
-//		assertTh;
-//		assertNotEquals(reserva2, 1);
-//		assertNotNull(reserva);
+//		
 //	}
 }

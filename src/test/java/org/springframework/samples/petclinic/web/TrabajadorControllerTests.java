@@ -18,8 +18,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
 import org.springframework.samples.petclinic.model.Trabajador;
+import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.service.TipoTrabajadorService;
 import org.springframework.samples.petclinic.service.TrabajadorService;
+import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,6 +41,9 @@ public class TrabajadorControllerTests {
 	
 	@MockBean
 	private TipoTrabajadorService tipoTrabajadorService;
+	
+	@MockBean
+	private UserService userService;
 
 
 	@Autowired
@@ -48,7 +53,7 @@ public class TrabajadorControllerTests {
 
 	@BeforeEach
 	void setup() {
-
+		
 		charles = new Trabajador();
 		charles.setId(TEST_TRABAJADOR_ID);
 		charles.setDni("41234567L");
