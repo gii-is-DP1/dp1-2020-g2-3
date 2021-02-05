@@ -1,5 +1,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags"%>
 <%@ taglib prefix="sec"
 	uri="http://www.springframework.org/security/tags"%>
@@ -34,11 +35,16 @@
 					<span>Reservas</span>
 				</petclinic:menuItem>
 				
-				<petclinic:menuItem active="${name eq 'miPerfil'}" url=""
+				
+    		    
+                <petclinic:menuItem active="${name eq 'miPerfil'}" url="/clientes/perfilCliente"
 					title="clientes">
 					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 					<span>Mi perfil</span>
 				</petclinic:menuItem>
+				
+    			
+				
 
 			</ul>
 

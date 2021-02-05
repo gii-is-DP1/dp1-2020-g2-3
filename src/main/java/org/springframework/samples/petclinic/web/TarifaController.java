@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.model.Tarifa;
 import org.springframework.samples.petclinic.service.TarifaService;
+import org.springframework.samples.petclinic.service.exceptions.DobleTarifaActivaException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -69,11 +70,13 @@ public class TarifaController {
 				modelMap.put("tarifa", modifiedTarifa);
 				return "tarifas/updateTarifaForm";
 			}else {
+					BeanUtils.copyProperties(modifiedTarifa, tarifa.get(), "tarifaId");
+					tariService.save(tarifa.get());
+					tariService.saveTarifa(tarifa.get());
+					modelMap.addAttribute("message","Tarifa actualizada correctamente");
 				
-				BeanUtils.copyProperties(modifiedTarifa, tarifa.get(), "tarifaId");
-				tariService.save(tarifa.get());
-				tariService.saveTarifa(tarifa.get());
-				modelMap.addAttribute("message","Tarifa actualizada correctamente");
+				
+				
 				return listadoTarifas(modelMap);
 			}
 		}

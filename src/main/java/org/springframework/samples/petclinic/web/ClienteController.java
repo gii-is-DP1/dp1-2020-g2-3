@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.web;
 
+import java.security.Principal;
 import java.util.Collection;
 
 import java.util.Map;
@@ -105,6 +106,8 @@ public class ClienteController {
 		model.addAttribute("selections",clientes);
 		return vista;
 	}
+	
+	
 
 	@GetMapping(value = "/clientes/{clienteId}/edit")
 	public String initUpdateClienteForm(@PathVariable("clienteId") int clienteId, Model model) {
@@ -128,6 +131,13 @@ public class ClienteController {
 		}
 	}
 
+	@GetMapping("/clientes/perfilCliente")
+	public ModelAndView perfilCliente(Principal p) {
+		String username = p.getName();
+		ModelAndView mav = new ModelAndView("clientes/clienteDetails");
+		mav.addObject(this.clienteService.findIdByUsername(username));
+		return mav;
+	}
 	
 	@GetMapping("/clientes/{clienteId}")
 	public ModelAndView showCliente(@PathVariable("clienteId") int clienteId) {

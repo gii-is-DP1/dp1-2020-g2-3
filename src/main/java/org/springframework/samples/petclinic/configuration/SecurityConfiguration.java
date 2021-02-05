@@ -1,6 +1,6 @@
 package org.springframework.samples.petclinic.configuration;
 
-import javax.sql.DataSource;
+import javax.sql.DataSource; 
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/tarifas/**").hasAnyAuthority("admin","taxista")
 				.antMatchers("/admin/**").hasAnyAuthority("admin")
 				.antMatchers("/clientes/new").permitAll()
+				.antMatchers("/clientes/perfilCliente").permitAll()
 				.antMatchers("/clientes/**").hasAnyAuthority("admin","taxista")
 				.antMatchers("/reservas/**").authenticated()
 				.antMatchers("/trabajadores/**").hasAnyAuthority("admin")

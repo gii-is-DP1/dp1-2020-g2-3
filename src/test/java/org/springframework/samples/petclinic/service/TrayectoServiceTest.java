@@ -1,6 +1,6 @@
 package org.springframework.samples.petclinic.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat; 
 import static org.junit.Assert.assertThat;
 
 import static org.junit.Assert.assertTrue;
