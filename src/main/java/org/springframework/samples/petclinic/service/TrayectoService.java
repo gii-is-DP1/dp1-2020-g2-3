@@ -14,20 +14,24 @@ import org.springframework.samples.petclinic.model.Ruta;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
+import org.springframework.samples.petclinic.web.ReservaController;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class TrayectoService {
 
 	
 	private TrayectoRepository trayectoRepo;
 	private RutaService rutaService;
-	
+	private UtilService utilService;
 	@Autowired
-	public TrayectoService(TrayectoRepository trayectoRepo,RutaService rutaService) {
+	public TrayectoService(TrayectoRepository trayectoRepo,RutaService rutaService,UtilService utilService) {
 		this.trayectoRepo=trayectoRepo;
 		this.rutaService=rutaService;
+		this.utilService=utilService;
 	}
 	
 	/*la ruta que se le pasa como parámetro viene desde un formulario con la siguiente estructura:
@@ -45,20 +49,23 @@ public class TrayectoService {
 	public Ruta calcularYAsignarTrayectos(Ruta rutaFormulario) throws DataAccessException,DuplicatedParadaException {
 		
 		if(rutaFormulario.getOrigenCliente().equals(rutaFormulario.getDestinoCliente())) {
-			
 			throw new DuplicatedParadaException();
-			
 		}else {
+			Ruta rutaConstruida= rutaService.inicializarRuta(rutaFormulario);
+			if(!rutaFormulario.getOrigenCliente().equals("Zahinos")) { //Se añade el trayecto Zahinos --> Origen Cliente en caso de que Origen Cliente no sea Zahinos
+				rutaConstruida=this.recalcularRutaAddTrayecto(rutaConstruida,"Zahinos", rutaFormulario.getOrigenCliente(),false);
+
+			}
 			
-			Ruta rutaConstruida= this.rutaService.inicializarRuta(rutaFormulario);
 			List<Trayecto> paradasIntermedias= rutaFormulario.getTrayectos();
+			
 			if(paradasIntermedias==null || paradasIntermedias.size()==0) { //No hay paradas intermedias
 				rutaConstruida= this.recalcularRutaAddTrayecto(rutaConstruida, rutaFormulario.getOrigenCliente(), rutaFormulario.getDestinoCliente(),true);
 				
 			}else { //Hay paradas intermedias
 				
 				if(rutaFormulario.getOrigenCliente().equals(paradasIntermedias.get(0).getOrigen())) {
-					System.out.println("origen igual a la primera parada intermedia");
+					log.error("Origen del cliente: " + rutaFormulario.getOrigenCliente() + ", igual a la primera parada intermedia:" + paradasIntermedias.get(0).getOrigen());
 					throw new DuplicatedParadaException();
 				}else {
 					//Trayecto Origen Cliente ---> Primera parada intermedia
@@ -69,7 +76,7 @@ public class TrayectoService {
 					while(i<listaSize-1) {  
 						
 						if(paradasIntermedias.get(i).getOrigen().equals(paradasIntermedias.get(i+1).getOrigen())) {
-							System.out.println("Parada intermedia i igual que la parada intermedia i+1");
+							log.error("Parada intermedia i igual que la parada intermedia i+1");
 							throw new DuplicatedParadaException();
 						}else {
 							rutaConstruida=this.recalcularRutaAddTrayecto(rutaConstruida, paradasIntermedias.get(i).getOrigen(), paradasIntermedias.get(i+1).getOrigen(),true);
@@ -78,7 +85,7 @@ public class TrayectoService {
 					}
 				//Trayecto última parada intermedia ---> Destino cliente
 					if(paradasIntermedias.get(listaSize-1).getOrigen().equals(rutaFormulario.getDestinoCliente())) {
-						System.out.println("última parada intermedia igual al destino de la ruta");
+						log.error("última parada intermedia igual al destino de la ruta");
 						throw new DuplicatedParadaException();
 					}else { 
 						
@@ -88,32 +95,28 @@ public class TrayectoService {
 			}
 			//En cualquier caso, hay que incorporar el trayecto [Zahinos --> OrigenCliente]  y [DestinoCliente ---> Zahinos]
 			//en estos trayectos no se sumarán las horas del cliente, porque son trayectos exclusivos del taxista	
-			if(!rutaFormulario.getOrigenCliente().equals("Zahinos")) {
-				rutaConstruida=this.recalcularRutaAddTrayecto(rutaConstruida,"Zahinos", rutaFormulario.getOrigenCliente(),false);
-
-			}if(!rutaFormulario.getDestinoCliente().equals("Zahinos")) {
+			if(!rutaFormulario.getDestinoCliente().equals("Zahinos")) {
 				rutaConstruida=this.recalcularRutaAddTrayecto(rutaConstruida,rutaFormulario.getDestinoCliente(), "Zahinos",false);				
 
 			}
 			//Se aproximan los resultados a 2 decimales
-			rutaConstruida.setNumKmTotales(this.aproximarNumero(rutaConstruida.getNumKmTotales()));
-			rutaConstruida.setHorasEstimadasTaxista(this.aproximarNumero(rutaConstruida.getHorasEstimadasTaxista()));
-			rutaConstruida.setHorasEstimadasCliente(this.aproximarNumero(rutaConstruida.getHorasEstimadasCliente()));
-			System.out.println("Horas estimadas Cliente: " + rutaConstruida.getHorasEstimadasCliente());
+			rutaConstruida.setNumKmTotales(utilService.aproximarNumero(rutaConstruida.getNumKmTotales()));
+			rutaConstruida.setHorasEstimadasTaxista(utilService.aproximarNumero(rutaConstruida.getHorasEstimadasTaxista()));
+			rutaConstruida.setHorasEstimadasCliente(utilService.aproximarNumero(rutaConstruida.getHorasEstimadasCliente()));
+			
 			return rutaConstruida;
 			
 		}
 	}
 	
+	//Dada una ruta y un origen/destino, se añade dicho trayecto y se actualizan los km totales, y horas estimadas de la ruta
 	@Transactional
 	public Ruta recalcularRutaAddTrayecto(Ruta ruta,String origenTrayecto, String destinoTrayecto,boolean sumarHorasCliente) {
-		
 		List<Trayecto> nuevaListaTrayectos= ruta.getTrayectos();
 		Trayecto trayectoReal=trayectoRepo.findByOrigenAndDestino(origenTrayecto, destinoTrayecto);
 		nuevaListaTrayectos.add(trayectoReal);
 		ruta.setTrayectos(nuevaListaTrayectos);
 		ruta.setNumKmTotales(ruta.getNumKmTotales()+trayectoReal.getNumKmTotales());
-		
 		if(sumarHorasCliente) {
 			ruta.setHorasEstimadasCliente(ruta.getHorasEstimadasCliente()+trayectoReal.getHorasEstimadas());
 		}
@@ -121,11 +124,7 @@ public class TrayectoService {
 		return ruta;
 	}
 	
-	@Transactional
-	public double aproximarNumero(Double numero) {
-		double numeroAproximado=(double)Math.round(numero * 100d) / 100d;
-		return numeroAproximado;
-	}
+
 	
 	
 	@Transactional 

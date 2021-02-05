@@ -141,7 +141,7 @@ public class RutaService {
 		return rutaRepo.findRutasByAttributes(origenCliente, destinoCliente, numKmTotales, horasEstimadasCliente,horasEstimadasTaxista);
 	}
 	
-	@Transactional()
+	@Transactional
 	public Ruta inicializarRuta(Ruta ruta)  {
 		Ruta nuevaRuta= new Ruta();
 		List<Trayecto> nuevaListaTrayectos= new ArrayList<Trayecto>();
