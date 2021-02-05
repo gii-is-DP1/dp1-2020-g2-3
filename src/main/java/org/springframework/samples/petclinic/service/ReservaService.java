@@ -395,20 +395,22 @@ public class ReservaService {
     public void cancelarReserva(Reserva reserva) throws DataAccessException, ReservaYaRechazada, CancelacionViajeAntelacionException {
 	
 		Date today = new Date();
-		Date fechaSalida = reserva.getFechaSalida();
-//		fechaSalida.setHours(reserva.getFechaSalida().getHours());
-//		fechaSalida.setMinutes(reserva.getFechaSalida().getMinutes());
-		Date fechaAux = this.addFecha(fechaSalida, Calendar.HOUR_OF_DAY, - 24);
-		
+		Date fechaSalida= new Date();
+		fechaSalida.setDate(reserva.getFechaSalida().getDate());
+		fechaSalida.setMonth(reserva.getFechaSalida().getMonth());
+		fechaSalida.setYear(reserva.getFechaSalida().getYear());
+		fechaSalida.setHours(reserva.getHoraSalida().getHours());
+		fechaSalida.setMinutes(reserva.getHoraSalida().getMinutes());
+		Date fechaAux = utilService.addFecha(fechaSalida, Calendar.HOUR_OF_DAY, -24); //REstamos 24 horas
 	
-        if(reserva.getEstadoReserva().getName().equals("Rechazada")) {
+        if(!(reserva.getEstadoReserva().getName().equals("Solicitada") || reserva.getEstadoReserva().getName().equals("Aceptada"))) {
             throw new ReservaYaRechazada();
-        }else if(reserva.getEstadoReserva().getName().equals("Aceptada") && fechaSalida.compareTo(today) < fechaAux.compareTo(fechaSalida)) {
+        }else if(today.compareTo(fechaAux)>0) {
         	throw new CancelacionViajeAntelacionException();
         }else {
+        	
             reserva.setEstadoReserva(estadoService.findEstadoById(3).get());
             reservaRepo.save(reserva);
-
         }
 
     }
