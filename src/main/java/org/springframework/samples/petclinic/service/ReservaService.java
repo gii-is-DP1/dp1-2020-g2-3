@@ -398,7 +398,7 @@ public class ReservaService {
 		Date fechaSalida = reserva.getFechaSalida();
 //		fechaSalida.setHours(reserva.getFechaSalida().getHours());
 //		fechaSalida.setMinutes(reserva.getFechaSalida().getMinutes());
-		Date fechaAux = this.addFecha(fechaSalida, Calendar.HOUR_OF_DAY, - 24);
+		Date fechaAux = utilService.addFecha(fechaSalida, Calendar.HOUR_OF_DAY, - 24);
 		
 	
         if(reserva.getEstadoReserva().getName().equals("Rechazada")) {
