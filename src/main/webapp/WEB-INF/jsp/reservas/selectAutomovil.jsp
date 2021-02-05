@@ -6,7 +6,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
-<petclinic:layout pageName="selectAuto-reserva-form">
+<petclinic:layout pageName="reservas">
     
    <h2>Seleccione el automóvil con el que realizará la reserva</h2>
     <form:form  class="form-horizontal" id="select-auto-reservaForm">

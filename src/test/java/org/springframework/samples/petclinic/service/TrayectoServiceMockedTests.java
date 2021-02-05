@@ -19,11 +19,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Ruta;
 import org.springframework.samples.petclinic.model.Trayecto;
+import org.springframework.samples.petclinic.repository.RutaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.util.EntityUtils;
@@ -37,12 +40,18 @@ class TrayectoServiceMockedTests {
 
     @Mock
     private TrayectoRepository trayectoRepo;
-
+    private RutaRepository rutaRepo; //No lo utilizamos pero es necesario para inicializar el rutaService de tipo Spy
+    
+    @Spy
+    private RutaService rutaService= new RutaService(rutaRepo); //Solo se utilizará para un método que no implica ningún repositorio
+    															//y que es necesario realizar, por lo tanto queremos usar el comportamiento
+    															// original y no replicarlo (Spy)
+    @Spy private UtilService utilService;
     protected TrayectoService trayectoService;
 
     @BeforeEach
     void setup() {
-    	trayectoService = new TrayectoService(trayectoRepo);
+    	trayectoService = new TrayectoService(trayectoRepo,rutaService,utilService);
 
     }
 
@@ -59,6 +68,7 @@ class TrayectoServiceMockedTests {
     		
         	Ruta rutaFormulario=nuevaRutaFormulario("Badajoz","Jerez de los Caballeros",new ArrayList<String>());
         	
+        
         	//ACT
     		Ruta rutaConTrayectosCalculados=trayectoService.calcularYAsignarTrayectos(rutaFormulario);
     	/*	Trayectos que se tienen que crear:
@@ -159,12 +169,14 @@ class TrayectoServiceMockedTests {
     		when(trayectoRepo.findByOrigenAndDestino("Zahinos", "Badajoz")).thenReturn(Trayecto.nuevoTrayecto("Zahinos","Badajoz",72.3,1.15));
     		when(trayectoRepo.findByOrigenAndDestino("Badajoz", "Jerez de los Caballeros")).thenReturn(Trayecto.nuevoTrayecto("Badajoz","Jerez de los Caballeros",73.7,1.03));
     		when(trayectoRepo.findByOrigenAndDestino("Jerez de los Caballeros", "Zahinos")).thenReturn(Trayecto.nuevoTrayecto("Jerez de los Caballeros","Zahinos",19.1,0.27));
-			double numKmTotal= 72.3+73.7+19.1;
-    		Double numKmTotalAproximado=0.0 + Math.round(numKmTotal*100)/100;
+    		
+    	//HAY QUE APROXIMAR A 2 DECIMALES PORQUE JAVA AL SUMAR PUEDE AÑADIR MÁS DECIMALES, por ello añadimos la suma manualmente en el test
+    		
+
+    		Double numKmTotalAproximado= 165.1; //72.3+73.7+19.1        	
     		//¡Las horas estimadas del cliente no tendrán en cuenta los trayectos que realice únicamente el taxista!
-    		Double horasEstimadasCliente=0.0+1.03;
-    		Double horasEstimadasTaxista=1.15+1.03+0.27;
-    		Double horasEstimadasTaxistaAproximadas= 0.0 + Math.round(horasEstimadasTaxista*100)/100;
+    		Double horasEstimadasClienteAproximadas=1.03;
+    		Double horasEstimadasTaxistaAproximadas= 2.45; //1.15+1.03+0.27
         	Ruta rutaFormulario=nuevaRutaFormulario("Badajoz","Jerez de los Caballeros",new ArrayList<String>());
         	
         	//ACT
@@ -174,7 +186,7 @@ class TrayectoServiceMockedTests {
     		//ASSERT
     		assertEquals(rutaConTrayectosCalculados.getNumKmTotales(),numKmTotalAproximado);
     
-    		assertEquals(rutaConTrayectosCalculados.getHorasEstimadasCliente(),horasEstimadasCliente);
+    		assertEquals(rutaConTrayectosCalculados.getHorasEstimadasCliente(),horasEstimadasClienteAproximadas);
     		assertEquals(rutaConTrayectosCalculados.getHorasEstimadasTaxista(),horasEstimadasTaxistaAproximadas);
       
     }
@@ -231,6 +243,7 @@ class TrayectoServiceMockedTests {
     public void ParadasIntermediasCosecutivasIgualesTest() {
     	//ARRANGE
 		when(trayectoRepo.findByOrigenAndDestino("Jerez de los Caballeros", "Zahinos")).thenReturn(Trayecto.nuevoTrayecto("Jerez de los Caballeros","Zahinos",19.1,0.27));
+		when(trayectoRepo.findByOrigenAndDestino("Zahinos", "Jerez de los Caballeros")).thenReturn(Trayecto.nuevoTrayecto("Zahinos","Jerez de los Caballeros",19.1,0.28));
 
     	List<String> paradasIntermedias= new ArrayList<String>();
     	paradasIntermedias.add("Zahinos");
@@ -313,12 +326,12 @@ class TrayectoServiceMockedTests {
     	/*	Trayectos que se tienen que crear que realizará el taxista:
 		Zahinos --> Badajoz ;;;;  Badajoz ---> Jerez de los Caballeros ;;;;  Jerez de los Caballeros --> Zahinos ;;;;; Zahinos --> Jerez de los Caballeros ;;;;;; Jerez de los Caballeros ----> Zahinos */
 		
-    	double numKmTotal= 72.3+73.7+19.1+19.1+19.1;
-		Double numKmTotalAproximado=0.0 + Math.round(numKmTotal*100)/100;
+    
+		Double numKmTotalAproximado=203.3; //72.3+73.7+19.1+19.1+19.1;
 		 
 		//Trayectos en los que estará el cliente: Badajoz---> Jerez de los Caballeros ---> Zahinos ----> Jerez de los Caballero
-		Double horasEstimadasCliente=0.0+1.03 + 0.27 + 0.28;
-		Double horasEstimadasTaxista=3.0; //1.15+1.03+0.27+0.28+0.27;
+		Double horasEstimadasClienteAproximadas=1.58; //1.03 + 0.27 + 0.28
+		Double horasEstimadasTaxistaAproximadas=3.0; //1.15+1.03+0.27+0.28+0.27;
 	
     	//ACT
 		Ruta rutaConTrayectosCalculados=trayectoService.calcularYAsignarTrayectos(rutaFormulario);
@@ -326,24 +339,79 @@ class TrayectoServiceMockedTests {
     	//ASSERT
 		
     	assertEquals(rutaConTrayectosCalculados.getNumKmTotales(),numKmTotalAproximado);
-    	assertEquals(rutaConTrayectosCalculados.getHorasEstimadasCliente(),horasEstimadasCliente);
-    	assertEquals(rutaConTrayectosCalculados.getHorasEstimadasTaxista(),horasEstimadasTaxista);
+    	assertEquals(rutaConTrayectosCalculados.getHorasEstimadasCliente(),horasEstimadasClienteAproximadas);
+    	assertEquals(rutaConTrayectosCalculados.getHorasEstimadasTaxista(),horasEstimadasTaxistaAproximadas);
       
     }
     
+    @Test
+    @Transactional
+    @DisplayName("Añadir un solo trayecto específico a un objeto de tipo ruta (sin formato formulario) y recalcular sus kmTotales, horasEstimadasCliente y horasEstimadasTaxista")
+    void recalcularRutaAddTrayectoTest1() throws DuplicatedParadaException {
+    	//Este método es uno auxuliar que utiliza el testeado anteriormente "calcularYAsignarTrayectos()"
+    	//ARRANGE
+    	Ruta nuevaRuta= new Ruta();
+    		List<Trayecto> trayectosTotalesRuta= new ArrayList<Trayecto>();
+    		Trayecto primerTrayecto= Trayecto.nuevoTrayecto("Zahinos","Jerez de los Caballeros",19.1,0.28);
+    		trayectosTotalesRuta.add(primerTrayecto);
+    		nuevaRuta.setTrayectos(trayectosTotalesRuta);
+    	
+    		nuevaRuta.setNumKmTotales(19.1);
+    		nuevaRuta.setHorasEstimadasCliente(0.28);
+    		nuevaRuta.setHorasEstimadasTaxista(0.28);
+    		
+		when(trayectoRepo.findByOrigenAndDestino("Zahinos", "Badajoz")).thenReturn(Trayecto.nuevoTrayecto("Zahinos","Badajoz",72.3,1.15));
+
+    	//ACT
+    	Ruta rutaRecalculada=trayectoService.recalcularRutaAddTrayecto(nuevaRuta,"Zahinos", "Badajoz",true);
+    	
+    	//ASSERT
+    	assertEquals(rutaRecalculada.getNumKmTotales(), (Double)91.4); //19.1+72.3
+    	assertEquals(rutaRecalculada.getHorasEstimadasCliente(), (Double)1.43); //0.28 + 1.15
+    	assertEquals(rutaRecalculada.getHorasEstimadasTaxista(), (Double)1.43); //0.28 + 1.15
+    	
+    }
     
+    @Test
+    @Transactional
+    @DisplayName("Añadir un solo trayecto específico a un objeto de tipo ruta (sin tener formato del formulario) y recalcular sus kmTotales, horasEstimadasTaxista PERO NO LAS HORAS ESTIMADAS DEL CLIENTE")
+    void recalcularRutaAddTrayectoTest2() throws DuplicatedParadaException {
+    	//ARRANGE
+    	Ruta nuevaRuta= new Ruta();
+    		List<Trayecto> trayectosTotalesRuta= new ArrayList<Trayecto>();
+    		Trayecto primerTrayecto= Trayecto.nuevoTrayecto("Zahinos","Jerez de los Caballeros",19.1,0.28);
+    		trayectosTotalesRuta.add(primerTrayecto);
+    		nuevaRuta.setTrayectos(trayectosTotalesRuta);
+    	
+    		nuevaRuta.setNumKmTotales(19.1);
+    		nuevaRuta.setHorasEstimadasCliente(0.28);
+    		nuevaRuta.setHorasEstimadasTaxista(0.28);
+    		
+		when(trayectoRepo.findByOrigenAndDestino("Zahinos", "Badajoz")).thenReturn(Trayecto.nuevoTrayecto("Zahinos","Badajoz",72.3,1.15));
+
+    	//ACT
+		
+		//simularemos como que en el trayecto Zahinos --> Badajoz no se encuentra montado el cliente en el autmóvil
+    	Ruta rutaRecalculada=trayectoService.recalcularRutaAddTrayecto(nuevaRuta,"Zahinos", "Badajoz",false);
+    	
+    	//ASSERT
+    	assertEquals(rutaRecalculada.getNumKmTotales(), (Double)91.4); //19.1+72.3
+    	assertEquals(rutaRecalculada.getHorasEstimadasCliente(), (Double)0.28); //0.28, ya que NO SUMAMOS EN ESTE CASO LAS HORAS ESTIMADAS DEL CLIENTE
+    	assertEquals(rutaRecalculada.getHorasEstimadasTaxista(), (Double)1.43); //0.28 + 1.15
+    	
+    }
     
+   
     
     
     /*
-    El siguiente método crea una ruta con los datos dados como parámetro, 
-    en el formato en el que vendría desde el formulario:
+    	El siguiente método crea una RUTA  con los datos dados como parámetro, 
+   		EN EL FORMATO EN EL QUE VENDRÍA DESDE EL FORMULARIO:
   	
-  	La ruta tendrá como List<Trayecto> solo los trayectos intermedios
-    sin tener en cuenta origen-->parada1, tampoco tiene en cuenta que si origen!=Zahinos
-    el primer trayecto debería ser Zahinos --> origen
+  	 	List<Trayecto> solo los trayectos intermedios que se especifiquen desde el formulario, teniendo el formato:
     
-    Además, cada trayecto intermedio será trayecto1= {origen=parada1, destino=null}
+   		trayecto1= {origen=parada1, destino=null}
+   		trayecto2= {origen=parada2, destino=null}
     
     Con este formato se pasa la ruta como parámetro al método calcularYAsignarTrayectos y por ello lo tenemos 
     que simular para testearlo
@@ -368,6 +436,7 @@ class TrayectoServiceMockedTests {
     	return nuevaRuta;
     }
    
+    
     /*
     static Stream<Ruta> diferentesRutasSinParadas1() {
     	

@@ -32,23 +32,23 @@
                     <c:out value="${reserva.precioTotal}"/>
                 </td>
                 <td>
-                    <c:out value="${Math.round((tarifa.porcentajeIvaRepercutido * 0.01 * reserva.precioTotal)*100.0)/100.0}"/>
+                    <c:out value="${factura.get('IVA Repercutido')}"/>
                 </td>
                  <td>
-                    <c:out value="${Math.round((tarifa.precioPorKm * reserva.numKmTotales)*100.0)/100.0}"/>
+                    <c:out value="${factura.get('Precio Distancia')}"/>
                 </td>
                  <td>
-                    <c:out value="${Math.round((reserva.horasEspera * tarifa.precioEsperaPorHora)*100.0)/100.0}"/>
+                    <c:out value="${factura.get('Precio Extra Espera')}"/>
                 </td>
                  <td>
-                    <c:out value="${Math.round((reserva.precioTotal - (tarifa.porcentajeIvaRepercutido * 0.01 * reserva.precioTotal))*100.0)/100.0}"/>
+                    <c:out value="${factura.get('Base Imponible')}"/>
                 </td>
                 <td>
-                    <c:out value="${tarifa.precioPorKm}"/> euros/Km
+                    <c:out value="${reserva.tarifa.precioPorKm}"/> euros/Km
                     <p> </p>
-                    <c:out value="${tarifa.porcentajeIvaRepercutido}"/>% IVA repercutido
+                    <c:out value="${reserva.tarifa.porcentajeIvaRepercutido}"/>% IVA repercutido
                     <p> </p>
-                    <c:out value="${tarifa.precioEsperaPorHora}"/> euros/horasEspera
+                    <c:out value="${reserva.tarifa.precioEsperaPorHora}"/> euros/horasEspera
                 </td>
                
             </tr>

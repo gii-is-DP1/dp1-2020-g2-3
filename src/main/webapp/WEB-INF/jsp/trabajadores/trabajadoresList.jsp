@@ -22,6 +22,7 @@
             <th style="width: 200px;">Inicio Contrato</th>
             <th style="width: 200px;">Fin Contrato</th>
             <th style="width: 200px;">Sueldo</th>
+            <th style="width: 200px;">Despedir</th>
         </tr>
         </thead>
         <tbody>
@@ -59,6 +60,12 @@
                 </td>
                 <td>
                     <c:out value="${trabajador.contrato.salarioMensual}"/>
+                </td>
+                <td>
+                 <spring:url value="/trabajadores/despedir/{trabajadorId}" var="despedirTrabajadorUrl">
+                <spring:param name="trabajadorId" value="${trabajador.id}"/>
+                </spring:url>
+				<a class="despedirTrabajador" href="${fn:escapeXml(despedirTrabajadorUrl)}"> Despedir</a>
                 </td>
             
             </tr>
