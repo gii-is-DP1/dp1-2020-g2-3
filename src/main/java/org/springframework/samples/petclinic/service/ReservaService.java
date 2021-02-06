@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.service;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -35,9 +36,14 @@ import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFac
 import org.springframework.samples.petclinic.service.exceptions.ExisteViajeEnEsteHorarioException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
+import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
+import org.springframework.samples.petclinic.service.exceptions.ReservasSoliAceptException;
+import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class ReservaService {
 	//Repositorio
@@ -50,9 +56,10 @@ public class ReservaService {
 	private TarifaService tarifaService;
 	private TrabajadorService trabajadorService;
 	private AuthoritiesService authoService;
+	private UtilService utilService;
 	
 	@Autowired
-	public ReservaService(ReservaRepository reservaRepo,TrayectoService trayectoService,EstadoReservaService estadoService,ClienteService clienteService,RutaService rutaService,TarifaService tarifaService,TrabajadorService trabajadorService,AuthoritiesService authoService) {
+	public ReservaService(ReservaRepository reservaRepo,TrayectoService trayectoService,EstadoReservaService estadoService,ClienteService clienteService,RutaService rutaService,TarifaService tarifaService,TrabajadorService trabajadorService,AuthoritiesService authoService,UtilService utilService) {
 		this.reservaRepo=reservaRepo;
 		this.trayectoService=trayectoService;
 		this.estadoService=estadoService;
@@ -61,6 +68,7 @@ public class ReservaService {
 		this.tarifaService=tarifaService;
 		this.trabajadorService=trabajadorService;
 		this.authoService=authoService;
+		this.utilService=utilService;
 	}
 	
 	@Transactional
@@ -77,14 +85,15 @@ public class ReservaService {
 
 		Reserva reserva = reservaRepo.findById(id).get();
 		Map<String, Double> res = new HashMap<String, Double>();
-		res.put("IVA Repercutido", Math.round((reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal())*100.0)/100.0);
-		res.put("Precio Distancia", Math.round((reserva.getTarifa().getPrecioPorKm() * reserva.getNumKmTotales())*100.0)/100.0);
-		res.put("Precio Extra Espera", Math.round((reserva.getHorasEspera() * reserva.getTarifa().getPrecioEsperaPorHora())*100.0)/100.0);
-        res.put("Base Imponible", Math.round((reserva.getPrecioTotal() - (reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal()))*100.0)/100.0);
+		res.put("IVA Repercutido", utilService.aproximarNumero(reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal()));
+		res.put("Precio Distancia", utilService.aproximarNumero(reserva.getTarifa().getPrecioPorKm() * reserva.getNumKmTotales()));
+		res.put("Precio Extra Espera", utilService.aproximarNumero(reserva.getHorasEspera() * reserva.getTarifa().getPrecioEsperaPorHora()));
+        res.put("Base Imponible", utilService.aproximarNumero(reserva.getPrecioTotal() - (reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal())));
 		return res;
 		
 		
 	}
+	
 	@Transactional
 	public Date calcularFechaYHoraLlegada(Date fechaSalida, Date horaSalida, Double horasEstimadasCliente) {
 		int minutosSumar= (int)Math.round(horasEstimadasCliente*60); //Devolvemos un Date con la fecha y hora de llegada
@@ -92,7 +101,7 @@ public class ReservaService {
 		fechaSalida.setMinutes(horaSalida.getMinutes());
 		
 		if(minutosSumar!=0) {
-			fechaSalida= this.addFecha(fechaSalida, Calendar.MINUTE, minutosSumar);
+			fechaSalida= utilService.addFecha(fechaSalida, Calendar.MINUTE, minutosSumar);
 		}
 		return fechaSalida;
 	}
@@ -111,15 +120,6 @@ public class ReservaService {
 			System.out.println("la hora de salida tiene al menos 40 minutos de antelación, no se lanza excepción");
 		}
 	}
-	
-	@Transactional
-	public Date addFecha(Date fechaBase, int tipoFecha, int cantidadSumar ) {
-		   Calendar calendar = Calendar.getInstance();
-		      calendar.setTime(fechaBase); 
-		      calendar.add(tipoFecha, cantidadSumar);
-		      return calendar.getTime();
-	   }
-	
 
 	
 	@Transactional
@@ -184,9 +184,10 @@ public class ReservaService {
 	public Optional<Reserva> findFacturaReservaById(int id) throws DataAccessException, EstadoReservaFacturaException {
 		Optional<Reserva> reserva = reservaRepo.findById(id);
 			if(reserva.get().getEstadoReserva().getName().equals("Completada")) {
-				System.out.println("La reserva ha sido completada, se muestra la factura");
+				log.info("La reserva ha sido completada, se muestra la factura");
 				return reserva;
 			}else {
+				log.error("Sólo se mostrarán aquellas reservas que estén completadas.");
 				throw new EstadoReservaFacturaException();
 			}
 		}
@@ -408,10 +409,6 @@ public class ReservaService {
 		
 		
 	}
-	@Transactional
-	public Collection<Reserva> findReservasByClienteId(int id) throws DataAccessException {
-	return reservaRepo.findReservasByClienteId(id);
-	}
 	
 	@Transactional
 	public void delete(Reserva reserva) throws DataAccessException  {
@@ -424,9 +421,69 @@ public class ReservaService {
 		reservaRepo.save(reserva);
 	}
 
+	@Transactional
+	public Iterable<Reserva> findReservasByUsername(String username) throws DataAccessException {
+		 return reservaRepo.findReservasByUsername(username);
 		
+	}
+	
+//	@Transactional
+//	public void cancelarReserva(Reserva reserva) throws DataAccessException, CancelacionViajeAntelacionException, ReservasSoliAceptException {
+//		
+//		Date today = new Date();
+//		Date fechaSalida = reserva.getFechaSalida();
+//		Date horaSalida = reserva.getHoraSalida();
+//		fechaSalida.setHours(horaSalida.getHours());
+//		fechaSalida.setMinutes(horaSalida.getMinutes());
+//		if(reserva.getEstadoReserva().getName().equals("Solicitada")) {
+//			EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
+//			reserva.setEstadoReserva(estadoReserva);
+//			save(reserva);
+//		}else if(reserva.getEstadoReserva().getName().equals("Aceptada")) {
+//			if(fechaSalida.compareTo(today) < fechaSalida.getHours() + 24) {
+//				throw new CancelacionViajeAntelacionException();
+//			}else{
+//				EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
+//				reserva.setEstadoReserva(estadoReserva);
+//				save(reserva);	
+//			}
+//		}else {
+//			throw new ReservasSoliAceptException();
+//		}
+//	}
 	
 	
+	
+	@Transactional
+    public void cancelarReserva(Reserva reserva) throws DataAccessException, ReservaYaRechazada, CancelacionViajeAntelacionException {
+	
+		Date today = new Date();
+
+		Date fechaSalida= new Date();
+		fechaSalida.setDate(reserva.getFechaSalida().getDate());
+		fechaSalida.setMonth(reserva.getFechaSalida().getMonth());
+		fechaSalida.setYear(reserva.getFechaSalida().getYear());
+		fechaSalida.setHours(reserva.getHoraSalida().getHours());
+		fechaSalida.setMinutes(reserva.getHoraSalida().getMinutes());
+		Date fechaAux = utilService.addFecha(fechaSalida, Calendar.HOUR_OF_DAY, -24); //REstamos 24 horas
+        if(!(reserva.getEstadoReserva().getName().equals("Solicitada") || reserva.getEstadoReserva().getName().equals("Aceptada"))) {
+        	log.error("El estado de la reserva tiene que ser 'Solicitada' o 'Aceptada' para poder cancelarla");
+        	throw new ReservaYaRechazada();
+        }else if(today.compareTo(fechaAux)>0) {
+        	log.error("La reserva tiene una fecha de salida con un intervalo de tiempo menor a 24 horas desde la actualidad o es anterior a la fecha actual, por lo que no puede ser cancelada");
+        	throw new CancelacionViajeAntelacionException();
+        }else {
+        	
+            reserva.setEstadoReserva(estadoService.findEstadoById(3).get());
+            reservaRepo.save(reserva);
+        }
+
+    }
+	
+	@Transactional(readOnly = true)
+	public Reserva findResById(int id) throws DataAccessException {
+		return reservaRepo.findResById(id);
+	}
 	
 
 	

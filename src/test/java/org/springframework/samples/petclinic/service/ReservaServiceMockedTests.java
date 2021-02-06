@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -41,8 +43,10 @@ import org.springframework.samples.petclinic.model.Tarifa;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.ReservaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
+import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
+import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
 import org.springframework.samples.petclinic.util.EntityUtils;
 import org.springframework.transaction.annotation.Transactional;
 import static org.mockito.Mockito.*;
@@ -77,13 +81,15 @@ class ReservaServiceMockedTests {
     private TrabajadorService trabajadorService;
     @Mock
     private AuthoritiesService authoService;
+    @Spy
+    private UtilService utilService= new UtilService();
 
     protected ReservaService reservaService;
 
     @BeforeEach
     void setup() {
     	
-    	reservaService= new ReservaService(reservaRepository,trayectoService,estadoService,clienteService,rutaService,tarifaService,trabajadorService,authoService);
+    	reservaService= new ReservaService(reservaRepository,trayectoService,estadoService,clienteService,rutaService,tarifaService,trabajadorService,authoService,utilService);
     	
     }
     
@@ -123,8 +129,8 @@ class ReservaServiceMockedTests {
     		int horaCalculada2=1;
     		int minutosCalculados2=30;
     	//ACT
-    	Date fechaCalculada1= reservaService.addFecha(fechaBase, Calendar.MINUTE, minutosSumar1);
-    	Date fechaCalculada2= reservaService.addFecha(fechaBase, Calendar.MINUTE, minutosSumar2);
+    	Date fechaCalculada1= utilService.addFecha(fechaBase, Calendar.MINUTE, minutosSumar1);
+    	Date fechaCalculada2= utilService.addFecha(fechaBase, Calendar.MINUTE, minutosSumar2);
 
     	
     	//ASSERT
@@ -160,8 +166,8 @@ class ReservaServiceMockedTests {
     		int horaCalculada2=23;
     		int minutosCalculados2=30;
     	//ACT
-    	Date fechaCalculada1= reservaService.addFecha(fechaBase, Calendar.MINUTE, minutosRestar1);
-    	Date fechaCalculada2= reservaService.addFecha(fechaBase, Calendar.MINUTE, minutosRestar2);
+    	Date fechaCalculada1= utilService.addFecha(fechaBase, Calendar.MINUTE, minutosRestar1);
+    	Date fechaCalculada2= utilService.addFecha(fechaBase, Calendar.MINUTE, minutosRestar2);
 
     	
     	//ASSERT
@@ -207,7 +213,7 @@ class ReservaServiceMockedTests {
 
     	//ARRANGE
     	Date today= new Date();
-    	Date fechaSalida1= reservaService.addFecha(today,Calendar.DATE,-1); //Será la fecha actual restándole 1 día
+    	Date fechaSalida1= utilService.addFecha(today,Calendar.DATE,-1); //Será la fecha actual restándole 1 día
 	    
     	//ACT
     	assertThrows(FechaSalidaAnteriorActualException.class,()->reservaService.fechaSalidaAnteriorActual(fechaSalida1, fechaSalida1));
@@ -218,7 +224,7 @@ class ReservaServiceMockedTests {
     void sumarDiaFecha() {
     	Date today= new Date(); //Día 10
     	today.setDate(10);
-    	Date diaAnterior= reservaService.addFecha(today,Calendar.DATE,-1); //Día 9
+    	Date diaAnterior= utilService.addFecha(today,Calendar.DATE,-1); //Día 9
     	assertEquals(9, diaAnterior.getDate());
     }
     
@@ -229,7 +235,7 @@ class ReservaServiceMockedTests {
 
     	//ARRANGE
     	Date today= new Date();
-    	Date horaSalida= reservaService.addFecha(today,Calendar.MINUTE,-5); //Hora actual restándole 5 min, este método ya está testeado
+    	Date horaSalida= utilService.addFecha(today,Calendar.MINUTE,-5); //Hora actual restándole 5 min, este método ya está testeado
 	    
     	//ACT
     	assertThrows(FechaSalidaAnteriorActualException.class,()->reservaService.fechaSalidaAnteriorActual(today, horaSalida));
@@ -336,7 +342,7 @@ class ReservaServiceMockedTests {
     	Reserva reserva= Reserva.newReservaSinCalcular(new Date(), new Date(), 2, "Maleta grande");
     	reserva.setRuta(ruta);
     	Date fechaSalida= new Date();
-    	fechaSalida= reservaService.addFecha(fechaSalida, Calendar.DATE, 1); //Para que no salte ninguna excepción
+    	fechaSalida= utilService.addFecha(fechaSalida, Calendar.DATE, 1); //Para que no salte ninguna excepción
     	Date horaSalida= new Date();
     	horaSalida.setHours(4);
     	reserva.setFechaSalida(fechaSalida);
@@ -350,6 +356,147 @@ class ReservaServiceMockedTests {
     	return reserva;
     }
     
-   
+
     
+    @Test
+	void calcularFactura(){
+    	//ARRANGE
+    	Integer porcentajeIvaRepercutido = 10;
+    	Double precioKm = 0.12;
+    	Double numKmTotales = 120.0;
+    	Double precioEsperaPorHora = 4.5;
+    	Double horasEspera = 0.0;
+    	
+    	Double precioTotal = precioKm * numKmTotales;
+    	
+    	Double ivaRepercutido = porcentajeIvaRepercutido * 0.01 * precioTotal;
+		Double precioDistancia = precioKm * numKmTotales;
+		Double precioExtraEspera = horasEspera * precioEsperaPorHora;
+		Double baseImponible = precioTotal - ivaRepercutido;
+		
+		Map<String, Double> res = new HashMap<String, Double>();
+		res.put("IVA Repercutido", utilService.aproximarNumero(ivaRepercutido));
+		res.put("Precio Distancia", utilService.aproximarNumero(precioDistancia));
+		res.put("Precio Extra Espera", utilService.aproximarNumero(precioExtraEspera));
+        res.put("Base Imponible", utilService.aproximarNumero(baseImponible));
+    
+    /*
+    	Reserva reserva1 = new Reserva();
+    	Tarifa tarifa1 = new Tarifa();
+    	
+    	tarifa1.setPorcentajeIvaRepercutido(porcentajeIvaRepercutido);
+    	tarifa1.setPrecioPorKm(precioKm);
+    	tarifa1.setPrecioEsperaPorHora(precioEsperaPorHora);
+    	
+    	reserva1.setTarifa(tarifa1);
+    	reserva1.setHorasEspera(horasEspera);
+    	reserva1.setPrecioTotal(precioTotal);
+    	*/
+        
+        Reserva reserva1 = reservaService.findReservaById(1).get();
+       
+           
+
+    	
+    	when(reservaRepository.findById(any())).thenReturn(Optional.of(reserva1));
+       
+        
+ 	
+
+		//ACT & ASSERT
+	assertNotEquals(res, reservaService.calcularFactura(1));
+		
+	}
+	
+		
+
+//    @Test
+//    @Transactional
+//    @DisplayName("Cancelar una reserva con estado Solicitada o Aceptada")
+//    void cancelarReservaSolicitadaAceptadaTest() {
+//    //ARRANGE	
+//    	Reserva reserva = new Reserva();
+//    	reserva.getEstadoReserva().equals("Solicitada");
+//    	
+//    	Reserva reserva2 = new Reserva();
+//    	reserva.getEstadoReserva().equals("Aceptada");
+//    
+//    //ACT
+//    	reserva = reservaService.cancelarReserva(reserva);
+//    }
+    
+    @Test
+    @Transactional
+    @DisplayName("Cancelar una reserva con estado Rechazada")
+    void cancelarReservaRechazadaTest() {
+      //ARRANGE	
+    	
+    	Reserva reserva = new Reserva();
+    	
+    	Date horaSalida= new Date(); 
+    	horaSalida.setHours(8);
+    	horaSalida.setMinutes(0);
+    	
+		Date fechaSalida= new Date();
+		fechaSalida.setDate(22);
+		fechaSalida.setMonth(3);
+		fechaSalida.setYear(2021);
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
+    	
+    	EstadoReserva estado = new EstadoReserva();
+    	estado.setId(3);
+    	estado.setName("Rechazada");
+    	reserva.setEstadoReserva(estado);
+    	reserva.setFechaSalida(fechaSalida);
+    	reserva.setHoraSalida(horaSalida);
+    	reserva.setPlazas_Ocupadas(3);
+    	
+      //ASSERT
+    	assertThrows(ReservaYaRechazada.class, ()->reservaService.cancelarReserva(reserva));
+    	
+    }
+    
+//    @Test
+//    @Transactional
+//    @DisplayName("Cancelar una reserva con fecha de salida con intervalo menor a 24 horas respecto a la actualidad")
+//    void cancelarReservaMenorIntervaloTest() {
+//    	//ARRANGE
+//    	
+//    	Ruta ruta= new Ruta(); 
+//    	Double numKmTotales=142.0;
+//    	ruta.setNumKmTotales(numKmTotales);
+//    	ruta.setHorasEstimadasCliente(1.0);
+//    	
+//    	Reserva reserva = new Reserva();
+//    	
+//    	Date horaSalida= new Date(); 
+//    	horaSalida.setHours(8);
+//    	horaSalida.setMinutes(0);
+//    	
+//		Date fechaSalida= new Date();
+//		fechaSalida.setDate(6);
+//		fechaSalida.setMonth(2);
+//		fechaSalida.setYear(2021);
+//		fechaSalida.setHours(horaSalida.getHours());
+//		fechaSalida.setMinutes(horaSalida.getMinutes());
+//    	
+//    	EstadoReserva estado = new EstadoReserva();
+//    	estado.setId(2);
+//    	estado.setName("Aceptada");
+//    	reserva.setEstadoReserva(estado);
+//    	reserva.setFechaSalida(fechaSalida);
+//    	reserva.setHoraSalida(horaSalida);
+//    	reserva.setPlazas_Ocupadas(3);
+//    	reserva.setRuta(ruta);
+//    	
+//    	//ASSERT
+//    	assertThrows(CancelacionViajeAntelacionException.class,()->reservaService.cancelarReserva(reserva));
+//    }
+    
+//    @Test
+//    @Transactional
+//    @DisplayName("Cancelar una reserva con fecha de salida anterior a la fecha actual")
+//    void cancelarReservaFechaSalidaAnteriorTest() {
+//    }
 }
