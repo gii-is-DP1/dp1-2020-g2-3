@@ -360,14 +360,35 @@ class ReservaServiceMockedTests {
 //    @DisplayName("Cancelar una reserva con estado Solicitada o Aceptada")
 //    void cancelarReservaSolicitadaAceptadaTest() {
 //    //ARRANGE	
-//    	Reserva reserva = new Reserva();
-//    	reserva.getEstadoReserva().equals("Solicitada");
+//    	Ruta ruta= new Ruta(); 
+//    	Double numKmTotales=142.0;
+//    	ruta.setNumKmTotales(numKmTotales);
+//    	ruta.setHorasEstimadasCliente(1.0);
 //    	
-//    	Reserva reserva2 = new Reserva();
-//    	reserva.getEstadoReserva().equals("Aceptada");
+//    	Reserva reserva = new Reserva();
+//    	
+//    	Date horaSalida= new Date(); 
+//    	horaSalida.setHours(8);
+//    	horaSalida.setMinutes(0);
+//    	
+//		Date fechaSalida= new Date();
+//		fechaSalida.setDate(9);
+//		fechaSalida.setMonth(2);
+//		fechaSalida.setYear(2021);
+//		fechaSalida.setHours(horaSalida.getHours());
+//		fechaSalida.setMinutes(horaSalida.getMinutes());
+//    	
+//    	EstadoReserva estado = new EstadoReserva();
+//    	estado.setId(2);
+//    	estado.setName("Aceptada");
+//    	reserva.setEstadoReserva(estado);
+//    	reserva.setFechaSalida(fechaSalida);
+//    	reserva.setHoraSalida(horaSalida);
+//    	reserva.setPlazas_Ocupadas(3);
+//    	reserva.setRuta(ruta);
 //    
 //    //ACT
-//    	reserva = reservaService.cancelarReserva(reserva);
+//    	assertThrows(CancelacionViajeAntelacionException.class, ()->reservaService.save(reserva));
 //    }
     
     @Test
