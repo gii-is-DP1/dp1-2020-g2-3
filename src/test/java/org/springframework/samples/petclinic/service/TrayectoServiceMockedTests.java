@@ -105,11 +105,9 @@ class TrayectoServiceMockedTests {
     		when(trayectoRepo.findByOrigenAndDestino("Jerez de los Caballeros", "Zahinos")).thenReturn(Trayecto.nuevoTrayecto("Jerez de los Caballeros","Zahinos",19.1,0.27));
     		
         	Ruta rutaFormulario=nuevaRutaFormulario("Zahinos","Jerez de los Caballeros",new ArrayList<String>());
-        	
 
         	//ACT
     		Ruta rutaConTrayectosCalculados=trayectoService.calcularYAsignarTrayectos(rutaFormulario);
-    		
     	/*	Trayectos que se tienen que crear:
     	 
     		Zahinos --> Jerez de los Caballeros ;;;;  Jerez de los Caballeros ---> Zahinos  */
@@ -117,14 +115,54 @@ class TrayectoServiceMockedTests {
     		
     		//ASSERT
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().size(),2);
-        	
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getOrigen(),"Zahinos");
+    		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getDestino(),"Jerez de los Caballeros");
+    		
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getOrigen(),"Zahinos");
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(0).getDestino(),"Jerez de los Caballeros");
         	
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getOrigen(),"Jerez de los Caballeros");
     		assertEquals(rutaConTrayectosCalculados.getTrayectos().get(1).getDestino(),"Zahinos");
-
+    		
+    }
+    
+    @Test
+    @Transactional
+    @DisplayName("calcular y asignar los diferentes trayectos de una ruta CON TRAYECTOS INTERMEDIOS=NULL CUYO ORIGEN ES ZAHINOS")
+    void calcularTrayectosRutaSinParadasTest4() throws DuplicatedParadaException{
+    			
+		
     	
+    		//ARRANGE
+    		when(trayectoRepo.findByOrigenAndDestino("Zahinos", "Jerez de los Caballeros")).thenReturn(Trayecto.nuevoTrayecto("Zahinos","Jerez de los Caballeros",19.1,0.28));
+    		when(trayectoRepo.findByOrigenAndDestino("Jerez de los Caballeros", "Zahinos")).thenReturn(Trayecto.nuevoTrayecto("Jerez de los Caballeros","Zahinos",19.1,0.27));
+    		
+        	Ruta rutaTrayectosNull=nuevaRutaFormulario("Zahinos","Jerez de los Caballeros", new ArrayList<String>());
+        	rutaTrayectosNull.setTrayectos(null); // comprobamos que el método también funciona con trayectos intermedios= null
+
+        	//ACT
+    		Ruta rutaNullConTrayectosCalculados=  trayectoService.calcularYAsignarTrayectos(rutaTrayectosNull);   		
+    	/*	Trayectos que se tienen que crear:
+    	 
+    		Zahinos --> Jerez de los Caballeros ;;;;  Jerez de los Caballeros ---> Zahinos  */
+    	
+    		
+    		//ASSERT
+    		
+    
+    		
+    		assertEquals(rutaNullConTrayectosCalculados.getTrayectos().size(),2);
+
+        	
+    		assertEquals(rutaNullConTrayectosCalculados.getTrayectos().get(0).getOrigen(),"Zahinos");
+    		assertEquals(rutaNullConTrayectosCalculados.getTrayectos().get(0).getDestino(),"Jerez de los Caballeros");
+    		
+    		assertEquals(rutaNullConTrayectosCalculados.getTrayectos().get(0).getOrigen(),"Zahinos");
+    		assertEquals(rutaNullConTrayectosCalculados.getTrayectos().get(0).getDestino(),"Jerez de los Caballeros");
+        	
+    		assertEquals(rutaNullConTrayectosCalculados.getTrayectos().get(1).getOrigen(),"Jerez de los Caballeros");
+    		assertEquals(rutaNullConTrayectosCalculados.getTrayectos().get(1).getDestino(),"Zahinos");
+    		
     }
     
     @Test
