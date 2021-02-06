@@ -69,10 +69,11 @@ public class ReservaController {
 	private final AutomovilService autoService;
 	private final TrabajadorService trabajadorService;
 	private final UtilService utilService;
+	private final ClienteController clienteController;
 	
 	
 	@Autowired
-	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService,EstadoReservaService estadoReservaService,ClienteService clienteService, TarifaService tarifaService,AutomovilService autoService,TrabajadorService trabajadorService,UtilService utilService) {
+	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService,EstadoReservaService estadoReservaService,ClienteService clienteService, TarifaService tarifaService,AutomovilService autoService,TrabajadorService trabajadorService,UtilService utilService, ClienteController clienteController) {
 		this.reservaService=reservaService;
 		this.trayectoService=trayectoService;
 		this.rutaService=rutaService;
@@ -83,6 +84,7 @@ public class ReservaController {
 		this.autoService=autoService;
 		this.trabajadorService=trabajadorService;
 		this.utilService=utilService;
+		this.clienteController=clienteController;
 	}
 	
 	@GetMapping(value = "/reservasList")
@@ -530,6 +532,28 @@ public class ReservaController {
 			modelMap.addAttribute("error","Estado de reserva no completado");
 			log.error("Estado de reserva no completado");
 			return listadoReservas(modelMap);
+		}
+	
+		
+	}
+	
+	@GetMapping("/reservaMiFactura/{reservaId}")
+	public String reservaMiFactura(@PathVariable("reservaId") int reservaId,ModelMap modelMap, Principal p) throws DataAccessException, EstadoReservaFacturaException {
+		try {
+			Optional<Reserva> reserva=reservaService.findFacturaReservaById(reservaId);
+		if(reserva.isPresent()) {
+			Map<String,Double> factura = reservaService.calcularFactura(reservaId);
+      modelMap.addAttribute("factura",factura);
+			modelMap.addAttribute("reserva",reserva.get());
+			return "reservas/reservaFactura";
+		}else {
+			modelMap.addAttribute("message","No se ha encontrado la factura");
+			return clienteController.showReservas(modelMap, p);
+		}
+	
+		}catch(EstadoReservaFacturaException e){
+			modelMap.addAttribute("error","Estado de reserva no completado");
+			return clienteController.showReservas(modelMap, p);
 		}
 	
 		
