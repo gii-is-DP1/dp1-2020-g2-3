@@ -42,9 +42,9 @@ public class TrabajadorControllerTests {
 	
 	@MockBean
 	private TipoTrabajadorService tipoTrabajadorService;
-
+	
 	@MockBean
-	private  UserService userService;
+	private UserService userService;
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -56,6 +56,7 @@ public class TrabajadorControllerTests {
 	@BeforeEach
 	void setup() {
 		
+
 		usuario = new User();
 		usuario.setUsername("usuario");
 		usuario.setPassword("usuario");

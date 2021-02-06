@@ -58,6 +58,7 @@ public class ClienteService {
 		//creating authorities
 		authoritiesService.saveAuthorities(cliente.getUser().getUsername(), "cliente");
 	}
+	
 	@Transactional
 	public Integer findIdByUsername(String username) {
 		return clienteRepository.findIdByUsername(username);
