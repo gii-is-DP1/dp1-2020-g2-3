@@ -26,25 +26,31 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Servicio;
+import org.springframework.samples.petclinic.model.Trabajador;
+import org.springframework.samples.petclinic.repository.ReservaRepository;
 import org.springframework.samples.petclinic.repository.ServicioRepository;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedPetNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-/**
- * Mostly used as a facade for all Petclinic controllers Also a placeholder
- * for @Transactional and @Cacheable annotations
- *
- * @author Michael Isvy
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class ServicioService {
-	
-	@Autowired
+		
 	private ServicioRepository servicioRepository;
 
+	@Autowired
+	public ServicioService(ServicioRepository servicioRepository) {
+		this.servicioRepository=servicioRepository;
+		
+	}
 
+	
+	
+	
 	@Transactional
 	public long servicioCount() {
 		
@@ -57,9 +63,11 @@ public class ServicioService {
 	}
 	
 	@Transactional(readOnly = true)
-	public Optional<Servicio> findServicioById(int id) throws DataAccessException {
+	public Servicio findServicioById(int id) throws DataAccessException {
 		return servicioRepository.findById(id);
 	}
+	
+
 	
 	@Transactional()
 	public void delete(Servicio serv)  {

@@ -69,6 +69,9 @@ public class TrabajadorControllerTests {
 				.andExpect(view().name("trabajadores/trabajadoresList"));
 	}
 	
+	
+	
+	
 	@WithMockUser(value = "spring")
     @Test
     void testProcessFindFormSuccess() throws Exception {
@@ -77,12 +80,19 @@ public class TrabajadorControllerTests {
 	mockMvc.perform(get("/trabajadores/trabajadoresList")).andExpect(status().isOk()).andExpect(view().name("trabajadores/trabajadoresList"));
 }
 	
+	
+	
+	
+	
 	@WithMockUser(value = "spring")
     @Test
     void testInitCreationForm() throws Exception {
 		mockMvc.perform(get("/trabajadores/new")).andExpect(status().isOk()).andExpect(model().attributeExists("trabajadores"))
 				.andExpect(view().name("trabajadores/updateTrabajadorForm"));
 	}
+	
+	
+	
 	
 	@WithMockUser(value = "spring")
     @Test
@@ -94,6 +104,10 @@ public class TrabajadorControllerTests {
 							.param("telefono", "672823123"))
 				.andExpect(status().isOk());
 	}
+	
+	
+	
+	
 	
 	@WithMockUser(value = "spring")
     @Test
@@ -109,6 +123,7 @@ public class TrabajadorControllerTests {
 			.andExpect(model().attributeHasFieldErrors("trabajador", "telefono"))
 			.andExpect(view().name("trabajadores/updateTrabajadorForm"));
 	}	
+	
 	
 
 }

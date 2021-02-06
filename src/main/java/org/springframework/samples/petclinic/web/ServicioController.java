@@ -70,23 +70,18 @@ public class ServicioController {
 	
 	@GetMapping(value="/delete/{servicioId}")
 	public String borrarServicio(@PathVariable("servicioId") int servicioId,ModelMap modelMap) {
-		Optional<Servicio> servicio=servicioService.findServicioById(servicioId);
-		if (servicio.isPresent()) {
-			servicioService.delete(servicio.get()); 
-			modelMap.addAttribute("message", "Servicio borrado correctamente");
-		}else {
-			
-			modelMap.addAttribute("message", "Servicio no encontrado");
-		}
+		Servicio servicio=servicioService.findServicioById(servicioId);
+		servicioService.delete(servicio); 
+		modelMap.addAttribute("message", "Servicio borrado correctamente");
+	
 		return listadoServicios(modelMap);
 	}
 	
 	
 	@GetMapping("/edit/{servicioId}")
 	public String editServicio(@PathVariable("servicioId") int servicioId,ModelMap modelMap) {
-		Optional<Servicio> servicio=servicioService.findServicioById(servicioId);
-		if(servicio.isPresent()) {
-			modelMap.addAttribute("servicio",servicio.get());
+		Servicio servicio=servicioService.findServicioById(servicioId);
+			modelMap.addAttribute("servicio",servicio);
 			Iterable<Trabajador> trabajadores=trabService.findAll();
 			modelMap.addAttribute("trabajadores", trabajadores);
 			Iterable<Automovil> automoviles=autoService.findAll();
@@ -94,15 +89,12 @@ public class ServicioController {
 			Iterable<Taller> talleres=tallerService.findAll();
 			modelMap.addAttribute("talleres", talleres);
 			return "servicios/updateServicioForm";
-		}else {
-			modelMap.addAttribute("message","No se ha encontrado el servicio a editar");
-			return listadoServicios(modelMap);
-		}
+		
 	} 
 	
 	@PostMapping("/edit/{servicioId}")
 	public String editServicio(@PathVariable("servicioId") int id, @Valid Servicio modifiedServicio, BindingResult binding, ModelMap modelMap) {
-		Optional<Servicio> servicio=servicioService.findServicioById(id);
+		Servicio servicio=servicioService.findServicioById(id);
 		
 		if(binding.hasErrors()) {	
 			modelMap.addAttribute("message", binding.getAllErrors());
@@ -116,8 +108,8 @@ public class ServicioController {
 			return "servicios/updateServicioForm";
 		}else {
 			
-			BeanUtils.copyProperties(modifiedServicio, servicio.get(), "id");
-			servicioService.save(servicio.get());
+			BeanUtils.copyProperties(modifiedServicio, servicio, "id");
+			servicioService.save(servicio);
 			modelMap.addAttribute("message","Servicio actualizado correctamente");
 			return listadoServicios(modelMap);
 		}
