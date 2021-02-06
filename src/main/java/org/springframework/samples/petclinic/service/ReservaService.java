@@ -138,9 +138,10 @@ public class ReservaService {
 	public Optional<Reserva> findFacturaReservaById(int id) throws DataAccessException, EstadoReservaFacturaException {
 		Optional<Reserva> reserva = reservaRepo.findById(id);
 			if(reserva.get().getEstadoReserva().getName().equals("Completada")) {
-				System.out.println("La reserva ha sido completada, se muestra la factura");
+				log.info("La reserva ha sido completada, se muestra la factura");
 				return reserva;
 			}else {
+				log.error("Sólo se mostrarán aquellas reservas que estén completadas.");
 				throw new EstadoReservaFacturaException();
 			}
 		}

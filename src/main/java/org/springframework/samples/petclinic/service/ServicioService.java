@@ -47,10 +47,7 @@ public class ServicioService {
 		this.servicioRepository=servicioRepository;
 		
 	}
-
-	
-	
-	
+		
 	@Transactional
 	public long servicioCount() {
 		

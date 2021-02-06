@@ -30,6 +30,7 @@ import org.springframework.samples.petclinic.model.Taller;
 import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.AutomovilService;
+import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.ServicioService;
 import org.springframework.samples.petclinic.service.TallerService;
 import org.springframework.samples.petclinic.service.TrabajadorService;
@@ -42,7 +43,9 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequestMapping("/servicios")
 public class ServicioController {
@@ -72,6 +75,7 @@ public class ServicioController {
 	public String borrarServicio(@PathVariable("servicioId") int servicioId,ModelMap modelMap) {
 		Servicio servicio=servicioService.findServicioById(servicioId);
 		servicioService.delete(servicio); 
+		log.info("Servicio borrado correctamente");
 		modelMap.addAttribute("message", "Servicio borrado correctamente");
 	
 		return listadoServicios(modelMap);
@@ -95,9 +99,9 @@ public class ServicioController {
 	@PostMapping("/edit/{servicioId}")
 	public String editServicio(@PathVariable("servicioId") int id, @Valid Servicio modifiedServicio, BindingResult binding, ModelMap modelMap) {
 		Servicio servicio=servicioService.findServicioById(id);
-		
 		if(binding.hasErrors()) {	
 			modelMap.addAttribute("message", binding.getAllErrors());
+			log.error("No se puede editar el servicio");
 			modelMap.put("servicio", modifiedServicio);
 			Iterable<Trabajador> trabajadores=trabService.findAll();
 			modelMap.addAttribute("trabajadores", trabajadores);
@@ -110,6 +114,7 @@ public class ServicioController {
 			
 			BeanUtils.copyProperties(modifiedServicio, servicio, "id");
 			servicioService.save(servicio);
+			log.info("Servicio actualizado correctamente");
 			modelMap.addAttribute("message","Servicio actualizado correctamente");
 			return listadoServicios(modelMap);
 		}
@@ -128,9 +133,11 @@ public class ServicioController {
 	@PostMapping("/new")
 	public String saveNewServicio(@Valid Servicio servicio, BindingResult binding, ModelMap modelMap) {
 		if(binding.hasErrors()) {			
+			log.error("El servicio no se puede crear.");
 			return "servicios/updateServicioForm";
 		}else {
 			servicioService.save(servicio);
+			log.info("Servicio creado correctamente");
 			modelMap.addAttribute("message","Servicio creado correctamente");
 			return listadoServicios(modelMap);
 		}

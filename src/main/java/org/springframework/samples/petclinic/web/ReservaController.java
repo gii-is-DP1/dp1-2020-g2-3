@@ -517,16 +517,18 @@ public class ReservaController {
 			Optional<Reserva> reserva=reservaService.findFacturaReservaById(reservaId);
 		if(reserva.isPresent()) {
 			Map<String,Double> factura = reservaService.calcularFactura(reservaId);
-      modelMap.addAttribute("factura",factura);
+			modelMap.addAttribute("factura",factura);
 			modelMap.addAttribute("reserva",reserva.get());
 			return "reservas/reservaFactura";
 		}else {
 			modelMap.addAttribute("message","No se ha encontrado la factura");
+			log.error("No se ha encontrado la factura");
 			return listadoReservas(modelMap);
 		}
 	
 		}catch(EstadoReservaFacturaException e){
 			modelMap.addAttribute("error","Estado de reserva no completado");
+			log.error("Estado de reserva no completado");
 			return listadoReservas(modelMap);
 		}
 	
