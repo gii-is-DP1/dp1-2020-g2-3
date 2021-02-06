@@ -35,6 +35,7 @@ import org.springframework.samples.petclinic.service.TarifaService;
 import org.springframework.samples.petclinic.service.TrabajadorService;
 import org.springframework.samples.petclinic.service.TrayectoService;
 import org.springframework.samples.petclinic.service.UserService;
+import org.springframework.samples.petclinic.service.UtilService;
 import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasInsuficientesException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
@@ -53,6 +54,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
 @RequestMapping("/reservas")
 public class ReservaController {
@@ -66,10 +70,11 @@ public class ReservaController {
 	private final TarifaService tarifaService;
 	private final AutomovilService autoService;
 	private final TrabajadorService trabajadorService;
+	private final UtilService utilService;
 	
 	
 	@Autowired
-	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService,EstadoReservaService estadoReservaService,ClienteService clienteService, TarifaService tarifaService,AutomovilService autoService,TrabajadorService trabajadorService) {
+	public ReservaController(ReservaService reservaService,TrayectoService trayectoService,RutaService rutaService,AuthoritiesService authoService,EstadoReservaService estadoReservaService,ClienteService clienteService, TarifaService tarifaService,AutomovilService autoService,TrabajadorService trabajadorService,UtilService utilService) {
 		this.reservaService=reservaService;
 		this.trayectoService=trayectoService;
 		this.rutaService=rutaService;
@@ -79,6 +84,7 @@ public class ReservaController {
 		this.tarifaService=tarifaService;
 		this.autoService=autoService;
 		this.trabajadorService=trabajadorService;
+		this.utilService=utilService;
 	}
 	
 	
@@ -94,6 +100,7 @@ public class ReservaController {
 		String vista="reservas/reservasList";
 		Iterable<Reserva> reservas= reservaService.findAll();
 		modelMap.addAttribute("reservas", reservas);
+		log.info("Mostrando lista de reservas");
 		return vista;
 	}
 	
@@ -107,7 +114,7 @@ public class ReservaController {
 		//Mostramos una fecha de salida predeterminada del día de hoy, con 45 minutos más a los actuales en la hora de salida
 		// ya que no se pueden realizar reservas con una antelación menor a 40 minutos de la fecha de salida
 		
-		today=reservaService.addFecha(today, Calendar.MINUTE, 45);
+		today=utilService.addFecha(today, Calendar.MINUTE, 45);
 		nuevaReserva.setHoraSalida(today);
 		nuevaReserva.setFechaSalida(today);
 		modelMap.addAttribute("reserva",nuevaReserva);
@@ -115,6 +122,7 @@ public class ReservaController {
 		modelMap.addAttribute("paradas", paradas);
 		modelMap.addAttribute("numCiudadesIntermedias", 0);
 		modelMap.addAttribute("finBucle", 0);
+		log.info("Redirigir al formulario de crear nueva reserva");
 		return "reservas/newReservaForm";
 	}
 	
@@ -134,8 +142,10 @@ public class ReservaController {
 				modelMap.put("paradas", paradas);
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
 				modelMap.put("finBucle", numCiudadesIntermedias-1);
+				log.error("Error de binding tras intentar calcular los datos de una nueva reserva");
 				return "reservas/newReservaForm";
 			}else {
+				log.info("Se procederá a calcular la reserva");
 				return calcularMostrarReserva(reserva, modelMap,paradas,numCiudadesIntermedias,"reservas/newReservaForm","reservas/precioReserva",true,false,p);
 				
 			}
@@ -143,9 +153,11 @@ public class ReservaController {
 		}else if(action.equals("addParada")) {
 			//En esta parte no queremos mostrar los erroes del binding, porque el cliente todavía está editando el formulario
 			//Por ello lo ponemos null
+			log.info("Se ha solicitado añadir una nueva parada desde el formulario de creación de reservas");
 			modelMap.put("org.springframework.validation.BindingResult.reserva", null);
 			return addParada(reserva,modelMap,numCiudadesIntermedias,paradas,"reservas/newReservaForm");
 		}else {
+			log.error("Error tras rellenar el formulario de nueva reserva");
 			return "exception";
 		}
 	
@@ -167,6 +179,7 @@ public class ReservaController {
 				modelMap.put("paradas", paradas);
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
 				modelMap.put("finBucle", numCiudadesIntermedias-1);
+				log.error("Error de binding tras confirmar una nueva reserva");
 				return "reservas/newReservaForm";
 			}else {
 				
@@ -178,10 +191,11 @@ public class ReservaController {
 			modelMap.put("paradas", paradas);
 			modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
 			modelMap.put("finBucle", numCiudadesIntermedias-1);
+			log.info("Volviendo al formulario de nueva reserva con los datos cargados");
 			return "reservas/newReservaForm";
 			
 		}else {
-			
+			log.error("Error al intentar confirmar una nueva reserva");
 			return "exception";
 		}
 	
@@ -195,6 +209,7 @@ public class ReservaController {
 		modelMap.put("paradas", paradas);
 		modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias+1);
 		modelMap.put("finBucle", numCiudadesIntermedias);
+		log.info("Nueva parada añadida al formulario");
 		return formularioExito;
 	}
 	

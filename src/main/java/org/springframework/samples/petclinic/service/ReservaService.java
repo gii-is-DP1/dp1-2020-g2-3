@@ -49,9 +49,10 @@ public class ReservaService {
 	private TarifaService tarifaService;
 	private TrabajadorService trabajadorService;
 	private AuthoritiesService authoService;
+	private UtilService utilService;
 	
 	@Autowired
-	public ReservaService(ReservaRepository reservaRepo,TrayectoService trayectoService,EstadoReservaService estadoService,ClienteService clienteService,RutaService rutaService,TarifaService tarifaService,TrabajadorService trabajadorService,AuthoritiesService authoService) {
+	public ReservaService(ReservaRepository reservaRepo,TrayectoService trayectoService,EstadoReservaService estadoService,ClienteService clienteService,RutaService rutaService,TarifaService tarifaService,TrabajadorService trabajadorService,AuthoritiesService authoService,UtilService utilService) {
 		this.reservaRepo=reservaRepo;
 		this.trayectoService=trayectoService;
 		this.estadoService=estadoService;
@@ -60,6 +61,7 @@ public class ReservaService {
 		this.tarifaService=tarifaService;
 		this.trabajadorService=trabajadorService;
 		this.authoService=authoService;
+		this.utilService=utilService;
 	}
 	
 	@Transactional
@@ -91,19 +93,12 @@ public class ReservaService {
 		fechaSalida.setMinutes(horaSalida.getMinutes());
 		
 		if(minutosSumar!=0) {
-			fechaSalida= this.addFecha(fechaSalida, Calendar.MINUTE, minutosSumar);
+			fechaSalida= utilService.addFecha(fechaSalida, Calendar.MINUTE, minutosSumar);
 		}
 		return fechaSalida;
 	}
 	
-	@Transactional
-	public Date addFecha(Date fechaBase, int tipoFecha, int cantidadSumar ) {
-		   Calendar calendar = Calendar.getInstance();
-		      calendar.setTime(fechaBase); 
-		      calendar.add(tipoFecha, cantidadSumar);
-		      return calendar.getTime();
-	   }
-	
+
 
 	
 	@Transactional

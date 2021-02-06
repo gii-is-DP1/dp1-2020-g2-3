@@ -77,13 +77,15 @@ class ReservaServiceMockedTests {
     private TrabajadorService trabajadorService;
     @Mock
     private AuthoritiesService authoService;
+    @Spy
+    private UtilService utilService= new UtilService();
 
     protected ReservaService reservaService;
 
     @BeforeEach
     void setup() {
     	
-    	reservaService= new ReservaService(reservaRepository,trayectoService,estadoService,clienteService,rutaService,tarifaService,trabajadorService,authoService);
+    	reservaService= new ReservaService(reservaRepository,trayectoService,estadoService,clienteService,rutaService,tarifaService,trabajadorService,authoService,utilService);
     	
     }
     
@@ -123,8 +125,8 @@ class ReservaServiceMockedTests {
     		int horaCalculada2=1;
     		int minutosCalculados2=30;
     	//ACT
-    	Date fechaCalculada1= reservaService.addFecha(fechaBase, Calendar.MINUTE, minutosSumar1);
-    	Date fechaCalculada2= reservaService.addFecha(fechaBase, Calendar.MINUTE, minutosSumar2);
+    	Date fechaCalculada1= utilService.addFecha(fechaBase, Calendar.MINUTE, minutosSumar1);
+    	Date fechaCalculada2= utilService.addFecha(fechaBase, Calendar.MINUTE, minutosSumar2);
 
     	
     	//ASSERT
@@ -160,8 +162,8 @@ class ReservaServiceMockedTests {
     		int horaCalculada2=23;
     		int minutosCalculados2=30;
     	//ACT
-    	Date fechaCalculada1= reservaService.addFecha(fechaBase, Calendar.MINUTE, minutosRestar1);
-    	Date fechaCalculada2= reservaService.addFecha(fechaBase, Calendar.MINUTE, minutosRestar2);
+    	Date fechaCalculada1= utilService.addFecha(fechaBase, Calendar.MINUTE, minutosRestar1);
+    	Date fechaCalculada2= utilService.addFecha(fechaBase, Calendar.MINUTE, minutosRestar2);
 
     	
     	//ASSERT
@@ -207,7 +209,7 @@ class ReservaServiceMockedTests {
 
     	//ARRANGE
     	Date today= new Date();
-    	Date fechaSalida1= reservaService.addFecha(today,Calendar.DATE,-1); //Será la fecha actual restándole 1 día
+    	Date fechaSalida1= utilService.addFecha(today,Calendar.DATE,-1); //Será la fecha actual restándole 1 día
 	    
     	//ACT
     	assertThrows(FechaSalidaAnteriorActualException.class,()->reservaService.fechaSalidaAnteriorActual(fechaSalida1, fechaSalida1));
@@ -218,7 +220,7 @@ class ReservaServiceMockedTests {
     void sumarDiaFecha() {
     	Date today= new Date(); //Día 10
     	today.setDate(10);
-    	Date diaAnterior= reservaService.addFecha(today,Calendar.DATE,-1); //Día 9
+    	Date diaAnterior= utilService.addFecha(today,Calendar.DATE,-1); //Día 9
     	assertEquals(9, diaAnterior.getDate());
     }
     
@@ -229,7 +231,7 @@ class ReservaServiceMockedTests {
 
     	//ARRANGE
     	Date today= new Date();
-    	Date horaSalida= reservaService.addFecha(today,Calendar.MINUTE,-5); //Hora actual restándole 5 min, este método ya está testeado
+    	Date horaSalida= utilService.addFecha(today,Calendar.MINUTE,-5); //Hora actual restándole 5 min, este método ya está testeado
 	    
     	//ACT
     	assertThrows(FechaSalidaAnteriorActualException.class,()->reservaService.fechaSalidaAnteriorActual(today, horaSalida));
@@ -336,7 +338,7 @@ class ReservaServiceMockedTests {
     	Reserva reserva= Reserva.newReservaSinCalcular(new Date(), new Date(), 2, "Maleta grande");
     	reserva.setRuta(ruta);
     	Date fechaSalida= new Date();
-    	fechaSalida= reservaService.addFecha(fechaSalida, Calendar.DATE, 1); //Para que no salte ninguna excepción
+    	fechaSalida= utilService.addFecha(fechaSalida, Calendar.DATE, 1); //Para que no salte ninguna excepción
     	Date horaSalida= new Date();
     	horaSalida.setHours(4);
     	reserva.setFechaSalida(fechaSalida);

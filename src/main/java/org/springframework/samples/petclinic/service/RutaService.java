@@ -72,6 +72,8 @@ public class RutaService {
 	}
 	
 	
+	
+	
 	@Transactional
 	public int calcularHorasRutaCliente(Ruta ruta) {
 		double totalHoras= ruta.getHorasEstimadasCliente();
@@ -137,6 +139,20 @@ public class RutaService {
 			Double numKmTotales, Double horasEstimadasCliente, Double horasEstimadasTaxista)  {
 		
 		return rutaRepo.findRutasByAttributes(origenCliente, destinoCliente, numKmTotales, horasEstimadasCliente,horasEstimadasTaxista);
+	}
+	
+	@Transactional
+	public Ruta inicializarRuta(Ruta ruta)  {
+		Ruta nuevaRuta= new Ruta();
+		List<Trayecto> nuevaListaTrayectos= new ArrayList<Trayecto>();
+		nuevaRuta.setNumKmTotales(0.0);
+		nuevaRuta.setHorasEstimadasCliente(0.0);
+		nuevaRuta.setHorasEstimadasTaxista(0.0);
+		nuevaRuta.setTrayectos(nuevaListaTrayectos);
+		nuevaRuta.setOrigenCliente(ruta.getOrigenCliente());
+		nuevaRuta.setDestinoCliente(ruta.getDestinoCliente());
+		return nuevaRuta;
+		
 	}
 	
 	

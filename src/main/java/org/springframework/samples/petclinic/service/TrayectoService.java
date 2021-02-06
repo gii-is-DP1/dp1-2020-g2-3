@@ -14,19 +14,26 @@ import org.springframework.samples.petclinic.model.Ruta;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
+import org.springframework.samples.petclinic.web.ReservaController;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class TrayectoService {
 
 	
 	private TrayectoRepository trayectoRepo;
-	
+	private RutaService rutaService;
+	private UtilService utilService;
 	@Autowired
-	public TrayectoService(TrayectoRepository trayectoRepo) {
+	public TrayectoService(TrayectoRepository trayectoRepo,RutaService rutaService,UtilService utilService) {
 		this.trayectoRepo=trayectoRepo;
+		this.rutaService=rutaService;
+		this.utilService=utilService;
 	}
+	
 	/*la ruta que se le pasa como parámetro viene desde un formulario con la siguiente estructura:
 	
 	Tendrá como List<Trayecto> solo los trayectos intermedios,
@@ -35,119 +42,91 @@ public class TrayectoService {
     
     Además, cada trayecto intermedio será trayecto1= {origen=parada1, destino=null}
     
-    El siguiente método calcula y encadena todos los trayectos necesarios a esa ruta
+    El siguiente método calcula y encadena todos los trayectos necesarios a esa ruta, con sus kilómeotros y horas estimadas totales
     */
+	
 	@Transactional
 	public Ruta calcularYAsignarTrayectos(Ruta rutaFormulario) throws DataAccessException,DuplicatedParadaException {
-			
+		
 		if(rutaFormulario.getOrigenCliente().equals(rutaFormulario.getDestinoCliente())) {
-			
 			throw new DuplicatedParadaException();
-			
 		}else {
-			
-			List<Trayecto> nuevaListaTrayectos= new ArrayList<Trayecto>();
-			Double numKmTotal=0.0;
-			Double horasEstimadasCliente=0.0;
-			Double horasEstimadasTaxista=0.0;
-			if(rutaFormulario.getTrayectos()==null || rutaFormulario.getTrayectos().size()==0) { //No hay paradas intermedias
+			Ruta rutaConstruida= rutaService.inicializarRuta(rutaFormulario);
+			if(!rutaFormulario.getOrigenCliente().equals("Zahinos")) { //Se añade el trayecto Zahinos --> Origen Cliente en caso de que Origen Cliente no sea Zahinos
+				rutaConstruida=this.recalcularRutaAddTrayecto(rutaConstruida,"Zahinos", rutaFormulario.getOrigenCliente(),false);
 
-					
-					Trayecto trayecto= trayectoRepo.findByOrigenAndDestino(rutaFormulario.getOrigenCliente(), 
-							rutaFormulario.getDestinoCliente());
-					
-					
-					nuevaListaTrayectos.add(trayecto);
-					numKmTotal+=trayecto.getNumKmTotales();
-					horasEstimadasCliente+=trayecto.getHorasEstimadas();
-					
-					horasEstimadasTaxista+=trayecto.getHorasEstimadas();
-					
+			}
+			
+			List<Trayecto> paradasIntermedias= rutaFormulario.getTrayectos();
+			
+			if(paradasIntermedias==null || paradasIntermedias.size()==0) { //No hay paradas intermedias
+				rutaConstruida= this.recalcularRutaAddTrayecto(rutaConstruida, rutaFormulario.getOrigenCliente(), rutaFormulario.getDestinoCliente(),true);
 				
 			}else { //Hay paradas intermedias
 				
-				List<Trayecto> listaTrayectos= rutaFormulario.getTrayectos();
-				
-				if(rutaFormulario.getOrigenCliente().equals(listaTrayectos.get(0).getOrigen())) {
-					System.out.println("origen igual a la primera parada intermedia");
+				if(rutaFormulario.getOrigenCliente().equals(paradasIntermedias.get(0).getOrigen())) {
+					log.error("Origen del cliente: " + rutaFormulario.getOrigenCliente() + ", igual a la primera parada intermedia:" + paradasIntermedias.get(0).getOrigen());
 					throw new DuplicatedParadaException();
 				}else {
-					Trayecto trayectoInicial= trayectoRepo.findByOrigenAndDestino(rutaFormulario.getOrigenCliente(), 
-							listaTrayectos.get(0).getOrigen());
-
-					nuevaListaTrayectos.add(trayectoInicial);
-					numKmTotal+=trayectoInicial.getNumKmTotales();
-					horasEstimadasCliente+=trayectoInicial.getHorasEstimadas();
-					System.out.println(horasEstimadasTaxista + " + " +  trayectoInicial.getHorasEstimadas() + "=");
-					horasEstimadasTaxista+=trayectoInicial.getHorasEstimadas();
-					System.out.println(horasEstimadasTaxista);
-					
+					//Trayecto Origen Cliente ---> Primera parada intermedia
+					rutaConstruida=this.recalcularRutaAddTrayecto(rutaConstruida, rutaFormulario.getOrigenCliente(), paradasIntermedias.get(0).getOrigen(),true);
+					//Trayectos de parada intermedia i ----> parada intermedia i+1
 					int i=0;
-					int listaSize= listaTrayectos.size();
-					while(i<listaSize-1) {
-						if(listaTrayectos.get(i).getOrigen().equals(listaTrayectos.get(i+1).getOrigen())) {
-							System.out.println("Parada intermedia i igual que la parada intermedia i+1");
+					int listaSize=paradasIntermedias.size();
+					while(i<listaSize-1) {  
+						
+						if(paradasIntermedias.get(i).getOrigen().equals(paradasIntermedias.get(i+1).getOrigen())) {
+							log.error("Parada intermedia i igual que la parada intermedia i+1");
 							throw new DuplicatedParadaException();
 						}else {
-							Trayecto trayectoIntermedio= trayectoRepo.findByOrigenAndDestino(listaTrayectos.get(i).getOrigen(),
-									listaTrayectos.get(i+1).getOrigen());
-							nuevaListaTrayectos.add(trayectoIntermedio);
-							numKmTotal+=trayectoIntermedio.getNumKmTotales();
-							horasEstimadasCliente+=trayectoIntermedio.getHorasEstimadas();
-							horasEstimadasTaxista+=trayectoIntermedio.getHorasEstimadas();
+							rutaConstruida=this.recalcularRutaAddTrayecto(rutaConstruida, paradasIntermedias.get(i).getOrigen(), paradasIntermedias.get(i+1).getOrigen(),true);
 							i++;
 						}
-						
 					}
-					if(listaTrayectos.get(listaSize-1).getOrigen().equals(rutaFormulario.getDestinoCliente())) {
-						System.out.println("última parada intermedia igual al destino de la ruta");
+				//Trayecto última parada intermedia ---> Destino cliente
+					if(paradasIntermedias.get(listaSize-1).getOrigen().equals(rutaFormulario.getDestinoCliente())) {
+						log.error("última parada intermedia igual al destino de la ruta");
 						throw new DuplicatedParadaException();
-					}else {
-						Trayecto trayectoFinal=trayectoRepo.findByOrigenAndDestino(listaTrayectos.get(listaSize-1).getOrigen(), 
-								rutaFormulario.getDestinoCliente());
-						nuevaListaTrayectos.add(trayectoFinal);
-						numKmTotal+=trayectoFinal.getNumKmTotales();
-						horasEstimadasCliente+=trayectoFinal.getHorasEstimadas();
-						horasEstimadasTaxista+=trayectoFinal.getHorasEstimadas();
-
+					}else { 
+						
+						rutaConstruida=this.recalcularRutaAddTrayecto(rutaConstruida,paradasIntermedias.get(listaSize-1).getOrigen(), rutaFormulario.getDestinoCliente(),true);
 					}
-					
-					
 				}
-				
-				
 			}
 			//En cualquier caso, hay que incorporar el trayecto [Zahinos --> OrigenCliente]  y [DestinoCliente ---> Zahinos]
-			
-			if(!rutaFormulario.getOrigenCliente().equals("Zahinos")) {
-				Trayecto trayectoIdaTaxista= trayectoRepo.findByOrigenAndDestino("Zahinos", rutaFormulario.getOrigenCliente());
-				nuevaListaTrayectos.add(0, trayectoIdaTaxista);
-				numKmTotal+=trayectoIdaTaxista.getNumKmTotales();
-				//en este caso no sumamos las horas estimadas porque el cliente no estará en el coche en este trayecto, pero sí las horas del taxista
-				horasEstimadasTaxista+=trayectoIdaTaxista.getHorasEstimadas();
-
-			}if(!rutaFormulario.getDestinoCliente().equals("Zahinos")) {
-				Trayecto trayectoVueltaTaxista= trayectoRepo.findByOrigenAndDestino(rutaFormulario.getDestinoCliente(),"Zahinos");
-				nuevaListaTrayectos.add(trayectoVueltaTaxista);
-				numKmTotal+=trayectoVueltaTaxista.getNumKmTotales();
-				//en este caso no sumamos las horas estimadas porque el cliente no estará en el coche en este trayecto, pero sí las del taxista
-				horasEstimadasTaxista+=trayectoVueltaTaxista.getHorasEstimadas();
+			//en estos trayectos no se sumarán las horas del cliente, porque son trayectos exclusivos del taxista	
+			if(!rutaFormulario.getDestinoCliente().equals("Zahinos")) {
+				rutaConstruida=this.recalcularRutaAddTrayecto(rutaConstruida,rutaFormulario.getDestinoCliente(), "Zahinos",false);				
 
 			}
-			Ruta nuevaRuta= new Ruta();
-			double numKmTotalAproximado=Math.round(numKmTotal*100)/100;
-			double horasTaxistaAproximadas= Math.round(horasEstimadasTaxista*100)/100;
-			nuevaRuta.setTrayectos(nuevaListaTrayectos);
-			nuevaRuta.setHorasEstimadasCliente(horasEstimadasCliente);
-			nuevaRuta.setHorasEstimadasTaxista(horasTaxistaAproximadas);
-			nuevaRuta.setNumKmTotales(numKmTotalAproximado);
-			nuevaRuta.setOrigenCliente(rutaFormulario.getOrigenCliente());
-			nuevaRuta.setDestinoCliente(rutaFormulario.getDestinoCliente());
-			return nuevaRuta;
+			//Se aproximan los resultados a 2 decimales
+			rutaConstruida.setNumKmTotales(utilService.aproximarNumero(rutaConstruida.getNumKmTotales()));
+			rutaConstruida.setHorasEstimadasTaxista(utilService.aproximarNumero(rutaConstruida.getHorasEstimadasTaxista()));
+			rutaConstruida.setHorasEstimadasCliente(utilService.aproximarNumero(rutaConstruida.getHorasEstimadasCliente()));
+			
+			return rutaConstruida;
 			
 		}
-	
 	}
+	
+	//Dada una ruta y un origen/destino, se añade dicho trayecto y se actualizan los km totales, y horas estimadas de la ruta
+	@Transactional
+	public Ruta recalcularRutaAddTrayecto(Ruta ruta,String origenTrayecto, String destinoTrayecto,boolean sumarHorasCliente) {
+		List<Trayecto> nuevaListaTrayectos= ruta.getTrayectos();
+		Trayecto trayectoReal=trayectoRepo.findByOrigenAndDestino(origenTrayecto, destinoTrayecto);
+		nuevaListaTrayectos.add(trayectoReal);
+		ruta.setTrayectos(nuevaListaTrayectos);
+		ruta.setNumKmTotales(ruta.getNumKmTotales()+trayectoReal.getNumKmTotales());
+		if(sumarHorasCliente) {
+			ruta.setHorasEstimadasCliente(ruta.getHorasEstimadasCliente()+trayectoReal.getHorasEstimadas());
+		}
+		ruta.setHorasEstimadasTaxista(ruta.getHorasEstimadasTaxista()+trayectoReal.getHorasEstimadas());
+		return ruta;
+	}
+	
+
+	
+	
 	@Transactional 
 	public Trayecto findByOrigenAndDestino(String origen,String destino) {
 		return trayectoRepo.findByOrigenAndDestino(origen, destino);
