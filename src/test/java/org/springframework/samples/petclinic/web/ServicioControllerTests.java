@@ -122,15 +122,8 @@ public class ServicioControllerTests {
 		mockMvc.perform(get("/servicios/new")).andExpect(status().isOk()).andExpect(model().attributeExists("servicio"))
 				.andExpect(view().name("servicios/updateServicioForm"));
 	}
-/*	
-	@WithMockUser(value = "spring")
-    @Test
-    void testProcessCreationFormSuccess() throws Exception {
-		mockMvc.perform(post("/servicios/new").cont
-							)
-				.andExpect(status().isAccepted());
-	}
-	*/
+
+	
 	@Test
 	public void testInsertObject() throws Exception { 
 	

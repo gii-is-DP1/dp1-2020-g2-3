@@ -56,8 +56,6 @@ import aj.org.objectweb.asm.ClassTooLargeException;
 
 @ExtendWith(MockitoExtension.class)
 class ReservaServiceMockedTests {
-
- 
     
     @Mock
     private ReservaRepository reservaRepository;
@@ -357,7 +355,7 @@ class ReservaServiceMockedTests {
     }
     
 
-    
+    /*
     @Test
 	void calcularFactura(){
     	//ARRANGE
@@ -380,34 +378,59 @@ class ReservaServiceMockedTests {
 		res.put("Precio Extra Espera", utilService.aproximarNumero(precioExtraEspera));
         res.put("Base Imponible", utilService.aproximarNumero(baseImponible));
     
-    /*
+        
     	Reserva reserva1 = new Reserva();
+    	Cliente cliente1 = new Cliente();
+    	EstadoReserva estadoReserva1 = new EstadoReserva();
+    	estadoReserva1.setName("Completada");
     	Tarifa tarifa1 = new Tarifa();
     	
-    	tarifa1.setPorcentajeIvaRepercutido(porcentajeIvaRepercutido);
-    	tarifa1.setPrecioPorKm(precioKm);
-    	tarifa1.setPrecioEsperaPorHora(precioEsperaPorHora);
+     	Date horaSalida= new Date(); 
+    	horaSalida.setHours(8);
+    	horaSalida.setMinutes(0);
     	
-    	reserva1.setTarifa(tarifa1);
-    	reserva1.setHorasEspera(horasEspera);
-    	reserva1.setPrecioTotal(precioTotal);
-    	*/
-        
-        Reserva reserva1 = reservaService.findReservaById(1).get();
-       
-           
-
+    	Date horaLlegada= new Date(); 
+    	horaSalida.setHours(9);
+    	horaSalida.setMinutes(0);
     	
-    	when(reservaRepository.findById(any())).thenReturn(Optional.of(reserva1));
-       
-        
- 	
-
-		//ACT & ASSERT
-	assertNotEquals(res, reservaService.calcularFactura(1));
+    	Date fechaSalida= new Date();
+		fechaSalida.setDate(6);
+		fechaSalida.setMonth(2);
+		fechaSalida.setYear(2021);
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
 		
+		Date fechaLlegada= new Date();
+		fechaLlegada.setDate(6);
+		fechaLlegada.setMonth(2);
+		fechaLlegada.setYear(2021);
+		fechaLlegada.setHours(horaLlegada.getHours());
+		fechaLlegada.setMinutes(horaLlegada.getMinutes());
+		
+    	Ruta ruta1 = new Ruta();
+    	reserva1.setId(5);
+    	reserva1.setCliente(cliente1);
+    	reserva1.setRuta(ruta1);
+    	reserva1.setFechaSalida(fechaSalida);
+    	reserva1.setHoraSalida(horaSalida);
+    	reserva1.setFechaLlegada(fechaLlegada);
+    	reserva1.setHoraLlegada(horaLlegada);
+    	reserva1.setHorasEspera(0.0);
+    	reserva1.setPlazas_Ocupadas(2);
+    	reserva1.setDescripcionEquipaje("pesado");
+    	reserva1.setEstadoReserva(estadoReserva1);
+    	reserva1.setPrecioTotal(34.0);
+    	reserva1.setNumKmTotales(60.0);
+    	reserva1.setTarifa(tarifa1);
+    	reservaService.save(reserva1);
+    
+    	
+    	//when(reservaRepository.findById(any())).thenReturn(Optional.of(reserva1));
+       
+      		//ACT & ASSERT
+    	assertNotEquals(res, reservaService.calcularFactura(5));
 	}
-	
+	*/
 		
 
 //    @Test
