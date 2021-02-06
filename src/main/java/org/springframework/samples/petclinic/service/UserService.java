@@ -29,12 +29,15 @@ import org.springframework.samples.petclinic.service.exceptions.TrabajadorNoActi
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Mostly used as a facade for all Petclinic controllers Also a placeholder
  * for @Transactional and @Cacheable annotations
  *
  * @author Michael Isvy
  */
+@Slf4j
 @Service
 public class UserService {
 
@@ -55,10 +58,12 @@ public class UserService {
 	public void despedirTrabajador(User user) throws DataAccessException,TrabajadorNoActivo {
 		
 		if(!user.isEnabled()) {
+			log.error("El trabajador no está activo, no se puede despedir");
 			throw new TrabajadorNoActivo();
 		}else {
 			user.setEnabled(false);
 			userRepository.save(user);
+			log.info("Trabajador despedido");
 			
 		}
 		
