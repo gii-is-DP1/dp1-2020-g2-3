@@ -84,14 +84,15 @@ public class ReservaService {
 
 		Reserva reserva = reservaRepo.findById(id).get();
 		Map<String, Double> res = new HashMap<String, Double>();
-		res.put("IVA Repercutido", Math.round((reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal())*100.0)/100.0);
-		res.put("Precio Distancia", Math.round((reserva.getTarifa().getPrecioPorKm() * reserva.getNumKmTotales())*100.0)/100.0);
-		res.put("Precio Extra Espera", Math.round((reserva.getHorasEspera() * reserva.getTarifa().getPrecioEsperaPorHora())*100.0)/100.0);
-        res.put("Base Imponible", Math.round((reserva.getPrecioTotal() - (reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal()))*100.0)/100.0);
+		res.put("IVA Repercutido", utilService.aproximarNumero(reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal()));
+		res.put("Precio Distancia", utilService.aproximarNumero(reserva.getTarifa().getPrecioPorKm() * reserva.getNumKmTotales()));
+		res.put("Precio Extra Espera", utilService.aproximarNumero(reserva.getHorasEspera() * reserva.getTarifa().getPrecioEsperaPorHora()));
+        res.put("Base Imponible", utilService.aproximarNumero(reserva.getPrecioTotal() - (reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal())));
 		return res;
 		
 		
 	}
+	
 	@Transactional
 	public Date calcularFechaYHoraLlegada(Date fechaSalida, Date horaSalida, Double horasEstimadasCliente) {
 		int minutosSumar= (int)Math.round(horasEstimadasCliente*60); //Devolvemos un Date con la fecha y hora de llegada
@@ -137,9 +138,10 @@ public class ReservaService {
 	public Optional<Reserva> findFacturaReservaById(int id) throws DataAccessException, EstadoReservaFacturaException {
 		Optional<Reserva> reserva = reservaRepo.findById(id);
 			if(reserva.get().getEstadoReserva().getName().equals("Completada")) {
-				System.out.println("La reserva ha sido completada, se muestra la factura");
+				log.info("La reserva ha sido completada, se muestra la factura");
 				return reserva;
 			}else {
+				log.error("Sólo se mostrarán aquellas reservas que estén completadas.");
 				throw new EstadoReservaFacturaException();
 			}
 		}
