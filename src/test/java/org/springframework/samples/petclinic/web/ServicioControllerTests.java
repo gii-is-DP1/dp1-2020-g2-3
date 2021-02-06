@@ -124,19 +124,17 @@ public class ServicioControllerTests {
 	}
 
 	
-	@Test
-	public void testInsertObject() throws Exception { 
-	
-	    ObjectMapper mapper = new ObjectMapper();
-	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-	    ObjectWriter ow = (ObjectWriter) mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=((ObjectMapper) ow).writeValueAsString(s1 );
-
-	    mockMvc.perform(post("/servicios/new")
-	        .content(requestJson))
-	        .andExpect(status().isOk());
-	}
-	
+	@WithMockUser(value = "spring")
+    @Test
+    void testProcessCreationFormHasErrors() throws Exception {
+		mockMvc.perform(post("/servicios/new", TEST_SERVICIO_ID)
+					.param("descripcion", "ou mama"))
+			//.andExpect(status().isOk())
+			.andExpect(model().attributeHasErrors("servicio"))
+			.andExpect(model().attributeHasFieldErrors("servicio", "taller"))
+			
+			.andExpect(view().name("servicios/UpdateServicioForm"));
+	}	
 	
 	
 
@@ -161,5 +159,16 @@ public class ServicioControllerTests {
 	
 	
 	*/
+	
+	@Test
+	public void testDelete() throws Exception{
+		
+		mockMvc.perform(get("servicios/delete/1"))
+			.andExpect(status().is2xxSuccessful())
+			.andExpect(view().name("servicios/listadoServicios"));
+		;
+	}
+	
+	
 
 }
