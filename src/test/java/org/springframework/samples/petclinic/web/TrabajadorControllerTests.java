@@ -1,5 +1,7 @@
 package org.springframework.samples.petclinic.web;
 
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -8,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +46,24 @@ public class TrabajadorControllerTests {
 	@MockBean
 	private UserService userService;
 
+	@MockBean
+	private  UserService userService;
 
 	@Autowired
 	private MockMvc mockMvc;
 	
 	private Trabajador charles;
+	private User usuario;
+	
 
 	@BeforeEach
 	void setup() {
 		
+
+		usuario = new User();
+		usuario.setUsername("usuario");
+		usuario.setPassword("usuario");
+		usuario.setEnabled(true);
 		charles = new Trabajador();
 		charles.setId(TEST_TRABAJADOR_ID);
 		charles.setDni("41234567L");
@@ -61,6 +71,7 @@ public class TrabajadorControllerTests {
 		charles.setApellidos("Pérez García");
 		charles.setEmail("charles@gmail.es");
 		charles.setTelefono("608555102");
+		charles.setUser(usuario);
 		given(this.trabajadorService.findById(TEST_TRABAJADOR_ID)).willReturn(charles);
 
 	}
@@ -115,5 +126,14 @@ public class TrabajadorControllerTests {
 			.andExpect(view().name("trabajadores/updateTrabajadorForm"));
 	}	
 	
+	@WithMockUser(value = "spring")
+    @Test
+    void testProcessDespedirTrabajadorSuccess() throws Exception {
+		mockMvc.perform(get("/trabajadores/despedir/{trabajadorId}",TEST_TRABAJADOR_ID))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("message", is("Trabajador despedido")));
+	}
+	
+
 
 }

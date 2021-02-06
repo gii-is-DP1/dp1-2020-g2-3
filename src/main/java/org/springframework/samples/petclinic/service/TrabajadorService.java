@@ -18,15 +18,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TrabajadorService {
-
-	@Autowired
-	private TrabajadorRepository trabRepo;
+private TrabajadorRepository trabRepo;
 	
-	@Autowired
+	
 	private UserService userService;
 	
-	@Autowired
+	
 	private AuthoritiesService authoritiesService;
+	
+	@Autowired
+	public TrabajadorService(TrabajadorRepository trabRepo, UserService userService, AuthoritiesService authoritiesService) {
+		this.trabRepo = trabRepo;
+		this.userService = userService;
+		this.authoritiesService = authoritiesService;
+	}
 	
 	@Transactional
 	public long trabajdorCount() {
