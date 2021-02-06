@@ -111,7 +111,7 @@ public class ReservaService {
 		Date today = new Date();
 		fechaSalida.setHours(horaSalida.getHours());
 		fechaSalida.setMinutes(horaSalida.getMinutes());
-		fechaSalida = this.addFecha(fechaSalida, Calendar.MINUTE, -40);
+		fechaSalida = utilService.addFecha(fechaSalida, Calendar.MINUTE, -40);
 		
 		if(fechaSalida.compareTo(today)<0) {
 			System.out.println("hora de salida con menos de 40 minutos de antelación, se lanza excepción");
