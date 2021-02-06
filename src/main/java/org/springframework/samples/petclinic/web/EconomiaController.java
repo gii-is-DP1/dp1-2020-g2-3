@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
 @RequestMapping("/economias")
 public class EconomiaController {
@@ -34,6 +37,7 @@ public class EconomiaController {
 		LocalDate fecha2 = LocalDate.now();	
 		model.put("fecha1", fecha1);
 		model.put("fecha2", fecha2);
+		log.info("Creando formulario de economia.");
 		return "economias/findEconomias";
 	}
 	
@@ -45,16 +49,19 @@ public class EconomiaController {
 			LocalDate fechaFin = LocalDate.parse(fecha2);
 			if((fechaInicial.isAfter(fechaFin))) {
 				model.put("error", "La fecha final no puede ser anterior a la fecha inicial.");
+				log.error("La fecha final no puede ser anterior a la fecha inicial. Fecha inicial: " + fechaInicial + "; Fecha final: " + fechaFin);
 				return "economias/findEconomias";
 			}else {
 				Double ingresos = reservaService.calcularIngresos(asDate(fechaInicial), asDate(fechaFin));
 				Double gastos = servicioService.calcularGastos(asDate(fechaInicial), asDate(fechaFin));
 				model.put("ingresos", ingresos);
 				model.put("gastos", gastos);
+				log.info("Mostrando los ingresos y gastos");
 				return "economias/listEconomias";
 			}
 		}else {
-			model.put("error", "Debes introducir una fecha correcta.");
+			model.put("error", "Debes introducir una fecha.");
+			log.error("Se debe introducir una fecha en el formulario de economia.");
 			return "economias/findEconomias";
 		}		
 	}

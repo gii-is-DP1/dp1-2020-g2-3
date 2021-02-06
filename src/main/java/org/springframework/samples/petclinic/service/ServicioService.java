@@ -76,6 +76,7 @@ public class ServicioService {
 				gastos = gastos + s.getPrecio();
 			}
 		}
+		log.info("Los gastos calculados han sido de:" + gastos);
 		return gastos;
 	}
 	
