@@ -46,9 +46,6 @@ public class TrabajadorControllerTests {
 	@MockBean
 	private UserService userService;
 
-	@MockBean
-	private  UserService userService;
-
 	@Autowired
 	private MockMvc mockMvc;
 	

@@ -419,7 +419,10 @@ public class ReservaService {
 
     }
 	
-	
+	@Transactional(readOnly = true)
+	public Reserva findResById(int id) throws DataAccessException {
+		return reservaRepo.findResById(id);
+	}
 	
 
 	

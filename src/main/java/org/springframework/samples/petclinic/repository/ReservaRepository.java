@@ -17,6 +17,8 @@ public interface ReservaRepository extends CrudRepository<Reserva, Integer> {
 	@Query("SELECT  res FROM Reserva res where res.cliente.user.username = ?1")
 	Iterable<Reserva> findReservasByUsername(String username) throws DataAccessException;
 
+	@Query("SELECT reserva FROM Reserva reserva WHERE reserva.id = :id")
+	public Reserva findResById(@Param("id") int id);
 }
 
 
