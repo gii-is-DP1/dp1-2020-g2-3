@@ -30,6 +30,10 @@ import org.springframework.samples.petclinic.model.Trabajador;
 
 public interface ServicioRepository extends CrudRepository<Servicio, Integer> {
 
+
+	@Query("SELECT servicio FROM Servicio servicio")
+	public Collection<Servicio> findAllServicios();
+
 	@Query("SELECT servicio FROM Servicio servicio WHERE servicio.id =:id")
 	public Servicio findById(@Param("id") int id);
 	

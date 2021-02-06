@@ -15,8 +15,11 @@
  */
 package org.springframework.samples.petclinic.service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collection;
-
+import java.util.Date;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -64,7 +67,18 @@ public class ServicioService {
 		return servicioRepository.findById(id);
 	}
 	
-
+	@Transactional
+	public Double calcularGastos(Date fecha1, Date fecha2) {
+		Collection<Servicio> servicios = servicioRepository.findAllServicios();
+		Double gastos = 0.0;
+		for(Servicio s: servicios) {
+			if(s.getFecha().after(fecha1) && s.getFecha().before(fecha2)) {
+				gastos = gastos + s.getPrecio();
+			}
+		}
+		log.info("Los gastos calculados han sido de:" + gastos);
+		return gastos;
+	}
 	
 	@Transactional()
 	public void delete(Servicio serv)  {
@@ -77,8 +91,6 @@ public class ServicioService {
 		
 		servicioRepository.save(serv);
 	}
-	
-		
 	
 
 }
