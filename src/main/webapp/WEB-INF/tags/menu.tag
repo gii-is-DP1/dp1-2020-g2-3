@@ -49,6 +49,15 @@
 				</petclinic:menuItem>
 				
 			</sec:authorize>
+			
+			<sec:authorize access="hasAnyAuthority('admin')">  
+				<petclinic:menuItem active="${name eq 'economias'}" url="/economias/find"
+					title="Economias">
+					<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+					<span>Economia</span>
+				</petclinic:menuItem>
+				
+			</sec:authorize>
 
 				<petclinic:menuItem active="${name eq 'servicios'}" url="/servicios/listado"
 					title="Servicios">

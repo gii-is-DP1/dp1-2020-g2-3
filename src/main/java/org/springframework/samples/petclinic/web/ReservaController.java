@@ -40,8 +40,10 @@ import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasI
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
 import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
+import org.springframework.samples.petclinic.service.exceptions.ExisteViajeEnEsteHorarioException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
+import org.springframework.samples.petclinic.service.exceptions.HoraSalidaSinAntelacionException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -245,7 +247,15 @@ public class ReservaController {
 		modelMap.addAttribute("error", "La fecha y hora de salida no puede ser anterior al instante actual");
 
 		return formularioError;	
-		}
+		} catch(HoraSalidaSinAntelacionException e3) {
+				modelMap.put("reserva", reserva);
+				modelMap.put("paradas", paradas);
+				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+				modelMap.put("finBucle", numCiudadesIntermedias-1);
+				modelMap.addAttribute("error", "La fecha de salida debe realizarse con al menos 40 minutos de antelación");
+
+				return formularioError;
+			}
 	}
 	
 	public String mostrarReservaCalculada(Reserva reserva, ModelMap modelMap,String formularioExito,List<Trayecto> trayectosIntermedios,int horasRutaCliente,int minutosRutaCliente,Principal p) {
@@ -308,6 +318,14 @@ public class ReservaController {
 
 			return "reservas/newReservaForm";	
 
+		} catch(HoraSalidaSinAntelacionException e3) {
+			modelMap.put("reserva", reserva);
+			modelMap.put("paradas", paradas);
+			modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
+			modelMap.put("finBucle", numCiudadesIntermedias-1);
+			modelMap.addAttribute("error", "La reserva debe realizarse con un mínimo de 1 hora de antelación");
+
+			return "reservas/newReservaForm";	
 		}
 	}
 	
@@ -486,6 +504,8 @@ public class ReservaController {
 					modelMap.addAttribute("error", "La reserva que se intenta aceptar ya ha sido aceptada/rechazada anteriormente");
 				}catch(AutomovilPlazasInsuficientesException e) {
 					modelMap.addAttribute("error", "El automóvil que ha seleccionado no tiene suficientes plazas para realizar la reserva");
+				}catch(ExisteViajeEnEsteHorarioException e) {
+					modelMap.addAttribute("error", "El taxista ya tiene una reserva aceptada en este periodo de tiempo.");
 				}
 				return listadoPeticionesReservas(modelMap);
 			}
@@ -559,4 +579,3 @@ public class ReservaController {
 		
 	}
 }
-
