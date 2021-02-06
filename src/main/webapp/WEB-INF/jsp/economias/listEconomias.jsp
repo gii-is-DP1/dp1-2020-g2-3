@@ -9,17 +9,18 @@
 <petclinic:layout pageName="economias">
 
 	<jsp:body>
-    <h2>Mostrar Ingresos y gastos</h2>
+    <h2>Resumen de ingresos y gastos</h2>
 
         <div class="form-group">
             <div class="form-group has-feedback">
-       		<h2>
+            <br>
+       		<h3>
        		<c:if test="${not empty ingresos}"> Los ingresos en dicho rango de fechas han sido de -> <c:out value="${ingresos}"/></c:if>
-       		</h2>
+       		</h3>
        		
-       		<h2>
+       		<h3>
        		<c:if test="${not empty gastos}"> Los gastos en dicho rango de fechas han sido de -> <c:out value="${gastos}"/></c:if>
-       		</h2>
+       		</h3>
        		
        		</div>
 

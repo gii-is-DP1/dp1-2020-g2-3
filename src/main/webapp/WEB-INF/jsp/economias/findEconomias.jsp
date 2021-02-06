@@ -15,7 +15,10 @@
                id="search-owner-form">
         <div class="form-group">
             <div class="form-group has-feedback">
+            <label for="fechaInicio">Fecha inicial</label> 
 			<input type="date" name="fecha1"  id="fecha1" value="<fmt:formatDate pattern = "yyyy-MM-dd" value = "${economia.fecha1}" />"/> 
+			<br>
+			<label for="fechaFinal">Fecha final</label> 
 			<input type="date" name="fecha2"  id="fecha2" value="<fmt:formatDate pattern = "yyyy-MM-dd" value = "${economia.fecha2}" />"/> 
        		
        		</div>
