@@ -29,15 +29,39 @@ class TrabajadorValidatorTest {
 	void shouldNotValidateWhenTelefonoEmpty() {
 
 		Trabajador trabajador = new Trabajador();
+
+		
+		trabajador.setNombre("paco");
+		trabajador.setApellidos("perez");
+		trabajador.setDni("12345678H");
 	
 	
 		Validator validator = createValidator();
 		Set<ConstraintViolation<Trabajador>> constraintViolations = validator.validate(trabajador);
-
 		assertThat(constraintViolations.size()).isEqualTo(1);
 		ConstraintViolation<Trabajador> violation = constraintViolations.iterator().next();
 		assertThat(violation.getPropertyPath().toString()).isEqualTo("telefono");
 		assertThat(violation.getMessage()).isEqualTo("no puede estar vacío");
+	}
+	
+	@Test
+	void shouldNotValidateWhenTelefonoIsWrong() {
+
+		Trabajador trabajador = new Trabajador();
+
+		
+		trabajador.setNombre("paco");
+		trabajador.setApellidos("perez");
+		trabajador.setDni("12345678H");
+		trabajador.setTelefono("198720398712039");
+	
+	
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Trabajador>> constraintViolations = validator.validate(trabajador);
+		assertThat(constraintViolations.size()).isEqualTo(1);
+		ConstraintViolation<Trabajador> violation = constraintViolations.iterator().next();
+		assertThat(violation.getPropertyPath().toString()).isEqualTo("telefono");
+		assertThat(violation.getMessage()).isEqualTo("valor numérico fuera de los límites (se esperaba <10 dígitos>.<0 dígitos)");
 	}
 	
 	
