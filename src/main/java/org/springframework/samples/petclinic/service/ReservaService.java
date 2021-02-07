@@ -78,7 +78,7 @@ public class ReservaService {
 		Double precioTotal=kmTotal*precioPorKm;	
 		Double precioTotalRedondeado=utilService.aproximarNumero(precioTotal);
 		return precioTotalRedondeado;								
-		
+	
 	}
 	@Transactional
 	public Map<String,Double> calcularFactura(int id){
@@ -96,7 +96,7 @@ public class ReservaService {
 	
 	@Transactional
 	public Date calcularFechaYHoraLlegada(Date fechaSalida, Date horaSalida, Double horasEstimadasCliente) {
-		int minutosSumar= (int)Math.round(horasEstimadasCliente*60); //Devolvemos un Date con la fecha y hora de llegada
+		int minutosSumar= (int)utilService.aproximarNumero(horasEstimadasCliente*60); //Devolvemos un Date con la fecha y hora de llegada
 		fechaSalida.setHours(horaSalida.getHours());
 		fechaSalida.setMinutes(horaSalida.getMinutes());
 		
@@ -125,14 +125,21 @@ public class ReservaService {
 	@Transactional
 	public void fechaSalidaAnteriorActual(Date fechaSalida, Date horaSalida) throws FechaSalidaAnteriorActualException  {
 		Date today= new Date();
-		fechaSalida.setHours(horaSalida.getHours());
-		fechaSalida.setMinutes(horaSalida.getMinutes());
-	
-		if(fechaSalida.compareTo(today)<0) { //Fecha anterior
-			System.out.println("fecha de salida es anterior a la actual, se lanza excepción");
+		Date fechaSalidaConHoras= new Date(); //Creamos un nuevo Date para evitar ciertos errores
+		fechaSalidaConHoras.setDate(fechaSalida.getDate());
+		fechaSalidaConHoras.setMonth(fechaSalida.getMonth());
+		fechaSalidaConHoras.setYear(fechaSalida.getYear());
+		fechaSalidaConHoras.setHours(horaSalida.getHours());
+		fechaSalidaConHoras.setMinutes(horaSalida.getMinutes());
+		
+
+		
+		log.debug("fecha de salida con horas" + fechaSalidaConHoras);
+		if(fechaSalidaConHoras.compareTo(today)<0) { //Fecha anterior
+			log.info("fecha de salida es anterior a la actual, se lanza excepción");
 			throw new FechaSalidaAnteriorActualException();
 		}else {
-			System.out.println("la fecha de salida es posterior o igual a la actual, no se lanza excepción");
+			log.info("la fecha de salida es posterior o igual a la actual, no se lanza excepción");
 		}
 		
 	}
@@ -187,7 +194,7 @@ public class ReservaService {
 				log.info("La reserva ha sido completada, se muestra la factura");
 				return reserva;
 			}else {
-				log.error("Sólo se mostrarán aquellas reservas que estén completadas.");
+				log.error("Sólo se mostrarán las facturas de aquellas reservas que estén completadas.");
 				throw new EstadoReservaFacturaException();
 			}
 		}
@@ -201,42 +208,51 @@ public class ReservaService {
 		//Si confirmarReserva= false solo se calcularán los campos estrictamente necesarios para mostrar la reserva en el formulario
 		
 		if(nuevaReserva) { //si el cliente calcula la reserva se comprueba la restricción de la fecha
-			fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha
-			fechaSalidaSinAntelacion(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar antelación
+			this.fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha
+			log.info("Se ha comprobado la fecha");
+			this.fechaSalidaSinAntelacion(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar antelación
 		}
-
+		
 		Ruta nuevaRuta= trayectoService.calcularYAsignarTrayectos(reserva.getRuta());
 		reserva.setRuta(nuevaRuta);
+		log.debug("km totales nueva ruta: " + nuevaRuta.getNumKmTotales());
+
 		reserva.setNumKmTotales(nuevaRuta.getNumKmTotales());
-		Date fechaHoraLlegada=calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
+		Date fechaHoraLlegada=this.calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
 		reserva.setFechaLlegada(fechaHoraLlegada);
 		reserva.setHoraLlegada(fechaHoraLlegada);
+		log.debug("fecha llegada estimada" + fechaHoraLlegada);
 		Tarifa tarifa= tarifaService.findTarifaActiva();
+		log.debug("Tarifa Activa: "  + tarifa);
 		Optional<Tarifa> tarifaCopia= tarifaService.findCopyOfTarifa(tarifa);
+		
 		if(tarifaCopia.isPresent()) { //Si existe una tarifa copia se utiliza
 			tarifa=tarifaCopia.get();
-		}else { //Si no existe una tarifa copia igual, se crea
+		}else { //Si no existe una tarifa copia igual, se crea y se asocia
+			log.info("No existe una tarifa con original=false a la que se está tomando como referencia, se creará una nueva entidad" );
 			tarifa= tarifaService.nuevaTarifa(false, false, tarifa.getPorcentajeIvaRepercutido(), tarifa.getPrecioEsperaPorHora(), tarifa.getPrecioPorKm());
 			tarifaService.save(tarifa);
 		}
+		log.info("Se ha guardado la tarifa");
 		reserva.setTarifa(tarifa);
 		Double precioPorKm= tarifa.getPrecioPorKm();
 		Double precioTotal=calcularPrecioDistancia(nuevaRuta.getNumKmTotales(), precioPorKm);
 		reserva.setPrecioTotal(precioTotal);
 		if(confirmarReserva ) { //Solo cuando se confirma la reserva se añadirán los siguientes campos
 			
-			//Por motivos de seguridad, tras ver el precio de una reserva, se vuelven a calcular todos los campos de la reserva
-			// en este método,por si alguien ha intentado modificar algo desde el jsp.
-			//Antes de confirmar la reserva no se calculan estos campos, porque en la vista precioReserva.jsp no aparecen
+					//Por motivos de seguridad, tras ver el precio de una reserva, se vuelven a calcular todos los campos de la reserva
+					// en este método,por si alguien ha intentado modificar algo desde el jsp.
+					//Antes de confirmar la reserva no se calculan estos campos, porque en la vista precioReserva.jsp no aparecen
+					
+					//si la ruta creada ya existe en la BD se asignará, y si no,se creará una nueva Ruta
 			
-			//si la ruta creada ya existe en la BD se asignará
 			reserva=asignarRutaExistenteOCrearla(reserva);
-			
-				reserva.setHorasEspera(0.0);
-				reserva.setEstadoReserva(estadoService.findEstadoById(1).get());
-			
+			log.info("Vamos a asignar las horas de espera");
+			reserva.setHorasEspera(0.0);
+			reserva.setEstadoReserva(estadoService.findEstadoById(1).get());
 		
 		}
+		
 		return reserva;
 		
 	}
@@ -247,7 +263,7 @@ public class ReservaService {
 		Optional<Ruta> rutaExistente= rutaService.findRutaByRuta(ruta);
 		
 		if(rutaExistente.isPresent()) {
-			System.out.println("Ya existe una ruta similar! No hace falta guardarla en la BD");
+			log.info("Ya existe una ruta similar! No hace falta guardarla en la BD");
 			ruta.setId(rutaExistente.get().getId());
 			reserva.setRuta(ruta);
 			
@@ -255,64 +271,13 @@ public class ReservaService {
 		}else {
 			
 			System.out.println("No existe la ruta, se asignará  una nueva a la reserva"); //Ya está asignada antes del if(confirmarReserva)
-			System.out.println(ruta);
+			
 			rutaService.save(ruta); //Se guarda en la BD la nueva ruta
-			System.out.println("ruta asignada!");
+			System.out.println("ruta nueva guardada y asociada en la BD!");
 		} 
 		return reserva;
 	}
-	/*@Transactional //Este método calculará el precio, la fecha/hora estimada de llegada, los km totales,ruta... de la reserva después del primer formulario de su creación
-	public Reserva calcularNuevaReserva(Reserva reserva,boolean confirmarReserva) throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException {
-		
-		//Si confirmarReserva= false solo se calcularán los campos estrictamente necesarios para mostrar la reserva en el precioReserva.jsp
-		
-		
-		fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha
-		Reserva reservaCalculada= new Reserva();
-		reservaCalculada.setDescripcionEquipaje(reserva.getDescripcionEquipaje());
-		reservaCalculada.setFechaSalida(reserva.getFechaSalida());
-		reservaCalculada.setHoraSalida(reserva.getHoraSalida());
-		reservaCalculada.setPlazas_Ocupadas(reserva.getPlazas_Ocupadas());
-		Ruta nuevaRuta= trayectoService.calcularYAsignarTrayectos(reserva.getRuta());
-		reservaCalculada.setRuta(nuevaRuta);
-		reservaCalculada.setNumKmTotales(nuevaRuta.getNumKmTotales());
-		Date fechaHoraLlegada=calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
-		reservaCalculada.setFechaLlegada(fechaHoraLlegada);
-		reservaCalculada.setHoraLlegada(fechaHoraLlegada);
-		Double precioPorKm=tarifaService.findTarifaActiva().getPrecioPorKm();
-		Double precioTotal=calcularPrecioDistancia(nuevaRuta.getNumKmTotales(), precioPorKm);
-		reservaCalculada.setPrecioTotal(precioTotal);
-		if(confirmarReserva ) { //Solo cuando se confirma la reserva se añadirán los siguientes campos
-			
-			//Por motivos de seguridad, tras ver el precio de una reserva, se vuelven a calcular todos los campos de la reserva
-			// en este método,por si alguien ha intentado modificar algo desde el jsp.
-			//Antes de confirmar la reserva no se calculan estos campos, porque en la vista precioReserva.jsp no aparecen
-			
-			//si la ruta creada ya existe en la BD se asignará
-			Optional<Ruta> rutaExistente= rutaService.findRutaByRuta(nuevaRuta);
-		
-			if(rutaExistente.isPresent()) {
-				System.out.println("Ya existe una ruta similar! No hace falta guardarla en la BD");
-				nuevaRuta.setId(rutaExistente.get().getId());
-				reserva.setRuta(nuevaRuta);
-				System.out.println("Trayectos de la ruta existente: " + rutaExistente.get().getTrayectos());
-				System.out.println("Ruta existente: " + rutaExistente.get());
-				
-			}else {
-				
-				System.out.println("No existe la ruta, se asignará una  una nueva a la reserva"); //Ya está asignada antes del if(confirmarReserva)
-				
-				rutaService.save(nuevaRuta); //Se guarda en la BD la nueva ruta
-				System.out.println("ruta asignada!");
-			}
-			reservaCalculada.setHorasEspera(0.0);
-			reservaCalculada.setEstadoReserva(estadoService.findEstadoById(1).get());
-			
-		}
-		return reservaCalculada;
-		
-	}
-	*/
+	
 	@Transactional
 	public Reserva guardarReservaEditada(Reserva reservaEditada,Reserva reservaBD) throws DuplicatedParadaException,FechaLlegadaAnteriorSalidaException{
 		
@@ -412,12 +377,12 @@ public class ReservaService {
 	}
 	
 	@Transactional
-	public void delete(Reserva reserva) throws DataAccessException  {
+	public void delete(Reserva reserva) throws DataAccessException  { //Método CRUD REPOSITORY
 			reservaRepo.delete(reserva);
 	}
 
 	@Transactional
-	public void save(Reserva reserva)  {
+	public void save(Reserva reserva)  { //Método CRUD REPOSITORY
 		
 		reservaRepo.save(reserva);
 	}
