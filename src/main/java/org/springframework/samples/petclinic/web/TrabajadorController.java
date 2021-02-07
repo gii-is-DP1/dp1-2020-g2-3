@@ -60,6 +60,7 @@ public class TrabajadorController {
 	@PostMapping("/new")
 	public String saveNewTrabajador(@Valid Trabajador trabajador, BindingResult binding, ModelMap modelMap) throws FechaFinAnteriorInicioException {
 		if(binding.hasErrors()) {
+			log.error("error de binding" + binding.getAllErrors());
 			modelMap.put("trabajador", trabajador);
 			return "trabajadores/updateTrabajadorForm";
 		}else {

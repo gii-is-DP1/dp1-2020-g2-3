@@ -42,9 +42,9 @@ public class TrabajadorControllerTests {
 	
 	@MockBean
 	private TipoTrabajadorService tipoTrabajadorService;
-
+	
 	@MockBean
-	private  UserService userService;
+	private UserService userService;
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -56,6 +56,7 @@ public class TrabajadorControllerTests {
 	@BeforeEach
 	void setup() {
 		
+
 		usuario = new User();
 		usuario.setUsername("usuario");
 		usuario.setPassword("usuario");
@@ -81,6 +82,9 @@ public class TrabajadorControllerTests {
 				.andExpect(view().name("trabajadores/trabajadoresList"));
 	}
 	
+	
+	
+	
 	@WithMockUser(value = "spring")
     @Test
     void testProcessFindFormSuccess() throws Exception {
@@ -89,12 +93,19 @@ public class TrabajadorControllerTests {
 	mockMvc.perform(get("/trabajadores/trabajadoresList")).andExpect(status().isOk()).andExpect(view().name("trabajadores/trabajadoresList"));
 }
 	
+	
+	
+	
+	
 	@WithMockUser(value = "spring")
     @Test
     void testInitCreationForm() throws Exception {
 		mockMvc.perform(get("/trabajadores/new")).andExpect(status().isOk()).andExpect(model().attributeExists("trabajadores"))
 				.andExpect(view().name("trabajadores/updateTrabajadorForm"));
 	}
+	
+	
+	
 	
 	@WithMockUser(value = "spring")
     @Test
@@ -106,6 +117,10 @@ public class TrabajadorControllerTests {
 							.param("telefono", "672823123"))
 				.andExpect(status().isOk());
 	}
+	
+	
+	
+	
 	
 	@WithMockUser(value = "spring")
     @Test
@@ -121,7 +136,7 @@ public class TrabajadorControllerTests {
 			.andExpect(model().attributeHasFieldErrors("trabajador", "telefono"))
 			.andExpect(view().name("trabajadores/updateTrabajadorForm"));
 	}	
-	
+
 	@WithMockUser(value = "spring")
     @Test
     void testProcessDespedirTrabajadorSuccess() throws Exception {
@@ -130,6 +145,7 @@ public class TrabajadorControllerTests {
 						.andExpect(model().attribute("message", is("Trabajador despedido")));
 	}
 	
+
 
 
 }

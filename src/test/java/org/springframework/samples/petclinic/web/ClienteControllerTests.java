@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,7 @@ import org.springframework.samples.petclinic.model.Cliente;
 import org.springframework.samples.petclinic.model.EstadoReserva;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
+import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.ReservaService;
@@ -42,6 +44,8 @@ excludeAutoConfiguration= SecurityConfiguration.class)
 public class ClienteControllerTests {
 	
 	private static final int TEST_CLIENTE_ID = 1;
+	
+	private static final int TEST_RESERVA_ID = 1;
 
 	@Autowired
 	private ClienteController clienteController;
@@ -71,7 +75,11 @@ public class ClienteControllerTests {
 	
 	@BeforeEach
 	void setup() {
-
+		
+		User user = new User();
+		user.setUsername("Lucas99");
+		user.setPassword("Lucas99");
+		
 		lucas = new Cliente();
 		lucas.setId(TEST_CLIENTE_ID);
 		lucas.setNombre("Lucas");
@@ -79,40 +87,41 @@ public class ClienteControllerTests {
 		lucas.setDni("42562345H");
 		lucas.setEmail("lucas@gmail.com");
 		lucas.setTelefono("608555103");
+		lucas.setUser(user);
 		given(this.clienteService.findClienteById(TEST_CLIENTE_ID)).willReturn(lucas);
 
-//		estRes = new EstadoReserva();
-//		estRes.setId(1);
-//		estRes.setName("Solicitada");
-//		
-//		ruta = new Ruta();
-//		ruta.setDestinoCliente("Zahinos");
-//		ruta.setOrigenCliente("Badajoz");
-//		ruta.setId(1);
-//		ruta.setNumKmTotales(58.8);
-//		ruta.setHorasEstimadasCliente(10.);
-//		ruta.setHorasEstimadasTaxista(8.);
-//		
-//		reserva = new Reserva();
-//		reserva.setCliente(lucas);
-//		reserva.setDescripcionEquipaje("Maleta pequeña");
-//		reserva.setEstadoReserva(estRes);
-//		Date fechaLlegada = new Date(2021,3,3);
-//		reserva.setFechaLlegada(fechaLlegada);
-//		Date fechaSalida = new Date(2021,3,2);
-//		reserva.setFechaSalida(fechaSalida);
-//		Date horaLlegada = new Date(2021,3,3,19,30,00);
-//		reserva.setHoraLlegada(horaLlegada);
-//		Date horaSalida = new Date(2021,3,2,22,30,00);
-//		reserva.setHoraSalida(horaSalida);
-//		reserva.setHorasEspera(0.);
-//		reserva.setId(1);
-//		reserva.setPlazas_Ocupadas(5);
-//		reserva.setNumKmTotales(58.8);
-//		reserva.setPrecioTotal(39.5);
-//		reserva.setRuta(ruta);
-//		
-//		given(this.reservaService.findReservasByClienteId(TEST_CLIENTE_ID));
+		estRes = new EstadoReserva();
+		estRes.setId(1);
+		estRes.setName("Solicitada");
+		
+		ruta = new Ruta();
+		ruta.setDestinoCliente("Zahinos");
+		ruta.setOrigenCliente("Badajoz");
+		ruta.setId(1);
+		ruta.setNumKmTotales(58.8);
+		ruta.setHorasEstimadasCliente(10.);
+		ruta.setHorasEstimadasTaxista(8.);
+		
+		reserva = new Reserva();
+		reserva.setCliente(lucas);
+		reserva.setDescripcionEquipaje("Maleta pequeña");
+		reserva.setEstadoReserva(estRes);
+		Date fechaLlegada = new Date(2021,3,3);
+		reserva.setFechaLlegada(fechaLlegada);
+		Date fechaSalida = new Date(2021,3,2);
+		reserva.setFechaSalida(fechaSalida);
+		Date horaLlegada = new Date(2021,3,3,19,30,00);
+		reserva.setHoraLlegada(horaLlegada);
+		Date horaSalida = new Date(2021,3,2,22,30,00);
+		reserva.setHoraSalida(horaSalida);
+		reserva.setHorasEspera(0.);
+		reserva.setId(1);
+		reserva.setPlazas_Ocupadas(5);
+		reserva.setNumKmTotales(58.8);
+		reserva.setPrecioTotal(39.5);
+		reserva.setRuta(ruta);
+		
+		given(this.reservaService.findResById(TEST_RESERVA_ID)).willReturn(reserva);
 		
 	}
 	
@@ -235,14 +244,26 @@ void testInitUpdateClienteForm() throws Exception {
 			.andExpect(view().name("clientes/clienteDetails"));
     }
     
+    @WithMockUser(value = "spring")
+    @Test
+    void testShowReservas() throws Exception {
+		mockMvc.perform(get("/clientes/myReservas", TEST_CLIENTE_ID)).andExpect(status().isOk())
+			.andExpect(view().name("reservas/misReservas"));
+	}
+
+    @WithMockUser(value = "spring")
+    @Test
+    void testNoEncuentraReserva() throws Exception {
+		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}", TEST_RESERVA_ID)).andExpect(status().isOk())
+		.andExpect(model().attribute("error", is("Reserva no encontrada")));
+		
+	}
+    
 //    @WithMockUser(value = "spring")
 //    @Test
-//    void testShowReservas() throws Exception {
-//    	
-//		mockMvc.perform(get("/clientes/{clienteId}/myReservas", TEST_CLIENTE_ID)).andExpect(status().isOk())
-//		    .andExpect(model().attributeExists("cliente"))
-//		    .andExpect(model().attributeExists("reserva"))
-//			.andExpect(view().name("reservas/reservasList"));
+//    void testCancelarReserva() throws Exception {
+//		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}",4)).andExpect(status().isOk())
+//		.andExpect(model().attribute("message", is("Reserva cancelada correctamente")));
+//		
 //	}
-
 }

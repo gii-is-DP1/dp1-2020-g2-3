@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -41,8 +43,10 @@ import org.springframework.samples.petclinic.model.Tarifa;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.ReservaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
+import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
+import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
 import org.springframework.samples.petclinic.util.EntityUtils;
 import org.springframework.transaction.annotation.Transactional;
 import static org.mockito.Mockito.*;
@@ -95,15 +99,12 @@ class ReservaServiceMockedTests {
     	//ARRANGE
     	Double kmTotal=1057.4;
     	Double precioPorKm=0.41;
-    	Double precioTotalDistancia= kmTotal*precioPorKm;
-		Double precioTotalRedondeado=Math.round(precioTotalDistancia*100.0)/100.0;
+    	Double precioTotalDistancia= kmTotal*precioPorKm; //433.534
+		Double precioTotalRedondeado=433.53; //Aproximado a 2 decimales
 		//ACT & ASSERT
     	assertEquals(precioTotalRedondeado,reservaService.calcularPrecioDistancia(kmTotal, precioPorKm));
     }
-    
-
-    
-    
+   
     @Test
     @Transactional
     @DisplayName("Sumar minutos a una fecha")
@@ -352,6 +353,147 @@ class ReservaServiceMockedTests {
     	return reserva;
     }
     
-   
+
     
+    @Test
+	void calcularFactura(){
+    	//ARRANGE
+    	Integer porcentajeIvaRepercutido = 10;
+    	Double precioKm = 0.12;
+    	Double numKmTotales = 120.0;
+    	Double precioEsperaPorHora = 4.5;
+    	Double horasEspera = 0.0;
+    	
+    	Double precioTotal = precioKm * numKmTotales;
+    	
+    	Double ivaRepercutido = porcentajeIvaRepercutido * 0.01 * precioTotal;
+		Double precioDistancia = precioKm * numKmTotales;
+		Double precioExtraEspera = horasEspera * precioEsperaPorHora;
+		Double baseImponible = precioTotal - ivaRepercutido;
+		
+		Map<String, Double> res = new HashMap<String, Double>();
+		res.put("IVA Repercutido", utilService.aproximarNumero(ivaRepercutido));
+		res.put("Precio Distancia", utilService.aproximarNumero(precioDistancia));
+		res.put("Precio Extra Espera", utilService.aproximarNumero(precioExtraEspera));
+        res.put("Base Imponible", utilService.aproximarNumero(baseImponible));
+    
+    /*
+    	Reserva reserva1 = new Reserva();
+    	Tarifa tarifa1 = new Tarifa();
+    	
+    	tarifa1.setPorcentajeIvaRepercutido(porcentajeIvaRepercutido);
+    	tarifa1.setPrecioPorKm(precioKm);
+    	tarifa1.setPrecioEsperaPorHora(precioEsperaPorHora);
+    	
+    	reserva1.setTarifa(tarifa1);
+    	reserva1.setHorasEspera(horasEspera);
+    	reserva1.setPrecioTotal(precioTotal);
+    	*/
+        
+        Reserva reserva1 = reservaService.findReservaById(1).get();
+       
+           
+
+    	
+    	when(reservaRepository.findById(any())).thenReturn(Optional.of(reserva1));
+       
+        
+ 	
+
+		//ACT & ASSERT
+	assertNotEquals(res, reservaService.calcularFactura(1));
+		
+	}
+	
+		
+
+//    @Test
+//    @Transactional
+//    @DisplayName("Cancelar una reserva con estado Solicitada o Aceptada")
+//    void cancelarReservaSolicitadaAceptadaTest() {
+//    //ARRANGE	
+//    	Reserva reserva = new Reserva();
+//    	reserva.getEstadoReserva().equals("Solicitada");
+//    	
+//    	Reserva reserva2 = new Reserva();
+//    	reserva.getEstadoReserva().equals("Aceptada");
+//    
+//    //ACT
+//    	reserva = reservaService.cancelarReserva(reserva);
+//    }
+    
+    @Test
+    @Transactional
+    @DisplayName("Cancelar una reserva con estado Rechazada")
+    void cancelarReservaRechazadaTest() {
+      //ARRANGE	
+    	
+    	Reserva reserva = new Reserva();
+    	
+    	Date horaSalida= new Date(); 
+    	horaSalida.setHours(8);
+    	horaSalida.setMinutes(0);
+    	
+		Date fechaSalida= new Date();
+		fechaSalida.setDate(22);
+		fechaSalida.setMonth(3);
+		fechaSalida.setYear(2021);
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
+    	
+    	EstadoReserva estado = new EstadoReserva();
+    	estado.setId(3);
+    	estado.setName("Rechazada");
+    	reserva.setEstadoReserva(estado);
+    	reserva.setFechaSalida(fechaSalida);
+    	reserva.setHoraSalida(horaSalida);
+    	reserva.setPlazas_Ocupadas(3);
+    	
+      //ASSERT
+    	assertThrows(ReservaYaRechazada.class, ()->reservaService.cancelarReserva(reserva));
+    	
+    }
+    
+//    @Test
+//    @Transactional
+//    @DisplayName("Cancelar una reserva con fecha de salida con intervalo menor a 24 horas respecto a la actualidad")
+//    void cancelarReservaMenorIntervaloTest() {
+//    	//ARRANGE
+//    	
+//    	Ruta ruta= new Ruta(); 
+//    	Double numKmTotales=142.0;
+//    	ruta.setNumKmTotales(numKmTotales);
+//    	ruta.setHorasEstimadasCliente(1.0);
+//    	
+//    	Reserva reserva = new Reserva();
+//    	
+//    	Date horaSalida= new Date(); 
+//    	horaSalida.setHours(8);
+//    	horaSalida.setMinutes(0);
+//    	
+//		Date fechaSalida= new Date();
+//		fechaSalida.setDate(6);
+//		fechaSalida.setMonth(2);
+//		fechaSalida.setYear(2021);
+//		fechaSalida.setHours(horaSalida.getHours());
+//		fechaSalida.setMinutes(horaSalida.getMinutes());
+//    	
+//    	EstadoReserva estado = new EstadoReserva();
+//    	estado.setId(2);
+//    	estado.setName("Aceptada");
+//    	reserva.setEstadoReserva(estado);
+//    	reserva.setFechaSalida(fechaSalida);
+//    	reserva.setHoraSalida(horaSalida);
+//    	reserva.setPlazas_Ocupadas(3);
+//    	reserva.setRuta(ruta);
+//    	
+//    	//ASSERT
+//    	assertThrows(CancelacionViajeAntelacionException.class,()->reservaService.cancelarReserva(reserva));
+//    }
+    
+//    @Test
+//    @Transactional
+//    @DisplayName("Cancelar una reserva con fecha de salida anterior a la fecha actual")
+//    void cancelarReservaFechaSalidaAnteriorTest() {
+//    }
 }

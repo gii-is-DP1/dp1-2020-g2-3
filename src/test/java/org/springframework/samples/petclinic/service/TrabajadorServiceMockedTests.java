@@ -1,5 +1,7 @@
 package org.springframework.samples.petclinic.service;
 
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -76,6 +78,40 @@ class TrabajadorServiceMockedTests {
     	// ACT & ASSERT
        	assertThrows(FechaFinAnteriorInicioException.class,()->trabService.save(nuevoTrabajador));
     }
+    
+    @Test
+    @Transactional
+    @DisplayName("Trabajador creado correctamente")
+    public void trabajadorBienCreado() throws FechaFinAnteriorInicioException {
+    	//ARRANGE
+    	//ARRANGE
+    			User  nuevoUser = new User();
+    			nuevoUser.setUsername("nuevo1");
+    			nuevoUser.setPassword("nuevo1");
+    			TipoTrabajador   nuevoTipoTrabajador = new TipoTrabajador();
+    			nuevoTipoTrabajador.setName("NuevoTipo");
+    			tipotrabService.save(nuevoTipoTrabajador);
+    			Contrato nuevoContrato = new Contrato();
+    			nuevoContrato.setFechaInicio(Date.valueOf(LocalDate.of(2015, 2, 15)));
+    			nuevoContrato.setFechaFin(Date.valueOf(LocalDate.of(2015, 4, 15)));
+    			nuevoContrato.setSalarioMensual(1200.00);
+    			Trabajador nuevoTrabajador= new Trabajador();
+    			nuevoTrabajador.setNombre("Paco");
+    			nuevoTrabajador.setApellidos("Torres");
+    			nuevoTrabajador.setDni("23422432Q");
+    			nuevoTrabajador.setTelefono("995778443");
+    			nuevoTrabajador.setTipoTrabajador(nuevoTipoTrabajador);
+    			nuevoTrabajador.setUser(nuevoUser);
+    			nuevoTrabajador.setContrato(nuevoContrato);
+    			
+    
+    			
+    	// ACT & ASSERT
+    		assertDoesNotThrow(()->trabService.save(nuevoTrabajador),"fecha de fin es anterior a la de inicio, se lanza excepción");
+    }
+    
+    
+    
     
 
 	
