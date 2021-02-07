@@ -62,6 +62,13 @@ public class TrabajadorService {
 		}
 	}
 	
+	@Transactional
+	public void savePerfil(Trabajador trabajador) throws DataAccessException{
+		
+		trabRepo.save(trabajador);
+		userService.saveUser(trabajador.getUser());
+	}
+	
 
 	
 }
