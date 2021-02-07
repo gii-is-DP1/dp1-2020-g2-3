@@ -20,21 +20,21 @@ public class EstadoReservaService {
 
 	
 	@Transactional
-	public Iterable<EstadoReserva> findAll(){
+	public Iterable<EstadoReserva> findAll(){ //CRUD REPOSITORY
 		 return estadoRepo.findAll();
 	}
 	
 	@Transactional(readOnly = true)
-	public Optional<EstadoReserva> findEstadoById(int id) throws DataAccessException {
+	public Optional<EstadoReserva> findEstadoById(int id) throws DataAccessException {  //CRUD REPOSITORY
 		return estadoRepo.findById(id);
 	}
 	
 	@Transactional()
-	public void delete(EstadoReserva estado) throws DataAccessException  {
+	public void delete(EstadoReserva estado) throws DataAccessException  {  //CRUD REPOSITORY
 		estadoRepo.delete(estado);
 	}
 	@Transactional()
-	public void save(EstadoReserva estado)  {
+	public void save(EstadoReserva estado)  {  //CRUD REPOSITORY
 		
 		estadoRepo.save(estado);
 	}

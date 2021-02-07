@@ -76,14 +76,14 @@ public class ReservaService {
 		//precioPorKm realmente habría que buscarlo de la tarifa que se encuentre activa en este momento.
 		
 		Double precioTotal=kmTotal*precioPorKm;	
-		Double precioTotalRedondeado=Math.round(precioTotal*100.0)/100.0;
+		Double precioTotalRedondeado=utilService.aproximarNumero(precioTotal);
 		return precioTotalRedondeado;								
 		
 	}
 	@Transactional
 	public Map<String,Double> calcularFactura(int id){
 
-		Reserva reserva = reservaRepo.findById(id).get();
+		Reserva reserva = reservaRepo.findResById(id);
 		Map<String, Double> res = new HashMap<String, Double>();
 		res.put("IVA Repercutido", utilService.aproximarNumero(reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal()));
 		res.put("Precio Distancia", utilService.aproximarNumero(reserva.getTarifa().getPrecioPorKm() * reserva.getNumKmTotales()));
@@ -324,12 +324,13 @@ public class ReservaService {
 		Ruta rutaConstruida= trayectoService.calcularYAsignarTrayectos(reservaEditada.getRuta());
 		reservaEditada.setRuta(rutaConstruida);
 		System.out.println("Guardar ruta editada: " + rutaConstruida);
+		
 		reservaEditada= asignarRutaExistenteOCrearla(reservaEditada);
 		System.out.println(reservaEditada.getRuta());
 		reservaEditada.setTarifa(reservaBD.getTarifa());
 		BeanUtils.copyProperties(reservaEditada, reservaBD, "id");
 		save(reservaBD);
-		return reservaBD;
+		return reservaBD; 
 	}
 	@Transactional 
 	public Reserva calcularYConfirmarNuevaReserva(Reserva reserva,String username)throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException,HoraSalidaSinAntelacionException{
