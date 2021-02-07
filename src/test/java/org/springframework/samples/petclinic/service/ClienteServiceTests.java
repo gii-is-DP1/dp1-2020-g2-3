@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.petclinic.model.Cliente;
+import org.springframework.samples.petclinic.model.EstadoReserva;
 import org.springframework.samples.petclinic.model.Reserva;
+import org.springframework.samples.petclinic.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,16 +70,57 @@ public class ClienteServiceTests {
 		Cliente clienteActualizado=clienteService.findClienteById(1);
 		assertEquals(telefono,clienteActualizado.getTelefono());
 	}
-//	@Test
-//	@Transactional
-//	public void findReservaByIdTest() {	
-//		String username = "Pablo";
-//		
-//		Iterable<Reserva> reserva = reservaService.findReservasByUsername(username);
-//		Iterable<Reserva> reserva2 = reservaService.findReservasByUsername("Pedro");
-//		
-//		assertTh;
-//		assertNotEquals(reserva2, 1);
-//		assertNotNull(reserva);
-//	}
+	@Test
+	@Transactional
+	public void findReservaByIdTest() {	
+		//ARRANGE
+		User user = new User();
+		user.setUsername("Pablo33");
+		user.setPassword("Pablo33");
+		user.setEnabled(true);
+		
+		Cliente cliente = new Cliente();
+		cliente.setId(1);
+		cliente.setNombre("Lucas");
+		cliente.setApellidos("Perez");
+		cliente.setTelefono("608555103");
+		cliente.setUser(user);
+	
+		
+		Reserva reserva = new Reserva();
+    	
+    	Date horaSalida= new Date(); 
+    	horaSalida.setHours(8);
+    	horaSalida.setMinutes(0);
+    	
+		Date fechaSalida= new Date();
+		fechaSalida.setDate(22);
+		fechaSalida.setMonth(3);
+		fechaSalida.setYear(2021);
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
+    	
+    	EstadoReserva estado = new EstadoReserva();
+    	estado.setId(1);
+    	estado.setName("Solicitada");
+    	reserva.setId(1);
+    	reserva.setEstadoReserva(estado);
+    	reserva.setFechaSalida(fechaSalida);
+    	reserva.setHoraSalida(horaSalida);
+    	reserva.setPlazas_Ocupadas(3);
+		reserva.setCliente(cliente);
+		
+		//ACT
+		Reserva reserva1 = reservaService.findResById(1);
+		
+		//ASSERT
+		
+		assertEquals(user.getUsername(), "Pablo33");
+		assertEquals(reserva1.getId(), reserva.getId());
+		assertNotEquals(reserva1.getId(), 2);
+		assertTrue(reserva1.getEstadoReserva().getName().equals("Solicitada"));
+		
+		
+		
+	}
 }

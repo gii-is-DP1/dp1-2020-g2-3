@@ -30,9 +30,10 @@ import org.springframework.samples.petclinic.repository.RutaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
 import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasInsuficientesException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
-
+import org.springframework.samples.petclinic.service.exceptions.HoraSalidaSinAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
 import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
+import org.springframework.samples.petclinic.service.exceptions.ExisteViajeEnEsteHorarioException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
 import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
@@ -84,14 +85,15 @@ public class ReservaService {
 
 		Reserva reserva = reservaRepo.findById(id).get();
 		Map<String, Double> res = new HashMap<String, Double>();
-		res.put("IVA Repercutido", Math.round((reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal())*100.0)/100.0);
-		res.put("Precio Distancia", Math.round((reserva.getTarifa().getPrecioPorKm() * reserva.getNumKmTotales())*100.0)/100.0);
-		res.put("Precio Extra Espera", Math.round((reserva.getHorasEspera() * reserva.getTarifa().getPrecioEsperaPorHora())*100.0)/100.0);
-        res.put("Base Imponible", Math.round((reserva.getPrecioTotal() - (reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal()))*100.0)/100.0);
+		res.put("IVA Repercutido", utilService.aproximarNumero(reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal()));
+		res.put("Precio Distancia", utilService.aproximarNumero(reserva.getTarifa().getPrecioPorKm() * reserva.getNumKmTotales()));
+		res.put("Precio Extra Espera", utilService.aproximarNumero(reserva.getHorasEspera() * reserva.getTarifa().getPrecioEsperaPorHora()));
+        res.put("Base Imponible", utilService.aproximarNumero(reserva.getPrecioTotal() - (reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal())));
 		return res;
 		
 		
 	}
+	
 	@Transactional
 	public Date calcularFechaYHoraLlegada(Date fechaSalida, Date horaSalida, Double horasEstimadasCliente) {
 		int minutosSumar= (int)Math.round(horasEstimadasCliente*60); //Devolvemos un Date con la fecha y hora de llegada
@@ -104,7 +106,20 @@ public class ReservaService {
 		return fechaSalida;
 	}
 	
-
+	@Transactional
+	public void fechaSalidaSinAntelacion(Date fechaSalida, Date horaSalida) throws HoraSalidaSinAntelacionException{
+		Date today = new Date();
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
+		fechaSalida = utilService.addFecha(fechaSalida, Calendar.MINUTE, -40);
+		
+		if(fechaSalida.compareTo(today)<0) {
+			System.out.println("hora de salida con menos de 40 minutos de antelación, se lanza excepción");
+			throw new HoraSalidaSinAntelacionException();
+		}else {
+			System.out.println("la hora de salida tiene al menos 40 minutos de antelación, no se lanza excepción");
+		}
+	}
 
 	
 	@Transactional
@@ -122,6 +137,38 @@ public class ReservaService {
 		
 	}
 	
+	@Transactional
+	public void existeViajeEnEsteHorario(Date horaSalida, Date horaLlegada, Date fechaSalida, int trabajadorId) throws ExisteViajeEnEsteHorarioException{
+		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(trabajadorId);
+		
+		for (Reserva r: reservasTrabajador) {
+			Boolean cond1 = horaSalida.before(r.getHoraSalida()) && horaLlegada.before(r.getHoraSalida());
+			Boolean cond2 = horaSalida.after(r.getHoraSalida()) && horaLlegada.after(r.getHoraLlegada());
+			if((r.getFechaSalida().equals(fechaSalida)) && !(cond1 || cond2)){
+				System.out.println("El taxista ya tiene un viaje aceptado en ese periodo de tiempo.");
+				throw new ExisteViajeEnEsteHorarioException();
+			}else {
+				System.out.println("El taxista acepta el viaje.");
+			}
+		}
+	}
+	
+	//Comprueba si un taxista ya tiene una reserva aceptada en el horario en el que esta intentando aceptar otra reserva.
+	public boolean taxistaConViaje(int taxistaId, Reserva reserva) {
+		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(taxistaId);
+		boolean res = false;
+		for (Reserva r: reservasTrabajador) {
+			Date horaSalida = reserva.getHoraSalida();
+			Date horaLlegada = reserva.getHoraLlegada();
+			Boolean cond1 = horaSalida.before(r.getHoraSalida()) && horaLlegada.before(r.getHoraSalida());
+			Boolean cond2 = horaSalida.after(r.getHoraLlegada()) && horaLlegada.after(r.getHoraLlegada());
+			if((r.getFechaSalida().equals(reserva.getFechaSalida())) && !(cond1 || cond2)){
+				res = true;
+			}
+		}
+		return res;
+	}
+	
 	
 	@Transactional
 	public Iterable<Reserva> findAll(){
@@ -137,9 +184,10 @@ public class ReservaService {
 	public Optional<Reserva> findFacturaReservaById(int id) throws DataAccessException, EstadoReservaFacturaException {
 		Optional<Reserva> reserva = reservaRepo.findById(id);
 			if(reserva.get().getEstadoReserva().getName().equals("Completada")) {
-				System.out.println("La reserva ha sido completada, se muestra la factura");
+				log.info("La reserva ha sido completada, se muestra la factura");
 				return reserva;
 			}else {
+				log.error("Sólo se mostrarán aquellas reservas que estén completadas.");
 				throw new EstadoReservaFacturaException();
 			}
 		}
@@ -148,13 +196,13 @@ public class ReservaService {
 	
 	
 	@Transactional //Este método calculará el precio, la fecha/hora estimada de llegada, los km totales,ruta... de la reserva después del primer formulario de su creación
-	public Reserva calcularReservaAPartirDeRuta(Reserva reserva,boolean confirmarReserva,boolean nuevaReserva) throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException {
+	public Reserva calcularReservaAPartirDeRuta(Reserva reserva,boolean confirmarReserva,boolean nuevaReserva) throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException,HoraSalidaSinAntelacionException {
 		
 		//Si confirmarReserva= false solo se calcularán los campos estrictamente necesarios para mostrar la reserva en el formulario
 		
 		if(nuevaReserva) { //si el cliente calcula la reserva se comprueba la restricción de la fecha
 			fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha
-
+			fechaSalidaSinAntelacion(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar antelación
 		}
 
 		Ruta nuevaRuta= trayectoService.calcularYAsignarTrayectos(reserva.getRuta());
@@ -284,7 +332,7 @@ public class ReservaService {
 		return reservaBD;
 	}
 	@Transactional 
-	public Reserva calcularYConfirmarNuevaReserva(Reserva reserva,String username)throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException{
+	public Reserva calcularYConfirmarNuevaReserva(Reserva reserva,String username)throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException,HoraSalidaSinAntelacionException{
 		
 		Reserva reservaCalculada= calcularReservaAPartirDeRuta(reserva,true,true);
 		Set<String> authorities= authoService.findAuthoritiesByUsername(username);
@@ -298,6 +346,18 @@ public class ReservaService {
 		}
 		this.save(reservaCalculada);
 		return reservaCalculada;
+	}
+	
+	@Transactional
+	public Double calcularIngresos(Date fecha1, Date fecha2) {
+		Collection<Reserva> reservas = reservaRepo.findByEstadoReservaCompletadaOAceptada();
+		Double ingresos = 0.0;
+		for(Reserva r:reservas) {
+			if(r.getFechaSalida().after(fecha1) && r.getFechaSalida().before(fecha2)) {
+				ingresos = ingresos + r.getPrecioTotal();
+			}
+		}
+		return ingresos;
 	}
 	
 	
@@ -323,7 +383,7 @@ public class ReservaService {
 		
 	}
 	@Transactional
-	public void aceptarReserva(Reserva reserva,Automovil auto,Principal p) throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException {
+	public void aceptarReserva(Reserva reserva,Automovil auto,Principal p) throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException,ExisteViajeEnEsteHorarioException {
 	
 		if(!reserva.getEstadoReserva().getName().equals("Solicitada")) {
 			throw new ParadaYaAceptadaRechazadaException();
@@ -333,8 +393,9 @@ public class ReservaService {
 			
 			if(auto.getNumPlazas()-1<reserva.getPlazas_Ocupadas()){
 				throw new AutomovilPlazasInsuficientesException();
-			} //Añadir con else if las comprobaciones de las RN-02 Automóvil en uso  y RN-04- Rechazar viajes en un mismo horario
-			else {
+			}else if(taxistaConViaje(trabajador.getId(),reserva)){
+				throw new ExisteViajeEnEsteHorarioException();			
+			}else {//Añadir con else if las comprobaciones de las RN-02 Automóvil en uso
 				
 				
 				EstadoReserva estadoReserva=estadoService.findEstadoById(2).get(); //Estado 2= Aceptada
@@ -419,7 +480,10 @@ public class ReservaService {
 
     }
 	
-	
+	@Transactional(readOnly = true)
+	public Reserva findResById(int id) throws DataAccessException {
+		return reservaRepo.findResById(id);
+	}
 	
 
 	
