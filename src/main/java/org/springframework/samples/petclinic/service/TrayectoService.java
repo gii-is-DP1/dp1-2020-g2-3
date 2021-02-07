@@ -128,33 +128,33 @@ public class TrayectoService {
 	
 	
 	@Transactional 
-	public Trayecto findByOrigenAndDestino(String origen,String destino) {
+	public Trayecto findByOrigenAndDestino(String origen,String destino) { //CUSTOM QUERY
 		return trayectoRepo.findByOrigenAndDestino(origen, destino);
 	}
 	
 	@Transactional
-	public Iterable<Trayecto> findAll(){
+	public Iterable<Trayecto> findAll(){ //MÉTODO DE CRUD REPOSITORY
 		 return trayectoRepo.findAll();
 	}
 	
 	@Transactional()
-	public Iterable<String> findDistinctParadas(){
+	public Iterable<String> findDistinctParadas(){ //CUSTOM QUERY
 		return trayectoRepo.findDistinctParadas();
 		
 	}
 
 
 	@Transactional(readOnly = true)
-	public Optional<Trayecto> findTrayectoById(int id) throws DataAccessException {
+	public Optional<Trayecto> findTrayectoById(int id) throws DataAccessException { //Método de CRUD REPOSITORY
 		return trayectoRepo.findById(id);
 	}
 	
 	@Transactional()
-	public void delete(Trayecto trayecto) throws DataAccessException  {
+	public void delete(Trayecto trayecto) throws DataAccessException  { //MÉTODO DE CRUD REPOSITORY
 			trayectoRepo.delete(trayecto);
 	}
 	@Transactional()
-	public void save(Trayecto trayecto)  {
+	public void save(Trayecto trayecto)  { //MÉTODO DE CRUD REPOSITORY
 		
 		trayectoRepo.save(trayecto);
 	}

@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -41,8 +44,10 @@ import org.springframework.samples.petclinic.model.Tarifa;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.ReservaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
+import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
+import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
 import org.springframework.samples.petclinic.util.EntityUtils;
 import org.springframework.transaction.annotation.Transactional;
 import static org.mockito.Mockito.*;
@@ -52,8 +57,6 @@ import aj.org.objectweb.asm.ClassTooLargeException;
 
 @ExtendWith(MockitoExtension.class)
 class ReservaServiceMockedTests {
-
- 
     
     @Mock
     private ReservaRepository reservaRepository;
@@ -79,7 +82,8 @@ class ReservaServiceMockedTests {
     private AuthoritiesService authoService;
     @Spy
     private UtilService utilService= new UtilService();
-
+    
+    @InjectMocks
     protected ReservaService reservaService;
 
     @BeforeEach
@@ -95,15 +99,12 @@ class ReservaServiceMockedTests {
     	//ARRANGE
     	Double kmTotal=1057.4;
     	Double precioPorKm=0.41;
-    	Double precioTotalDistancia= kmTotal*precioPorKm;
-		Double precioTotalRedondeado=Math.round(precioTotalDistancia*100.0)/100.0;
+    	Double precioTotalDistancia= kmTotal*precioPorKm; //433.534
+		Double precioTotalRedondeado=433.53; //Aproximado a 2 decimales
 		//ACT & ASSERT
     	assertEquals(precioTotalRedondeado,reservaService.calcularPrecioDistancia(kmTotal, precioPorKm));
     }
-    
-
-    
-    
+   
     @Test
     @Transactional
     @DisplayName("Sumar minutos a una fecha")
@@ -352,6 +353,95 @@ class ReservaServiceMockedTests {
     	return reserva;
     }
     
-   
+	
+
+//    @Test
+//    @Transactional
+//    @DisplayName("Cancelar una reserva con estado Solicitada o Aceptada")
+//    void cancelarReservaSolicitadaAceptadaTest() {
+//    //ARRANGE	
+//    	Reserva reserva = new Reserva();
+//    	reserva.getEstadoReserva().equals("Solicitada");
+//    	
+//    	Reserva reserva2 = new Reserva();
+//    	reserva.getEstadoReserva().equals("Aceptada");
+//    
+//    //ACT
+//    	reserva = reservaService.cancelarReserva(reserva);
+//    }
     
+    @Test
+    @Transactional
+    @DisplayName("Cancelar una reserva con estado Rechazada")
+    void cancelarReservaRechazadaTest() {
+      //ARRANGE	
+    	
+    	Reserva reserva = new Reserva();
+    	
+    	Date horaSalida= new Date(); 
+    	horaSalida.setHours(8);
+    	horaSalida.setMinutes(0);
+    	
+		Date fechaSalida= new Date();
+		fechaSalida.setDate(22);
+		fechaSalida.setMonth(3);
+		fechaSalida.setYear(2021);
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
+    	
+    	EstadoReserva estado = new EstadoReserva();
+    	estado.setId(3);
+    	estado.setName("Rechazada");
+    	reserva.setEstadoReserva(estado);
+    	reserva.setFechaSalida(fechaSalida);
+    	reserva.setHoraSalida(horaSalida);
+    	reserva.setPlazas_Ocupadas(3);
+    	
+      //ASSERT
+    	assertThrows(ReservaYaRechazada.class, ()->reservaService.cancelarReserva(reserva));
+    	
+    }
+    
+//    @Test
+//    @Transactional
+//    @DisplayName("Cancelar una reserva con fecha de salida con intervalo menor a 24 horas respecto a la actualidad")
+//    void cancelarReservaMenorIntervaloTest() {
+//    	//ARRANGE
+//    	
+//    	Ruta ruta= new Ruta(); 
+//    	Double numKmTotales=142.0;
+//    	ruta.setNumKmTotales(numKmTotales);
+//    	ruta.setHorasEstimadasCliente(1.0);
+//    	
+//    	Reserva reserva = new Reserva();
+//    	
+//    	Date horaSalida= new Date(); 
+//    	horaSalida.setHours(8);
+//    	horaSalida.setMinutes(0);
+//    	
+//		Date fechaSalida= new Date();
+//		fechaSalida.setDate(6);
+//		fechaSalida.setMonth(2);
+//		fechaSalida.setYear(2021);
+//		fechaSalida.setHours(horaSalida.getHours());
+//		fechaSalida.setMinutes(horaSalida.getMinutes());
+//    	
+//    	EstadoReserva estado = new EstadoReserva();
+//    	estado.setId(2);
+//    	estado.setName("Aceptada");
+//    	reserva.setEstadoReserva(estado);
+//    	reserva.setFechaSalida(fechaSalida);
+//    	reserva.setHoraSalida(horaSalida);
+//    	reserva.setPlazas_Ocupadas(3);
+//    	reserva.setRuta(ruta);
+//    	
+//    	//ASSERT
+//    	assertThrows(CancelacionViajeAntelacionException.class,()->reservaService.cancelarReserva(reserva));
+//    }
+    
+//    @Test
+//    @Transactional
+//    @DisplayName("Cancelar una reserva con fecha de salida anterior a la fecha actual")
+//    void cancelarReservaFechaSalidaAnteriorTest() {
+//    }
 }

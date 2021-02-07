@@ -1,5 +1,7 @@
 package org.springframework.samples.petclinic.web;
 
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -8,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
 import org.springframework.samples.petclinic.model.Trabajador;
+import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.service.TipoTrabajadorService;
 import org.springframework.samples.petclinic.service.TrabajadorService;
+import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,16 +42,25 @@ public class TrabajadorControllerTests {
 	
 	@MockBean
 	private TipoTrabajadorService tipoTrabajadorService;
-
+	
+	@MockBean
+	private UserService userService;
 
 	@Autowired
 	private MockMvc mockMvc;
 	
 	private Trabajador charles;
+	private User usuario;
+	
 
 	@BeforeEach
 	void setup() {
+		
 
+		usuario = new User();
+		usuario.setUsername("usuario");
+		usuario.setPassword("usuario");
+		usuario.setEnabled(true);
 		charles = new Trabajador();
 		charles.setId(TEST_TRABAJADOR_ID);
 		charles.setDni("41234567L");
@@ -56,6 +68,7 @@ public class TrabajadorControllerTests {
 		charles.setApellidos("Pérez García");
 		charles.setEmail("charles@gmail.es");
 		charles.setTelefono("608555102");
+		charles.setUser(usuario);
 		given(this.trabajadorService.findById(TEST_TRABAJADOR_ID)).willReturn(charles);
 
 	}
@@ -69,6 +82,9 @@ public class TrabajadorControllerTests {
 				.andExpect(view().name("trabajadores/trabajadoresList"));
 	}
 	
+	
+	
+	
 	@WithMockUser(value = "spring")
     @Test
     void testProcessFindFormSuccess() throws Exception {
@@ -77,12 +93,19 @@ public class TrabajadorControllerTests {
 	mockMvc.perform(get("/trabajadores/trabajadoresList")).andExpect(status().isOk()).andExpect(view().name("trabajadores/trabajadoresList"));
 }
 	
+	
+	
+	
+	
 	@WithMockUser(value = "spring")
     @Test
     void testInitCreationForm() throws Exception {
 		mockMvc.perform(get("/trabajadores/new")).andExpect(status().isOk()).andExpect(model().attributeExists("trabajadores"))
 				.andExpect(view().name("trabajadores/updateTrabajadorForm"));
 	}
+	
+	
+	
 	
 	@WithMockUser(value = "spring")
     @Test
@@ -94,6 +117,10 @@ public class TrabajadorControllerTests {
 							.param("telefono", "672823123"))
 				.andExpect(status().isOk());
 	}
+	
+	
+	
+	
 	
 	@WithMockUser(value = "spring")
     @Test
@@ -109,6 +136,16 @@ public class TrabajadorControllerTests {
 			.andExpect(model().attributeHasFieldErrors("trabajador", "telefono"))
 			.andExpect(view().name("trabajadores/updateTrabajadorForm"));
 	}	
+
+	@WithMockUser(value = "spring")
+    @Test
+    void testProcessDespedirTrabajadorSuccess() throws Exception {
+		mockMvc.perform(get("/trabajadores/despedir/{trabajadorId}",TEST_TRABAJADOR_ID))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("message", is("Trabajador despedido")));
+	}
 	
+
+
 
 }

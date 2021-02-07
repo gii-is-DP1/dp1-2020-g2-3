@@ -26,45 +26,25 @@ public class ServicioServiceTest {
 	@Test
 	public void findByIdTest() {
 		
-		Optional<Servicio> servicio= servicioService.findServicioById(1);
-		assertEquals(servicio.get().getId(),1);
+		Servicio servicio= servicioService.findServicioById(1);
+		assertEquals(servicio.getId(),1);
 	}
-	
-	
-	
-	
-	
-	
-	@Test
-	@Transactional
-	public void deleteServicio() {
-		
-		Long numServicios=servicioService.servicioCount();
-		Optional<Servicio> servicio= servicioService.findServicioById(2); //borrar un automóvil no usado en ningún serivico o viaje
-		servicioService.delete(servicio.get());
-		Optional<Servicio> servicio2= servicioService.findServicioById(2);
-		Long numServicios2=servicioService.servicioCount();
-		assertEquals (servicio2.isPresent(),false);
-		assertEquals(numServicios2,numServicios-1 );
-	}
-	
-	
 	
 	
 	@Test
 	@Transactional
 	public void editTest() {
 		
-		Optional<Servicio> servicio= servicioService.findServicioById(1);
+		Servicio servicio= servicioService.findServicioById(1);
 		
 		
-		Double nuevPrecio= 100.00;
-		servicio.get().setPrecio(nuevPrecio);
-		servicioService.save(servicio.get());
+		Double nuevoPrecio= 100.00;
+		servicio.setPrecio(nuevoPrecio);
+		servicioService.save(servicio);
 		
-		Optional<Servicio> servicioActualizado= servicioService.findServicioById(1);
+		Servicio servicioActualizado= servicioService.findServicioById(1);
 		
-		assertEquals (servicio.get().getPrecio(),servicioActualizado.get().getPrecio());
+		assertEquals (servicio.getPrecio(),servicioActualizado.getPrecio());
 	}
 	
 }

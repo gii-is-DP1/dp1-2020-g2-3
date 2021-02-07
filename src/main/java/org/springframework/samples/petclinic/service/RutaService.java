@@ -13,9 +13,13 @@ import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.RutaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
+import org.springframework.samples.petclinic.web.ReservaController;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class RutaService {
 
@@ -29,19 +33,19 @@ public class RutaService {
 	}
 	
 	@Transactional
-	public Iterable<Ruta> findAll(){
+	public Iterable<Ruta> findAll(){ //Método de CRUD Repository 
 		 return rutaRepo.findAll();
 	}
 	
 	
 	@Transactional()
-	public Optional<Ruta> findRutaByRuta(Ruta ruta){//Nos intentará devolver una ruta existente en la BD igual que la dada como parámetro 
-													// comparando también sus TRAYECTOS asociados (Relación ManyToMany)
+	public Optional<Ruta> findRutaByRuta(Ruta ruta){//Retorna una ruta  de la BD (si existe) igual que la dada como parámetro
+													// comparando también sus TRAYECTOS asociados (Relación ManyToMany), la ruta dada como parámetro no tiene id
 		List<Trayecto> trayectosRutaParametro= ruta.getTrayectos();
-		Collection<Ruta> rutasPosibles=findRutasByAttributes(ruta.getOrigenCliente(),ruta.getDestinoCliente(),ruta.getNumKmTotales(),ruta.getHorasEstimadasCliente(),ruta.getHorasEstimadasTaxista());
+		Collection<Ruta> rutasPosibles=this.findRutasByAttributes(ruta.getOrigenCliente(),ruta.getDestinoCliente(),ruta.getNumKmTotales(),ruta.getHorasEstimadasCliente(),ruta.getHorasEstimadasTaxista());
 		Optional<Ruta> resultado= Optional.ofNullable(null);
+	if(rutasPosibles!=null && rutasPosibles.size()!=0) {
 		
-	if(rutasPosibles.size()!=0 && rutasPosibles!=null) {
 			//Comprobamos si los trayectos de alguna de esas rutas candidatas coinciden con los trayectos de nuestra ruta
 			boolean rutaEncontrada=false;
 		for(Ruta r:rutasPosibles) {
@@ -49,11 +53,12 @@ public class RutaService {
 				if(trayectosPosibleRuta.size()==trayectosRutaParametro.size()) {
 					boolean coincidenTodosLosTrayectos=true;
 					int i=0;
-					while(i<trayectosPosibleRuta.size() && coincidenTodosLosTrayectos) { //Si hay algún trayecto que NO coincide la siguiente iteración
+					while(i<trayectosPosibleRuta.size()) { //Si hay algún trayecto que NO coincide la siguiente iteración
 						Trayecto trayectoParametro=trayectosRutaParametro.get(i);			// del bucle no se ejecuta  y se pasa a la siguiente Ruta
 						Trayecto trayectoPosibleRuta= trayectosPosibleRuta.get(i);
 						
-							if(!trayectoParametro.equals(trayectoPosibleRuta)) {
+
+							if(!trayectoParametro.equals(trayectoPosibleRuta)) { //Necesario porque puede ocurrir que ambas rutas tengan el mismo número de trayectos pero no sean iguales...
 								coincidenTodosLosTrayectos=false;
 								break;
 							}
@@ -68,6 +73,7 @@ public class RutaService {
 					}
 			}	
 		}
+	
 		return resultado;	
 	}
 	
@@ -120,16 +126,16 @@ public class RutaService {
 		return trayectosIntermedios;
 	}
 	@Transactional(readOnly = true)
-	public Optional<Ruta> findRutaById(int id) throws DataAccessException {
+	public Optional<Ruta> findRutaById(int id) throws DataAccessException { //Método de CRUD Repository 
 		return rutaRepo.findById(id);
 	}
 	
 	@Transactional()
-	public void delete(Ruta ruta) throws DataAccessException  {
+	public void delete(Ruta ruta) throws DataAccessException  { //Método de CRUD Repository 
 			rutaRepo.delete(ruta);
 	}
 	@Transactional()
-	public void save(Ruta ruta)  {
+	public void save(Ruta ruta)  { //Método de CRUD Repository 
 		
 		rutaRepo.save(ruta);
 	}

@@ -67,7 +67,7 @@
                 </td>
                 
                 <td>
-                 <spring:url value="/reservas/reservaFactura/{reservaId}" var="reservaFacturaEditUrl">
+                 <spring:url value="/reservas/reservaMiFactura/{reservaId}" var="reservaFacturaEditUrl">
                    <spring:param name="reservaId" value="${reserva.id}"/>                  
                 </spring:url>
                   <a class="editFacturaReserva" href="${fn:escapeXml(reservaFacturaEditUrl)}"> Ver</a>
