@@ -99,15 +99,12 @@ class ReservaServiceMockedTests {
     	//ARRANGE
     	Double kmTotal=1057.4;
     	Double precioPorKm=0.41;
-    	Double precioTotalDistancia= kmTotal*precioPorKm;
-		Double precioTotalRedondeado=Math.round(precioTotalDistancia*100.0)/100.0;
+    	Double precioTotalDistancia= kmTotal*precioPorKm; //433.534
+		Double precioTotalRedondeado=433.53; //Aproximado a 2 decimales
 		//ACT & ASSERT
     	assertEquals(precioTotalRedondeado,reservaService.calcularPrecioDistancia(kmTotal, precioPorKm));
     }
-    
-
-    
-    
+   
     @Test
     @Transactional
     @DisplayName("Sumar minutos a una fecha")

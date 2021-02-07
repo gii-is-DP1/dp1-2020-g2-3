@@ -76,7 +76,7 @@ public class ReservaService {
 		//precioPorKm realmente habría que buscarlo de la tarifa que se encuentre activa en este momento.
 		
 		Double precioTotal=kmTotal*precioPorKm;	
-		Double precioTotalRedondeado=Math.round(precioTotal*100.0)/100.0;
+		Double precioTotalRedondeado=utilService.aproximarNumero(precioTotal);
 		return precioTotalRedondeado;								
 		
 	}
