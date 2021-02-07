@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.service;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -34,9 +35,14 @@ import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnte
 import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
+import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
+import org.springframework.samples.petclinic.service.exceptions.ReservasSoliAceptException;
+import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class ReservaService {
 	//Repositorio
@@ -343,10 +349,6 @@ public class ReservaService {
 		
 		
 	}
-	@Transactional
-	public Collection<Reserva> findReservasByClienteId(int id) throws DataAccessException {
-	return reservaRepo.findReservasByClienteId(id);
-	}
 	
 	@Transactional
 	public void delete(Reserva reserva) throws DataAccessException  {
@@ -359,7 +361,64 @@ public class ReservaService {
 		reservaRepo.save(reserva);
 	}
 
+	@Transactional
+	public Iterable<Reserva> findReservasByUsername(String username) throws DataAccessException {
+		 return reservaRepo.findReservasByUsername(username);
 		
+	}
+	
+//	@Transactional
+//	public void cancelarReserva(Reserva reserva) throws DataAccessException, CancelacionViajeAntelacionException, ReservasSoliAceptException {
+//		
+//		Date today = new Date();
+//		Date fechaSalida = reserva.getFechaSalida();
+//		Date horaSalida = reserva.getHoraSalida();
+//		fechaSalida.setHours(horaSalida.getHours());
+//		fechaSalida.setMinutes(horaSalida.getMinutes());
+//		if(reserva.getEstadoReserva().getName().equals("Solicitada")) {
+//			EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
+//			reserva.setEstadoReserva(estadoReserva);
+//			save(reserva);
+//		}else if(reserva.getEstadoReserva().getName().equals("Aceptada")) {
+//			if(fechaSalida.compareTo(today) < fechaSalida.getHours() + 24) {
+//				throw new CancelacionViajeAntelacionException();
+//			}else{
+//				EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); 
+//				reserva.setEstadoReserva(estadoReserva);
+//				save(reserva);	
+//			}
+//		}else {
+//			throw new ReservasSoliAceptException();
+//		}
+//	}
+	
+	
+	
+	@Transactional
+    public void cancelarReserva(Reserva reserva) throws DataAccessException, ReservaYaRechazada, CancelacionViajeAntelacionException {
+	
+		Date today = new Date();
+
+		Date fechaSalida= new Date();
+		fechaSalida.setDate(reserva.getFechaSalida().getDate());
+		fechaSalida.setMonth(reserva.getFechaSalida().getMonth());
+		fechaSalida.setYear(reserva.getFechaSalida().getYear());
+		fechaSalida.setHours(reserva.getHoraSalida().getHours());
+		fechaSalida.setMinutes(reserva.getHoraSalida().getMinutes());
+		Date fechaAux = utilService.addFecha(fechaSalida, Calendar.HOUR_OF_DAY, -24); //REstamos 24 horas
+        if(!(reserva.getEstadoReserva().getName().equals("Solicitada") || reserva.getEstadoReserva().getName().equals("Aceptada"))) {
+        	log.error("El estado de la reserva tiene que ser 'Solicitada' o 'Aceptada' para poder cancelarla");
+        	throw new ReservaYaRechazada();
+        }else if(today.compareTo(fechaAux)>0) {
+        	log.error("La reserva tiene una fecha de salida con un intervalo de tiempo menor a 24 horas desde la actualidad o es anterior a la fecha actual, por lo que no puede ser cancelada");
+        	throw new CancelacionViajeAntelacionException();
+        }else {
+        	
+            reserva.setEstadoReserva(estadoService.findEstadoById(3).get());
+            reservaRepo.save(reserva);
+        }
+
+    }
 	
 	
 	

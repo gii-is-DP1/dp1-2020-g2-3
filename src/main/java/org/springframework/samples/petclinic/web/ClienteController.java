@@ -1,19 +1,26 @@
 package org.springframework.samples.petclinic.web;
 
+import java.security.Principal;
 import java.util.Collection;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Cliente;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.UserService;
+import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
+import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
+import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
+import org.springframework.samples.petclinic.service.exceptions.ReservasSoliAceptException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -25,6 +32,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Controller
 public class ClienteController {
 
@@ -136,12 +145,37 @@ public class ClienteController {
 		return mav;
 	}
 	
-	@GetMapping("/clientes/{clienteId}/myReservas")
-	public String showReservas(@PathVariable("clienteId") int clienteId, ModelMap model) {
-		Collection<Reserva> reservas = this.reservaService.findReservasByClienteId(clienteId); 
-		Cliente cliente = this.clienteService.findClienteById(clienteId);
-		model.addAttribute("reserva", reservas);
-		model.addAttribute("cliente", cliente);
-		return "reservas/reservasList";
+	@GetMapping("/clientes/myReservas")
+	public String showReservas(ModelMap modelMap, Principal p) {
+		String username = p.getName();
+		String vista="reservas/misReservas";
+		Iterable<Reserva> reservas= reservaService.findReservasByUsername(username);
+		modelMap.addAttribute("reservas", reservas);
+		log.info("Mostrando su lista de reservas");
+		return vista;
 	}
-}
+	
+	@GetMapping(value= "/clientes/myReservas/cancelar/{reservaId}")
+	public String cancelarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap, Principal p) throws DataAccessException, ReservaYaRechazada{
+		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
+		if(!reservaOptional.isPresent()) {
+			modelMap.addAttribute("error", "Reserva no encontrada");
+			return showReservas(modelMap,p);
+		}else {
+			try {
+				reservaService.cancelarReserva(reservaOptional.get());
+				modelMap.addAttribute("message", "Reserva cancelada correctamente");
+				log.info("La reserva ha sido cancelada con éxito");
+				return showReservas(modelMap, p);
+			}catch(CancelacionViajeAntelacionException e) {
+				modelMap.addAttribute("error", "No puedes cancelar una reserva con una antelación menor a 24 horas a la fecha de salida, ni después de dicha fecha");
+				return showReservas(modelMap, p);
+			}catch(ReservaYaRechazada e) {
+				modelMap.addAttribute("error", "No puedes cancelar una reserva que no tenga un estado Solicitada o Aceptada");
+				return showReservas(modelMap, p);
+			}
+		}
+		}
+	}
+	
+
