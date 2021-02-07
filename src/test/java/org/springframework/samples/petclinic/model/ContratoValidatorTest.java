@@ -85,23 +85,6 @@ class ContratoValidatorTest {
 	
 
 
-	@Test
-	void shouldNotValidateWhenFechaInicioPatternIsWrong() {
 
-		Contrato contrato = new Contrato();
-		Date fechaInicio = new Date();
-		Date fechaFin = new Date();
-		contrato.setSalarioMensual(null);
-		contrato.setFechaInicio(fechaInicio);
-		contrato.setFechaFin(fechaFin);
-
-		Validator validator = createValidator();
-		Set<ConstraintViolation<Contrato>> constraintViolations = validator.validate(contrato);
-
-		assertThat(constraintViolations.size()).isEqualTo(1);
-		ConstraintViolation<Contrato> violation = constraintViolations.iterator().next();
-		assertThat(violation.getPropertyPath().toString()).isEqualTo("fechaInicio");
-		assertThat(violation.getMessage()).isEqualTo("tiene que corresponder a la expresión regular \"[0-9]{8}[A-Za-z]{1}\"");
-	}
 
 }

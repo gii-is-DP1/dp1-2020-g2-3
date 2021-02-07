@@ -77,24 +77,5 @@ class ServicioValidatorTest {
 		assertThat(violation.getPropertyPath().toString()).isEqualTo("descripcion");
 		assertThat(violation.getMessage()).isEqualTo("no puede estar vacío");
 	}
-/*	
-	@Test
-	void shouldNotValidateWhenFechaPatternIsWrong() {
 
-		Servicio servicio = new Servicio();
-		Date fecha = new Date();
-		fecha.toLocaleString()
-		servicio.setFecha(fecha);
-		servicio.setPrecio(null);
-		servicio.setDescripcion("luna rota");
-
-		Validator validator = createValidator();
-		Set<ConstraintViolation<Person>> constraintViolations = validator.validate(person);
-
-		assertThat(constraintViolations.size()).isEqualTo(1);
-		ConstraintViolation<Person> violation = constraintViolations.iterator().next();
-		assertThat(violation.getPropertyPath().toString()).isEqualTo("dni");
-		assertThat(violation.getMessage()).isEqualTo("tiene que corresponder a la expresión regular \"[0-9]{8}[A-Za-z]{1}\"");
-	}
-*/
 }
