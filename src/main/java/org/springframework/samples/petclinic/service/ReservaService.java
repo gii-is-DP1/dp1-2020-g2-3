@@ -83,7 +83,7 @@ public class ReservaService {
 	@Transactional
 	public Map<String,Double> calcularFactura(int id){
 
-		Reserva reserva = reservaRepo.findById(id).get();
+		Reserva reserva = reservaRepo.findResById(id);
 		Map<String, Double> res = new HashMap<String, Double>();
 		res.put("IVA Repercutido", utilService.aproximarNumero(reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal()));
 		res.put("Precio Distancia", utilService.aproximarNumero(reserva.getTarifa().getPrecioPorKm() * reserva.getNumKmTotales()));

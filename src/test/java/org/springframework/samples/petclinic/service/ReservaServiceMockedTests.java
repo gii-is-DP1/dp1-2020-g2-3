@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -81,7 +82,8 @@ class ReservaServiceMockedTests {
     private AuthoritiesService authoService;
     @Spy
     private UtilService utilService= new UtilService();
-
+    
+    @InjectMocks
     protected ReservaService reservaService;
 
     @BeforeEach
@@ -354,84 +356,7 @@ class ReservaServiceMockedTests {
     	return reserva;
     }
     
-
-    /*
-    @Test
-	void calcularFactura(){
-    	//ARRANGE
-    	Integer porcentajeIvaRepercutido = 10;
-    	Double precioKm = 0.12;
-    	Double numKmTotales = 120.0;
-    	Double precioEsperaPorHora = 4.5;
-    	Double horasEspera = 0.0;
-    	
-    	Double precioTotal = precioKm * numKmTotales;
-    	
-    	Double ivaRepercutido = porcentajeIvaRepercutido * 0.01 * precioTotal;
-		Double precioDistancia = precioKm * numKmTotales;
-		Double precioExtraEspera = horasEspera * precioEsperaPorHora;
-		Double baseImponible = precioTotal - ivaRepercutido;
-		
-		Map<String, Double> res = new HashMap<String, Double>();
-		res.put("IVA Repercutido", utilService.aproximarNumero(ivaRepercutido));
-		res.put("Precio Distancia", utilService.aproximarNumero(precioDistancia));
-		res.put("Precio Extra Espera", utilService.aproximarNumero(precioExtraEspera));
-        res.put("Base Imponible", utilService.aproximarNumero(baseImponible));
-    
-        
-    	Reserva reserva1 = new Reserva();
-    	Cliente cliente1 = new Cliente();
-    	EstadoReserva estadoReserva1 = new EstadoReserva();
-    	estadoReserva1.setName("Completada");
-    	Tarifa tarifa1 = new Tarifa();
-    	
-     	Date horaSalida= new Date(); 
-    	horaSalida.setHours(8);
-    	horaSalida.setMinutes(0);
-    	
-    	Date horaLlegada= new Date(); 
-    	horaSalida.setHours(9);
-    	horaSalida.setMinutes(0);
-    	
-    	Date fechaSalida= new Date();
-		fechaSalida.setDate(6);
-		fechaSalida.setMonth(2);
-		fechaSalida.setYear(2021);
-		fechaSalida.setHours(horaSalida.getHours());
-		fechaSalida.setMinutes(horaSalida.getMinutes());
-		
-		Date fechaLlegada= new Date();
-		fechaLlegada.setDate(6);
-		fechaLlegada.setMonth(2);
-		fechaLlegada.setYear(2021);
-		fechaLlegada.setHours(horaLlegada.getHours());
-		fechaLlegada.setMinutes(horaLlegada.getMinutes());
-		
-    	Ruta ruta1 = new Ruta();
-    	reserva1.setId(5);
-    	reserva1.setCliente(cliente1);
-    	reserva1.setRuta(ruta1);
-    	reserva1.setFechaSalida(fechaSalida);
-    	reserva1.setHoraSalida(horaSalida);
-    	reserva1.setFechaLlegada(fechaLlegada);
-    	reserva1.setHoraLlegada(horaLlegada);
-    	reserva1.setHorasEspera(0.0);
-    	reserva1.setPlazas_Ocupadas(2);
-    	reserva1.setDescripcionEquipaje("pesado");
-    	reserva1.setEstadoReserva(estadoReserva1);
-    	reserva1.setPrecioTotal(34.0);
-    	reserva1.setNumKmTotales(60.0);
-    	reserva1.setTarifa(tarifa1);
-    	reservaService.save(reserva1);
-    
-    	
-    	//when(reservaRepository.findById(any())).thenReturn(Optional.of(reserva1));
-       
-      		//ACT & ASSERT
-    	assertNotEquals(res, reservaService.calcularFactura(5));
-	}
-	*/
-		
+	
 
 //    @Test
 //    @Transactional
