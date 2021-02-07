@@ -44,6 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/economias/**").hasAnyAuthority("admin","taxista")
 				.antMatchers("/clientes/myReservas/**").hasAnyAuthority("cliente")
 				.antMatchers("/reservas/**").authenticated()
+				.antMatchers("/miPerfil/**").authenticated()
 				.antMatchers("/trabajadores/**").hasAnyAuthority("admin")
 				
 				.antMatchers("/contratos/**").hasAnyAuthority("admin")
@@ -86,5 +87,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	}
 	
 }
-
 
