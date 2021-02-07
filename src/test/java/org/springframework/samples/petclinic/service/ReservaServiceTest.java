@@ -58,7 +58,7 @@ public class ReservaServiceTest {
     	Double precioEsperaPorHora = 4.5;
     	Double horasEspera = 0.0;
     	
-    	Double precioTotal = precioKm * numKmTotales;
+    	Double precioTotal = utilService.aproximarNumero(precioKm * numKmTotales);
     	
     	Double ivaRepercutido = porcentajeIvaRepercutido * 0.01 * precioTotal;
 		Double precioDistancia = precioKm * numKmTotales;
@@ -72,14 +72,15 @@ public class ReservaServiceTest {
         res.put("Base Imponible", utilService.aproximarNumero(baseImponible));
 
    
-    /*	Reserva reserva1 = new Reserva();
-    	Cliente cliente1 = new Cliente();
-    	//User user1 = new User();
-    	//userService.saveUser(user1);
-		
+        Reserva reserva1 = new Reserva();
+    	User user1 = new User();
+        Cliente cliente1 = new Cliente();
     	
-    	//cliente1.setUser(user1);
-		cliente1.setNombre("Pablo");
+        user1.setUsername("pablo");
+        user1.setPassword("pablo");
+				
+		cliente1.setUser(user1);
+   		cliente1.setNombre("Pablo");
 		cliente1.setApellidos("Garcia");
 		cliente1.setEmail("pablo@gmail.com");
 		cliente1.setTelefono("678823472");
@@ -91,10 +92,10 @@ public class ReservaServiceTest {
     	estadoReservaService.save(estadoReserva1);
     	
     	Tarifa tarifa1 = new Tarifa();
-    	tarifa1.setPrecioPorKm(0.12);
-    	tarifa1.setPrecioEsperaPorHora(4.5);
-    	tarifa1.setPorcentajeIvaRepercutido(10);
-    	//tarifaService.save(tarifa1);
+    	tarifa1.setPrecioPorKm(precioKm);
+    	tarifa1.setPrecioEsperaPorHora(precioEsperaPorHora);
+    	tarifa1.setPorcentajeIvaRepercutido(porcentajeIvaRepercutido);
+    	tarifaService.save(tarifa1);
     	
      	Date horaSalida= new Date(); 
     	horaSalida.setHours(8);
@@ -121,31 +122,29 @@ public class ReservaServiceTest {
     	Ruta ruta1 = new Ruta();
     	ruta1.setOrigenCliente("Badajoz");
     	ruta1.setHorasEstimadasCliente(2.0);
-    	ruta1.setDestinoCliente("Zahínos");
-    	ruta1.setNumKmTotales(180.0);
+    	ruta1.setDestinoCliente("Jerez de los Cabelleros");
+    	ruta1.setNumKmTotales(numKmTotales);
     	ruta1.setHorasEstimadasTaxista(3.0);
-    	//rutaService.save(ruta1);
-    	
-    	reserva1.setId(5);
+    	rutaService.save(ruta1);
+    	   	
     	reserva1.setCliente(cliente1);
     	reserva1.setRuta(ruta1);
     	reserva1.setFechaSalida(fechaSalida);
     	reserva1.setHoraSalida(horaSalida);
     	reserva1.setFechaLlegada(fechaLlegada);
     	reserva1.setHoraLlegada(horaLlegada);
-    	reserva1.setHorasEspera(0.0);
+    	reserva1.setHorasEspera(horasEspera);
     	reserva1.setPlazas_Ocupadas(2);
     	reserva1.setDescripcionEquipaje("pesado");
     	reserva1.setEstadoReserva(estadoReserva1);
-    	reserva1.setPrecioTotal(34.0);
-    	reserva1.setNumKmTotales(60.0);
+    	reserva1.setPrecioTotal(precioTotal);
+    	reserva1.setNumKmTotales(numKmTotales);
     	reserva1.setTarifa(tarifa1);
     	reservaService.save(reserva1);
-
- */
-          
+    	Integer id = reserva1.getId();
+              
       		//ACT & ASSERT
-    	assertNotEquals(res, reservaService.calcularFactura(1));
+    	assertEquals(res, reservaService.calcularFactura(id));
 	}
 	
 		
