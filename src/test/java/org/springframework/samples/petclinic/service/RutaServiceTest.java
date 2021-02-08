@@ -39,19 +39,19 @@ public class RutaServiceTest {
 
 	@Test
 	@Transactional
-	@DisplayName("Encontrar todas las rutas con DIFERENTES TRAYECTOS que tengan los mismos atributos básicos (origen,destino,kmTotal...)")
+	@DisplayName("Encontrar todas las rutas (con sus TRAYECTOS), que tengan los mismos atributos básicos (origen,destino,kmTotal...)")
 	void findRutaByAttributesTest() {
 		
-		// ¡2 rutas pueden tener los mismos atributos básicos pero con diferentes trayectos intermedios!
+		// ¡2 rutas pueden tener los mismos atributos básicos pero con diferentes trayectos intermedios!, lo simularemos con 2 rutas:
 		//ARRANGE
 		
-		//RUTA 1
-		Ruta ruta1= new Ruta();  //uno --> dos ---> uno (El cliente en este caso realiza Zahinos --> Badajoz)
+		//RUTA 1: Trayectos:  uno --> dos ---> uno (El cliente en este caso realiza uno --> dos)
+		Ruta ruta1= new Ruta(); 
 		Double kmTotales=80.0;
 		ruta1.setOrigenCliente("uno");
 		ruta1.setDestinoCliente("dos");
 		ruta1.setNumKmTotales(kmTotales);
-		ruta1.setHorasEstimadasCliente(0.5);
+		ruta1.setHorasEstimadasCliente(0.5); //El cliente no realiza dos--> uno (Trayecto de vuelta del taxista)
 		ruta1.setHorasEstimadasTaxista(1.0);
 		List<Trayecto> trayectos1= new ArrayList<Trayecto>();
 		Trayecto trayecto1= Trayecto.nuevoTrayecto("uno", "dos", 40.0, 0.5);
@@ -63,8 +63,8 @@ public class RutaServiceTest {
 		trayectos1.add(trayecto2);
 		ruta1.setTrayectos(trayectos1);
 		
-		//RUTA 2
-		Ruta ruta2= new Ruta(); //uno--> tres ---> dos ---> uno
+		//RUTA 2: Trayectos uno--> tres ---> dos ---> uno , El cliente realizará uno-->tres---> dos, y dos--> uno será el trayecto de vuelta del taxista
+		Ruta ruta2= new Ruta();
 		ruta2.setOrigenCliente("uno");
 		ruta2.setDestinoCliente("dos");
 		ruta2.setNumKmTotales(80.0);
@@ -75,11 +75,10 @@ public class RutaServiceTest {
 		Trayecto trayecto4= Trayecto.nuevoTrayecto("tres", "dos", 20.0, 0.25);
 		trayectoService.save(trayecto3);
 		trayectoService.save(trayecto4);
-	
 		
 		trayectos2.add(trayecto3);
 		trayectos2.add(trayecto4);
-		trayectos2.add(trayecto2); //útlimo trayecto  dos ---> uno, trayecto de vuelta, no va el taxista
+		trayectos2.add(trayecto2); //útlimo trayecto  dos ---> uno, trayecto de vuelta, no va el cliente
 		ruta2.setTrayectos(trayectos2);
 		
 		rutaService.save(ruta1);
