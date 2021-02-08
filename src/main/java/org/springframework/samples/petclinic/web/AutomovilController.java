@@ -71,7 +71,7 @@ public class AutomovilController {
 			modelMap.addAttribute("automovil",automovil.get());
 			return "automoviles/updateAutomovilForm";
 		}else {
-			modelMap.addAttribute("message","No se ha encontrado el automóvil a editar");
+			modelMap.addAttribute("error","No se ha encontrado el automóvil a editar");
 			return listadoAutomoviles(modelMap);
 		}
 	} 

@@ -77,6 +77,7 @@ public class AutomovilControllerTests {
 		autos.add(auto3);
 		this.autos=autos;
 		
+		
 	}
 	
 	@WithMockUser(value = "spring")
@@ -119,8 +120,8 @@ public class AutomovilControllerTests {
 	@WithMockUser(value = "spring")
     @Test
     void borrarAutomovilAsociadoAServicio() throws Exception {
+		
 		given(this.autoService.findAutomovilById(1)).willReturn(Optional.ofNullable(autos.get(0)));
-
 		given(this.autoService.delete(autos.get(0))).willThrow(AutomovilAsignadoServicioReservaException.class);
 		
 	
@@ -128,6 +129,116 @@ public class AutomovilControllerTests {
 				.andExpect(model().attribute("error", is("No se puede eliminar un automóvil que haya realizado un servicio o viaje")))
 				.andExpect(status().isOk())
 				.andExpect(view().name("automoviles/listadoAutomoviles"));
+	}
+	
+	@WithMockUser(value = "spring")
+    @Test
+    void editAutomovilTest1() throws Exception {
+
+		given(this.autoService.findAutomovilById(1)).willReturn(Optional.ofNullable(autos.get(0)));
+
+	
+		mockMvc.perform(get("/automoviles/edit/{autoId}",1))
+				.andExpect(model().attribute("automovil", is(autos.get(0))))
+				.andExpect(status().isOk())
+				.andExpect(view().name("automoviles/updateAutomovilForm"));
+	}
+	
+	
+	@WithMockUser(value = "spring")
+    @Test
+    void editExceptionAutomovilTest() throws Exception {
+
+		given(this.autoService.findAutomovilById(1)).willReturn(Optional.ofNullable(null));
+
+	
+		mockMvc.perform(get("/automoviles/edit/{autoId}",1))
+				.andExpect(model().attributeDoesNotExist("automovil"))
+				.andExpect(status().isOk())
+				.andExpect(model().attribute("error", "No se ha encontrado el automóvil a editar"))
+				.andExpect(view().name("automoviles/listadoAutomoviles"));
+	}
+	
+	@WithMockUser(value = "spring")
+    @Test
+    void postEditAutomovil() throws Exception {
+
+		given(this.autoService.findAutomovilById(1)).willReturn(Optional.ofNullable(autos.get(0)));
+
+		
+		mockMvc.perform(post("/automoviles/edit/{autoId}",1)
+				.with(csrf())
+				.param("marca", "Toyota")
+				.param("modelo", "Verso")
+				.param("numPlazas","5")
+				.param("kmRecorridos", "200.0")).andExpect(status().is2xxSuccessful())
+				.andExpect(model().attribute("message", "Automóvil actualizado correctamente"))
+				.andExpect(view().name("automoviles/listadoAutomoviles"));
+	}
+	
+	@WithMockUser(value = "spring")
+    @Test
+    void postEditAutomovilErrorBinding() throws Exception {
+
+		given(this.autoService.findAutomovilById(1)).willReturn(Optional.ofNullable(autos.get(0)));
+
+		
+		mockMvc.perform(post("/automoviles/edit/{autoId}",1)
+				.with(csrf())
+				.param("marca", "Toyota")
+				.param("modelo", "Verso")
+				.param("numPlazas","10")
+				.param("kmRecorridos", "200.0"))
+				.andExpect(status().isOk())
+				.andExpect(model().attributeHasErrors("automovil"))
+				.andExpect(model().attributeHasFieldErrors("automovil", "numPlazas"))
+				.andExpect(model().attributeExists("automovil"))
+				.andExpect(view().name("automoviles/updateAutomovilForm"));
+	}
+	
+	@WithMockUser(value = "spring")
+    @Test
+    void newAutomovil() throws Exception {
+		
+		mockMvc.perform(get("/automoviles//new"))
+		.andExpect(model().attribute("automovil", new Automovil()))
+		.andExpect(status().isOk())
+		.andExpect(view().name("automoviles/updateAutomovilForm"));
+	}
+	
+	@WithMockUser(value = "spring")
+    @Test
+    void newAutomovilPost() throws Exception {
+		
+		mockMvc.perform(post("/automoviles//new")
+				.with(csrf())
+				.param("marca", "Toyota")
+				.param("modelo", "Verso")
+				.param("numPlazas","4")
+				.param("kmRecorridos", "200.0"))
+				.andExpect(status().is2xxSuccessful())
+				.andExpect(model().attribute("message", "Automóvil creado correctamente"))
+				.andExpect(view().name("automoviles/listadoAutomoviles"));
+						
+	}
+	
+	@WithMockUser(value = "spring")
+    @Test
+    void newAutomovilPostErrorBinding() throws Exception {
+		
+		mockMvc.perform(post("/automoviles//new")
+				.with(csrf())
+				.param("marca", "Toyota")
+				.param("modelo", "Verso")
+				.param("numPlazas","10")
+				.param("kmRecorridos", "cadena"))
+				.andExpect(status().is2xxSuccessful())
+				.andExpect(model().attributeHasErrors("automovil"))
+				.andExpect(model().attributeHasFieldErrors("automovil", "numPlazas"))
+				.andExpect(model().attributeHasFieldErrors("automovil", "kmRecorridos"))
+				.andExpect(model().attributeExists("automovil"))
+				.andExpect(view().name("automoviles/updateAutomovilForm"));
+						
 	}
 	
 	
