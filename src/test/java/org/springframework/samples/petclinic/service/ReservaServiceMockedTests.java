@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
@@ -16,9 +17,11 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 
@@ -84,6 +87,7 @@ class ReservaServiceMockedTests {
     private TrabajadorService trabajadorService;
     @Mock
     private AuthoritiesService authoService;
+    
     @Spy
     private UtilService utilService= new UtilService(); //Es necesario utilizar sus métodos reales, por ello es Spy
   
@@ -155,15 +159,16 @@ class ReservaServiceMockedTests {
     void horaSalidaAnteriorActualTest() {
 
     	//ARRANGE
-    	Date today= new Date();
-    	Date horaSalida= utilService.addFecha(today,Calendar.MINUTE,-5); //Hora actual restándole 5 min, este método ya está testeado
-	    
+    	Date today= utilService.addFecha(new Date(),Calendar.MINUTE,-4); //DÍA actual restándole 5 min, este método ya está testeado
+
+    	Date horaSalida= utilService.addFecha(today,Calendar.MINUTE,-4); //HORA actual restándole 5 min, este método ya está testeado
+	  
     	//ACT
     	assertThrows(FechaSalidaAnteriorActualException.class,()->reservaService.fechaSalidaAnteriorActual(today, horaSalida));
     }
-    //Creamos una clase anidada para ciertos tests
+    //Creamos una clase anidada para ciertos tests que necesiten utilizar ciertos atributos
     @Nested
-    class calcularNuevaRutaTests {
+    class calcularReservaTests {
     	Reserva reservaSinCalcular;
     	Ruta rutaCalculada;
     	Tarifa tarifaActiva;
@@ -450,65 +455,101 @@ class ReservaServiceMockedTests {
       	    verify(rutaService,times(1)).findRutaByRuta(reservaSinCalcular.getRuta());
       	    verify(rutaService,never()).save(rutaCalculada);
      	    }
+    	  
+    	  @Test
+     	  @Transactional
+     	  @DisplayName("Editar una reserva existente y guardarla en la BD")
+     	  void guardarReservaEditadaTest() throws DuplicatedParadaException,FechaLlegadaAnteriorSalidaException {
+    		  //ARRANGE
+    		Reserva reservaBDPrevia= reservaSinCalcular;
+    		Date fechaLlegadaFutura= utilService.addFecha(new Date(),Calendar.DATE, 2); //Fecha llegada: 2 días más que hoy
+    		reservaBDPrevia.setFechaLlegada(fechaLlegadaFutura); //llegada dentro de 2 días
+    		reservaBDPrevia.setHoraLlegada(new Date()); //hora actual llegada
+    		reservaBDPrevia.setRuta(rutaCalculada);
+    		reservaBDPrevia.setEstadoReserva(estadoSolicitada);
+    		reservaBDPrevia.setTarifa(tarifaCopia);
+    		reservaBDPrevia.setDescripcionEquipaje("Descripción antigua");
+    		
+    		reservaSinCalcular.setDescripcionEquipaje("Descripción nueva");
+    		
+      	    when(trayectoService.calcularYAsignarTrayectos(reservaSinCalcular.getRuta())).thenReturn(rutaCalculada);
+      	    when(rutaService.findRutaByRuta(rutaCalculada)).thenReturn(Optional.ofNullable(rutaCalculada));
+    		
+      	    //ACT
+      	    Reserva reservaBD= reservaService.guardarReservaEditada(reservaSinCalcular, reservaBDPrevia);
+
+      	    //ASSERT
+      	    assertEquals(reservaBD.getDescripcionEquipaje(),"Descripción nueva");
+      	    
+     	    }
+    	  	@Test
+    		@Transactional
+    		@DisplayName("CLIENTE y taxista confirman una NUEVA RESERVA y se guarda en la BD. Si lo hace el CLIENTE la reserva se asocia a él")
+    		void calcularYConfirmarNuevaReservaClienteTest() throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException,HoraSalidaSinAntelacionException {
+    	  	
+    	  	//ARRANGE
+    	  		Cliente cliente= new Cliente();
+    	  		cliente.setDni("80097910L");
+    	  		cliente.setApellidos("Castillo Salcedo");
+    	  		cliente.setNombre("Lucas");
+    	  		cliente.setEmail("vicwork44@gmail.com");
+    	  		cliente.setId(40);
+    	  		cliente.setTelefono("638542987");
+    	  		
+    	  		User user= new User();
+    	  		user.setUsername("cliente");
+    	  		cliente.setUser(user);
+    	  	Set<String> authorities= new HashSet<String>();
+    	  	authorities.add("cliente");
+    	  	
+    	  	Date fechaSalida=utilService.addFecha(reservaSinCalcular.getFechaSalida(), Calendar.DATE, 2);
+      		 reservaSinCalcular.setFechaSalida(fechaSalida);
+      		when(clienteService.findClienteByUsername("cliente")).thenReturn(cliente);
+            when(authoService.findAuthoritiesByUsername("cliente")).thenReturn(authorities);
+      	    when(tarifaService.findTarifaActiva()).thenReturn(tarifaActiva);
+      	    when(trayectoService.calcularYAsignarTrayectos(reservaSinCalcular.getRuta())).thenReturn(rutaCalculada);
+      	    when(tarifaService.findCopyOfTarifa(tarifaActiva)).thenReturn(Optional.ofNullable(tarifaCopia));
+      	    when(rutaService.findRutaByRuta(rutaCalculada)).thenReturn(Optional.ofNullable(rutaCalculada));
+      	    when(estadoService.findEstadoById(1)).thenReturn(Optional.ofNullable(estadoSolicitada));
+      	    assertEquals(reservaSinCalcular.getCliente(), null); //La reserva al principio no tiene el cliente asociado
+      	    													//Pero tras el ACT lo tendrá
+      	    Reserva reservaSinCalcularTaxista= reservaSinCalcular;
+            //Cuando el taxista confirma la reserva, el cliente viene seleccionado desde un formulario
+
+      	  reservaSinCalcularTaxista.setCliente(cliente);
+      	    //ACT
+      	    Reserva reservaGuardadaCliente=reservaService.calcularYConfirmarNuevaReserva(reservaSinCalcular, "cliente");      	    
+      	   //ASSERT
+      	   
+      	    assertEquals(reservaGuardadaCliente.getCliente().getUser().getUsername(), cliente.getUser().getUsername());
+      	    assertEquals(reservaGuardadaCliente.getCliente().getDni(), cliente.getDni());
+      	    verify(clienteService,times(1)).findClienteByUsername("cliente"); //solo lo ha llamado la primera reserva
+      	    
+      	    //ninguna de las 2 reservas tiene asociado ningún taxista o automóvil, eso ocurre al aceptar las reservas
+      	    
+    	}
     }
    
     
-   
- 
+    @Test
+	@Transactional
+	@DisplayName("Exepción tras editar una reserva con fecha de llegada anterior a la de salida")
+	void calcularNuevaReservaTest4()  {
+		  //ARRANGE
+		  Reserva reserva= new Reserva();
+		  Date today= new Date();
+		  reserva.setFechaSalida(today);
+		  reserva.setHoraSalida(today); //hora actual
+		  Date ayer= utilService.addFecha(today, Calendar.DATE, -1);
+		  reserva.setFechaLlegada(ayer); //día anterior
+		  reserva.setHoraLlegada(today); //hora actual
+		  //ACT & ASSERT
+		  assertThrows(FechaLlegadaAnteriorSalidaException.class,()->reservaService.guardarReservaEditada(reserva, reserva));
+	  }
     
-  
     
-    
-   
-    
-    /*
     @Test
     @Transactional
-    @DisplayName("Calcular y guardar datos de una reserva al CONFIRMARLA con una ruta existente en la BD")
-    void confirmarNuevaReservaTest() throws DuplicatedParadaException,FechaSalidaAnteriorActualException {
-
-    //La parte comprobada en calcularNuevaReservaTest() no se volverá a comprobar aquí, 
-    	//ya que calcularYConfirmarReserva() llama también a calcularNuevaReserva()
-    	
-    	Reserva reserva= arrangeReservaRuta();
-    	
-    	Double horasEspera=0.0;
-    	EstadoReserva estado= new EstadoReserva();
-    	Integer idEstado=1;
-    	estado.setId(idEstado);
-    	Cliente cliente=  new Cliente();
-    	User user= new User();
-    	user.setUsername("usuarioPrueba");
-    	cliente.setUser(user);
-    	when(estadoService.findEstadoById(anyInt())).thenReturn(Optional.of(estado));
-    	when(clienteService.findClienteByUsername(anyString())).thenReturn(cliente);
-    	when(rutaService.findRutaByRuta(reserva.getRuta())).thenReturn(Optional.of(reserva.getRuta()));
-    	//ACT & ASSERT
-    	
-    		//La ruta que ha calculado existirá en la base de datos y no hará un save(ruta) en la BD
-    		Reserva reservaConfirmada= reservaService.calcularYConfirmarReserva(reserva,"usuarioPrueba");
-    		verify(rutaService,never()).save(reserva.getRuta());
-    		
-    	
-    		//No habrá una ruta igual en la base de datos a la que ha calculado y hará un save(ruta) de dicha ruta
-    		when(rutaService.findRutaByRuta(reserva.getRuta())).thenReturn(Optional.ofNullable(null));
-        	Reserva reservaConfirmada2= reservaService.calcularYConfirmarReserva(reserva,"usuarioPrueba");
-    		verify(rutaService).save(reserva.getRuta());
-    	
-    	verify(rutaService,times(2)).findRutaByRuta(reserva.getRuta());
-    	assertEquals(reservaConfirmada.getHorasEspera(),horasEspera);
-    	assertEquals(reservaConfirmada.getEstadoReserva().getId(),idEstado);
-    	assertEquals(reservaConfirmada.getCliente().getUser().getUsername(),"usuarioPrueba");
-
-    	
-    	
-    }
-    */
-   
-    
-
-    
-    @Test
 	void calcularFactura(){
     	//ARRANGE
     	Integer porcentajeIvaRepercutido = 10;

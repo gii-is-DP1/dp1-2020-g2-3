@@ -27,5 +27,18 @@ public class UtilService {
 		      return calendar.getTime();
 	   }
 	
+	
+	@Transactional
+	public Date unirFechaHora(Date fecha, Date hora) { //dado un Date con una fecha DD-MM-YYYY y una fecha con la hora HH:mm, obtiene un Date
+													//con la fecha del primer parámetro y la hora del segundo parámetro
+		
+		Date fechaHora= new Date();
+		fechaHora.setDate(fecha.getDate());
+		fechaHora.setMonth(fecha.getMonth());
+		fechaHora.setYear(fecha.getYear());
+		fechaHora.setHours(hora.getHours());
+		fechaHora.setMinutes(hora.getMinutes());
+		return fechaHora;
+	   }
 
 }

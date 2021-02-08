@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.service;
 
 import java.security.Principal;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -125,16 +126,10 @@ public class ReservaService {
 	@Transactional
 	public void fechaSalidaAnteriorActual(Date fechaSalida, Date horaSalida) throws FechaSalidaAnteriorActualException  {
 		Date today= new Date();
-		Date fechaSalidaConHoras= new Date(); //Creamos un nuevo Date para evitar ciertos errores
-		fechaSalidaConHoras.setDate(fechaSalida.getDate());
-		fechaSalidaConHoras.setMonth(fechaSalida.getMonth());
-		fechaSalidaConHoras.setYear(fechaSalida.getYear());
-		fechaSalidaConHoras.setHours(horaSalida.getHours());
-		fechaSalidaConHoras.setMinutes(horaSalida.getMinutes());
-		
-
+		Date fechaSalidaConHoras= utilService.unirFechaHora(fechaSalida, horaSalida); //Creamos un nuevo Date para evitar ciertos errores
 		
 		log.debug("fecha de salida con horas" + fechaSalidaConHoras);
+		log.debug("Today: " + today);
 		if(fechaSalidaConHoras.compareTo(today)<0) { //Fecha anterior
 			log.info("fecha de salida es anterior a la actual, se lanza excepción");
 			throw new FechaSalidaAnteriorActualException();
@@ -281,11 +276,18 @@ public class ReservaService {
 	@Transactional
 	public Reserva guardarReservaEditada(Reserva reservaEditada,Reserva reservaBD) throws DuplicatedParadaException,FechaLlegadaAnteriorSalidaException{
 		
-		if(reservaEditada.getFechaLlegada().compareTo(reservaEditada.getFechaSalida())<0) { //Si la fecha de llegada es anterior a la de salida se lanza excepción
-			throw new FechaLlegadaAnteriorSalidaException();
-		}else if(reservaEditada.getHoraLlegada().compareTo(reservaEditada.getHoraSalida())<0) {
+		
+		Date fechaHoraLlegada= utilService.unirFechaHora(reservaEditada.getFechaLlegada(), reservaEditada.getHoraLlegada());
+		Date fechaHoraSalida= utilService.unirFechaHora(reservaEditada.getFechaSalida(), reservaEditada.getHoraSalida());
+		
+		
+		if(fechaHoraLlegada.compareTo(fechaHoraSalida)<0) { //Si la fecha/hora de llegada es anterior a la de salida se lanza excepción
+			log.error("Fecha/hora de llegada anterior a la de salida, se lanza excepción");
 			throw new FechaLlegadaAnteriorSalidaException();
 		}
+		
+		
+		
 		Ruta rutaConstruida= trayectoService.calcularYAsignarTrayectos(reservaEditada.getRuta());
 		reservaEditada.setRuta(rutaConstruida);
 		System.out.println("Guardar ruta editada: " + rutaConstruida);
@@ -303,7 +305,6 @@ public class ReservaService {
 		Reserva reservaCalculada= calcularReservaAPartirDeRuta(reserva,true,true);
 		Set<String> authorities= authoService.findAuthoritiesByUsername(username);
 		//Si la reserva la solicita un taxista, el cliente ya viene desde el formulario construido
-		
 		//Si la reserva la solicita un cliente desde su cuenta, se le asocia a él.
 		
 		if (!(authorities.contains("admin") || authorities.contains("taxista"))) { 
