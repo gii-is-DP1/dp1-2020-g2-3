@@ -57,18 +57,18 @@ private TrabajadorRepository trabRepo;
 	}
 
 	@Transactional
-	public Trabajador save(Trabajador trabajador) throws FechaFinAnteriorInicioException  {
+	public void save(Trabajador trabajador) throws FechaFinAnteriorInicioException  {
 		
-		trabRepo.save(trabajador);
-		userService.saveUser(trabajador.getUser());
-		authoritiesService.saveAuthorities(trabajador.getUser().getUsername(), trabajador.getTipoTrabajador().toString().toLowerCase());
 		if(trabajador.getContrato().getFechaFin().compareTo(trabajador.getContrato().getFechaInicio())<0) { 
 			log.error("fecha de fin es anterior a la de inicio, se lanza excepción");
 			throw new FechaFinAnteriorInicioException();
 		}else {
+			trabRepo.save(trabajador);
+			userService.saveUser(trabajador.getUser());
+			authoritiesService.saveAuthorities(trabajador.getUser().getUsername(), 
+					trabajador.getTipoTrabajador().toString().toLowerCase());
 			log.info("la fecha de fin es posterior o igual a la de inicio, no se lanza excepción");
 		}
-		return trabajador;
 	}
 	
 	@Transactional
