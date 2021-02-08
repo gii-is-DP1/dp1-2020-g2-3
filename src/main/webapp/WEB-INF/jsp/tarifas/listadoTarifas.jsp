@@ -18,7 +18,8 @@
             <th>Precio de espera por hora</th>
             <th>Activada</th>
             <th>Editar</th>
-            <th>Eliminar</th>   
+            <th>Eliminar</th>
+            <th>Activar tarifa</th>   
         </tr>
         </thead>
         <tbody>
@@ -60,6 +61,8 @@
                 <spring:param name="tarifaId" value="${tarifa.id}"/>
                 </spring:url>
 				<a class="deleteTarifa" href="${fn:escapeXml(tarifaDeleteUrl)}"> <img alt="" id="delete" src="/resources/images/delete.png" style="width: 45px"></a>
+				<td>
+				<a href="" class="btn  btn-success"><span class="glyphicon glyphicon-star" aria-hidden="true"></span>Activar esta tarifa<span class="glyphicon glyphicon-star" aria-hidden="true"></span></a>
               </tr>
         </c:forEach>
         </tbody>

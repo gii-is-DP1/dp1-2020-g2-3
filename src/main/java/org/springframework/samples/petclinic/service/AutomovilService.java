@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.repository.AutomovilRepository;
+import org.springframework.samples.petclinic.service.exceptions.AutomovilAsignadoServicioReservaException;
+import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +35,18 @@ public class AutomovilService {
 	}
 	
 	@Transactional()
-	public void delete(Automovil auto) throws DataAccessException  {
-			autoRepo.delete(auto);
+	public Automovil delete(Automovil auto) throws AutomovilAsignadoServicioReservaException  {
+			
+			try {
+				autoRepo.delete(auto);
+				return auto;
+			}catch(DataAccessException e) {
+				//necesario generar una excepción PERSONALIZADA para luego testearla en el controller test
+				throw new AutomovilAsignadoServicioReservaException();
+			}
+			
+			
+	
 	}
 	@Transactional()
 	public void save(Automovil auto)  {
