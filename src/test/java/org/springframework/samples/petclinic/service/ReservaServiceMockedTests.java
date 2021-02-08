@@ -557,12 +557,8 @@ class ReservaServiceMockedTests {
       	    
     	}
     	  	public Automovil arrangeAutomovil() {
-    	  		Automovil auto= new Automovil();
-    	  		
-    	  		auto.setKmRecorridos(123.0);
-    	  		auto.setMarca("Toyota");
-    	  		auto.setModelo("Verso");
-    	  		auto.setNumPlazas(5);
+    	  		Automovil auto= Automovil.createAuto("Toyota", "Verso", 5, 123.0);
+    	  	
     	  		return auto;
     	  	}
     	  	public Trabajador arrangeTrabajador() {
