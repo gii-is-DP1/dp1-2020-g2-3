@@ -935,7 +935,7 @@ class ReservaServiceMockedTests {
 		Date fecha2 = new Date();
 		fecha2.setDate(01);
 		fecha2.setMonth(01);
-		fecha2.setYear(2030);
+		fecha2.setYear(2010);
 		fecha2.setHours(18);
 		fecha2.setMinutes(0);
 		
@@ -944,7 +944,7 @@ class ReservaServiceMockedTests {
 		
 		//ASSERT
 		System.out.println("DEBUG: "+ ingresos );
-		assertEquals(Double.valueOf(100), ingresos);
+		assertEquals(Double.valueOf(0), ingresos);
     }
     
     @Test
