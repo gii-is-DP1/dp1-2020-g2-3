@@ -31,25 +31,7 @@ public class AutomovilServiceTest {
 
 	@Autowired
 	AutomovilService autoService;
-	@Test
-	public void findByIdTest() {
-		
-		Optional<Automovil> automovil= autoService.findAutomovilById(1);
-		assertEquals(automovil.get().getId(),1);
-	}
 	
-	@Test
-	@Transactional
-	public void deleteAutomovilNuevo() {
-		
-		Long numAutomoviles=autoService.automovilCount();
-		Optional<Automovil> automovil= autoService.findAutomovilById(4); //borrar un automóvil no usado en ningún serivico o viaje
-		autoService.delete(automovil.get());
-		Optional<Automovil> automovil2= autoService.findAutomovilById(4);
-		Long numAutomoviles2=autoService.automovilCount();
-		assertEquals (automovil2.isPresent(),false);
-		assertEquals(numAutomoviles2,numAutomoviles-1 );
-	}
 	
 	
 	//El siguiente Test no detecta la excepción lanzada, pero sin embargo el controlador AutomovilController

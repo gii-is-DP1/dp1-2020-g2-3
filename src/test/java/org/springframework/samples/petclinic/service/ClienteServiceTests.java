@@ -112,7 +112,7 @@ public class ClienteServiceTests {
 		
 		//ACT
 		Reserva reserva1 = reservaService.findResById(1);
-		
+		reserva1.setEstadoReserva(estado);
 		//ASSERT
 		
 		assertEquals(user.getUsername(), "Pablo33");
