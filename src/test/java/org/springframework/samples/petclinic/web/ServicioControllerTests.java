@@ -1,5 +1,7 @@
 package org.springframework.samples.petclinic.web;
 
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -81,7 +83,8 @@ public class ServicioControllerTests {
 		t1 = new Taller();
 		
 		s1.setId(TEST_SERVICIO_ID);
-		s1.setFecha(Date.valueOf(LocalDate.of(2015, 2, 15)));
+		Date fecha = new Date(2015,2,15);
+		s1.setFecha(fecha);
 		s1.setPrecio(53.98);
 		s1.setTrabajador(trab1);
 		s1.setAutomovil(a1);
@@ -112,7 +115,6 @@ public class ServicioControllerTests {
 	mockMvc.perform(get("/servicios/listado")).andExpect(status().isOk()).andExpect(view().name("servicios/listadoServicios"));
 }
 	
-	
 
 	
 	
@@ -126,46 +128,57 @@ public class ServicioControllerTests {
 	
 	@WithMockUser(value = "spring")
     @Test
-    void testProcessCreationFormHasErrors() throws Exception {
-		mockMvc.perform(post("/servicios/new", TEST_SERVICIO_ID)
-					.param("descripcion", "ou mama"))
-			//.andExpect(status().isOk())
-			.andExpect(model().attributeHasErrors("servicio"))
-			.andExpect(model().attributeHasFieldErrors("servicio", "taller"))
-			
-			.andExpect(view().name("servicios/UpdateServicioForm"));
-	}	
-	
-	
-
-	
-	/*	
-	
+    void testProcessCreationFormSuccess() throws Exception {
+		mockMvc.perform(post("/servicios/new")
+				.with(csrf())
+				
+				.param("fecha", "2020-09-29")
+				.param("precio", "52.03")
+				.param("descripcion", "picotazo en la luna")
+				)
+				.andExpect(status().isOk());
+	}
+		
 	
 	@WithMockUser(value = "spring")
     @Test
     void testProcessCreationFormHasErrors() throws Exception {
-		mockMvc.perform(post("/trabajadores/new")
+		mockMvc.perform(post("/servicios/new")
 						.with(csrf())
-						.param("nombre", "Mike")
-						.param("apellidos", "Bloggs")
-						.param("dni", "42424211L")
-						.param("email", "mike@gmail.com"))
+						.param("fecha", "2020-09-29")
+						.param("precio", "52.03")
+						.param("descripcion", "")
+						)
 			.andExpect(status().isOk())
-			.andExpect(model().attributeHasErrors("trabajador"))
-			.andExpect(model().attributeHasFieldErrors("trabajador", "telefono"))
-			.andExpect(view().name("trabajadores/updateTrabajadorForm"));
+			.andExpect(model().attributeHasErrors("servicio"))
+			.andExpect(view().name("servicios/updateServicioForm"));
 	}	
 	
+    @WithMockUser(value = "spring")
+    @Test
+    void testInitUpdateServicioForm() throws Exception {
+	mockMvc.perform(get("/servicios/edit/{clienteId}", TEST_SERVICIO_ID)).andExpect(status().isOk())
+			.andExpect(model().attributeExists("servicio"))
+			.andExpect(model().attribute("servicio", hasProperty("fecha", is("3915-03-15"))))
+			.andExpect(model().attribute("servicio", hasProperty("precio", is("53.98"))))
+			.andExpect(model().attribute("servicio", hasProperty("trabajador", is("t1"))))
+			.andExpect(model().attribute("servicio", hasProperty("automovil", is("a1"))))
+			.andExpect(model().attribute("servicio", hasProperty("taller", is("t1"))))
+			.andExpect(model().attribute("servicio", hasProperty("descripcion", is("Revisión de GPS"))))
+			.andExpect(model().attribute("servicio", hasProperty("completado", is("true"))))
+			.andExpect(model().attribute("servicio", hasProperty("fechaCompletado", is("2015-02-27"))))
+			.andExpect(view().name("servicios/updateServicioForm"));
+}
+
 	
-	*/
 	
 	@Test
+	@WithMockUser(value = "spring")
 	public void testDelete() throws Exception{
 		
-		mockMvc.perform(get("servicios/delete/1"))
-			.andExpect(status().is2xxSuccessful())
-			.andExpect(view().name("servicios/listadoServicios"));
+		mockMvc.perform(get("servicios/delete/{servicioId}", TEST_SERVICIO_ID))
+			.andExpect(status().isOk()).andExpect(model().attributeExists("servicio"))
+			
 		;
 	}
 	
