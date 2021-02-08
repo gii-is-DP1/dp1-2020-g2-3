@@ -508,7 +508,7 @@ public class ReservaController {
 			}else {
 				
 				try {
-					reservaService.aceptarReserva(reservaOptional.get(),automovil.get(),p);
+					reservaService.aceptarReserva(reservaOptional.get(),automovil.get(),p.getName());
 					modelMap.addAttribute("message", "Reserva aceptada correctamente");
 				}catch(ParadaYaAceptadaRechazadaException e) {
 					modelMap.addAttribute("error", "La reserva que se intenta aceptar ya ha sido aceptada/rechazada anteriormente");
