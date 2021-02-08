@@ -1,6 +1,8 @@
 package org.springframework.samples.petclinic.service;
 
 import java.security.Principal;
+
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -78,7 +80,7 @@ public class ReservaService {
 		Double precioTotal=kmTotal*precioPorKm;	
 		Double precioTotalRedondeado=utilService.aproximarNumero(precioTotal);
 		return precioTotalRedondeado;								
-		
+	
 	}
 	@Transactional
 	public Map<String,Double> calcularFactura(int id){
@@ -96,7 +98,7 @@ public class ReservaService {
 	
 	@Transactional
 	public Date calcularFechaYHoraLlegada(Date fechaSalida, Date horaSalida, Double horasEstimadasCliente) {
-		int minutosSumar= (int)Math.round(horasEstimadasCliente*60); //Devolvemos un Date con la fecha y hora de llegada
+		int minutosSumar= (int)utilService.aproximarNumero(horasEstimadasCliente*60); //Devolvemos un Date con la fecha y hora de llegada
 		fechaSalida.setHours(horaSalida.getHours());
 		fechaSalida.setMinutes(horaSalida.getMinutes());
 		
@@ -109,11 +111,11 @@ public class ReservaService {
 	@Transactional
 	public void fechaSalidaSinAntelacion(Date fechaSalida, Date horaSalida) throws HoraSalidaSinAntelacionException{
 		Date today = new Date();
-		fechaSalida.setHours(horaSalida.getHours());
-		fechaSalida.setMinutes(horaSalida.getMinutes());
-		fechaSalida = utilService.addFecha(fechaSalida, Calendar.MINUTE, -40);
+		Date fechaHoraSalida= utilService.unirFechaHora(fechaSalida, horaSalida);
 		
-		if(fechaSalida.compareTo(today)<0) {
+		fechaHoraSalida = utilService.addFecha(fechaSalida, Calendar.MINUTE, -40);
+		
+		if(fechaHoraSalida.compareTo(today)<0) {
 			System.out.println("hora de salida con menos de 40 minutos de antelación, se lanza excepción");
 			throw new HoraSalidaSinAntelacionException();
 		}else {
@@ -125,49 +127,45 @@ public class ReservaService {
 	@Transactional
 	public void fechaSalidaAnteriorActual(Date fechaSalida, Date horaSalida) throws FechaSalidaAnteriorActualException  {
 		Date today= new Date();
-		fechaSalida.setHours(horaSalida.getHours());
-		fechaSalida.setMinutes(horaSalida.getMinutes());
-	
-		if(fechaSalida.compareTo(today)<0) { //Fecha anterior
-			System.out.println("fecha de salida es anterior a la actual, se lanza excepción");
+		Date fechaSalidaConHoras= utilService.unirFechaHora(fechaSalida, horaSalida); //Creamos un nuevo Date para evitar ciertos errores
+		
+		log.debug("fecha de salida con horas" + fechaSalidaConHoras);
+		log.debug("Today: " + today);
+		if(fechaSalidaConHoras.compareTo(today)<0) { //Fecha anterior
+			log.info("fecha de salida es anterior a la actual, se lanza excepción");
 			throw new FechaSalidaAnteriorActualException();
 		}else {
-			System.out.println("la fecha de salida es posterior o igual a la actual, no se lanza excepción");
+			log.info("la fecha de salida es posterior o igual a la actual, no se lanza excepción");
 		}
 		
 	}
-	
-	@Transactional
-	public void existeViajeEnEsteHorario(Date horaSalida, Date horaLlegada, Date fechaSalida, int trabajadorId) throws ExisteViajeEnEsteHorarioException{
-		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(trabajadorId);
-		
-		for (Reserva r: reservasTrabajador) {
-			Boolean cond1 = horaSalida.before(r.getHoraSalida()) && horaLlegada.before(r.getHoraSalida());
-			Boolean cond2 = horaSalida.after(r.getHoraSalida()) && horaLlegada.after(r.getHoraLlegada());
-			if((r.getFechaSalida().equals(fechaSalida)) && !(cond1 || cond2)){
-				System.out.println("El taxista ya tiene un viaje aceptado en ese periodo de tiempo.");
-				throw new ExisteViajeEnEsteHorarioException();
-			}else {
-				System.out.println("El taxista acepta el viaje.");
-			}
-		}
-	}
-	
 	//Comprueba si un taxista ya tiene una reserva aceptada en el horario en el que esta intentando aceptar otra reserva.
-	public boolean taxistaConViaje(int taxistaId, Reserva reserva) {
+	@Transactional
+	public boolean taxistaConViaje(int taxistaId,Reserva reserva){
+	
+		boolean res= false;
 		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(taxistaId);
-		boolean res = false;
+		log.debug("" + reservasTrabajador.size());
+		Date fechaHoraSalida= utilService.unirFechaHora(reserva.getFechaSalida(), reserva.getHoraSalida());
+		Date fechaHoraLlegada= utilService.unirFechaHora(reserva.getFechaLlegada(), reserva.getHoraLlegada());
+		if(reservasTrabajador.size()>0) {
+			
+		
 		for (Reserva r: reservasTrabajador) {
-			Date horaSalida = reserva.getHoraSalida();
-			Date horaLlegada = reserva.getHoraLlegada();
-			Boolean cond1 = horaSalida.before(r.getHoraSalida()) && horaLlegada.before(r.getHoraSalida());
-			Boolean cond2 = horaSalida.after(r.getHoraLlegada()) && horaLlegada.after(r.getHoraLlegada());
-			if((r.getFechaSalida().equals(reserva.getFechaSalida())) && !(cond1 || cond2)){
-				res = true;
+			Date fechaHoraSalidaReservaAceptada= utilService.unirFechaHora(r.getFechaSalida(), r.getHoraSalida());
+			Date fechaHoraLlegadaReservaAceptada= utilService.unirFechaHora(r.getFechaLlegada(), r.getHoraLlegada());
+			Boolean cond1 = fechaHoraSalida.before(fechaHoraSalidaReservaAceptada) && fechaHoraLlegada.before(fechaHoraSalidaReservaAceptada);
+			Boolean cond2 = fechaHoraSalida.after(fechaHoraLlegadaReservaAceptada) && fechaHoraLlegada.after(fechaHoraLlegadaReservaAceptada);
+			if(!(cond1 || cond2)){
+				log.info("El taxista ya tiene un viaje aceptado en ese periodo de tiempo.");
+				res=true;
+				break;
+			}
 			}
 		}
 		return res;
 	}
+	
 	
 	
 	@Transactional
@@ -187,7 +185,7 @@ public class ReservaService {
 				log.info("La reserva ha sido completada, se muestra la factura");
 				return reserva;
 			}else {
-				log.error("Sólo se mostrarán aquellas reservas que estén completadas.");
+				log.error("Sólo se mostrarán las facturas de aquellas reservas que estén completadas.");
 				throw new EstadoReservaFacturaException();
 			}
 		}
@@ -201,42 +199,50 @@ public class ReservaService {
 		//Si confirmarReserva= false solo se calcularán los campos estrictamente necesarios para mostrar la reserva en el formulario
 		
 		if(nuevaReserva) { //si el cliente calcula la reserva se comprueba la restricción de la fecha
-			fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha
-			fechaSalidaSinAntelacion(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar antelación
+			this.fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha
+			log.info("Se ha comprobado la fecha");
+			this.fechaSalidaSinAntelacion(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar antelación
 		}
-
+		
 		Ruta nuevaRuta= trayectoService.calcularYAsignarTrayectos(reserva.getRuta());
 		reserva.setRuta(nuevaRuta);
+		log.debug("km totales nueva ruta: " + nuevaRuta.getNumKmTotales());
+
 		reserva.setNumKmTotales(nuevaRuta.getNumKmTotales());
-		Date fechaHoraLlegada=calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
+		Date fechaHoraLlegada=this.calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
 		reserva.setFechaLlegada(fechaHoraLlegada);
 		reserva.setHoraLlegada(fechaHoraLlegada);
+		log.debug("fecha llegada estimada" + fechaHoraLlegada);
 		Tarifa tarifa= tarifaService.findTarifaActiva();
+		log.debug("Tarifa Activa: "  + tarifa);
 		Optional<Tarifa> tarifaCopia= tarifaService.findCopyOfTarifa(tarifa);
+		
 		if(tarifaCopia.isPresent()) { //Si existe una tarifa copia se utiliza
 			tarifa=tarifaCopia.get();
-		}else { //Si no existe una tarifa copia igual, se crea
+		}else { //Si no existe una tarifa copia igual, se crea y se asocia
+			log.info("No existe una tarifa con original=false a la que se está tomando como referencia, se creará una nueva entidad" );
 			tarifa= tarifaService.nuevaTarifa(false, false, tarifa.getPorcentajeIvaRepercutido(), tarifa.getPrecioEsperaPorHora(), tarifa.getPrecioPorKm());
 			tarifaService.save(tarifa);
 		}
+		log.info("Se ha guardado la tarifa");
 		reserva.setTarifa(tarifa);
 		Double precioPorKm= tarifa.getPrecioPorKm();
 		Double precioTotal=calcularPrecioDistancia(nuevaRuta.getNumKmTotales(), precioPorKm);
 		reserva.setPrecioTotal(precioTotal);
 		if(confirmarReserva ) { //Solo cuando se confirma la reserva se añadirán los siguientes campos
 			
-			//Por motivos de seguridad, tras ver el precio de una reserva, se vuelven a calcular todos los campos de la reserva
-			// en este método,por si alguien ha intentado modificar algo desde el jsp.
-			//Antes de confirmar la reserva no se calculan estos campos, porque en la vista precioReserva.jsp no aparecen
+					//Por motivos de seguridad, tras ver el precio de una reserva, se vuelven a calcular todos los campos de la reserva
+					// en este método,por si alguien ha intentado modificar algo desde el jsp.
+					//Antes de confirmar la reserva no se calculan estos campos, porque en la vista precioReserva.jsp no aparecen
+					
+					//si la ruta creada ya existe en la BD se asignará, y si no,se creará una nueva Ruta
 			
-			//si la ruta creada ya existe en la BD se asignará
 			reserva=asignarRutaExistenteOCrearla(reserva);
-			
-				reserva.setHorasEspera(0.0);
-				reserva.setEstadoReserva(estadoService.findEstadoById(1).get());
-			
+			reserva.setHorasEspera(0.0);
+			reserva.setEstadoReserva(estadoService.findEstadoById(1).get());
 		
 		}
+		
 		return reserva;
 		
 	}
@@ -247,7 +253,7 @@ public class ReservaService {
 		Optional<Ruta> rutaExistente= rutaService.findRutaByRuta(ruta);
 		
 		if(rutaExistente.isPresent()) {
-			System.out.println("Ya existe una ruta similar! No hace falta guardarla en la BD");
+			log.info("Ya existe una ruta similar! No hace falta guardarla en la BD");
 			ruta.setId(rutaExistente.get().getId());
 			reserva.setRuta(ruta);
 			
@@ -255,72 +261,28 @@ public class ReservaService {
 		}else {
 			
 			System.out.println("No existe la ruta, se asignará  una nueva a la reserva"); //Ya está asignada antes del if(confirmarReserva)
-			System.out.println(ruta);
+			
 			rutaService.save(ruta); //Se guarda en la BD la nueva ruta
-			System.out.println("ruta asignada!");
+			System.out.println("ruta nueva guardada y asociada en la BD!");
 		} 
 		return reserva;
 	}
-	/*@Transactional //Este método calculará el precio, la fecha/hora estimada de llegada, los km totales,ruta... de la reserva después del primer formulario de su creación
-	public Reserva calcularNuevaReserva(Reserva reserva,boolean confirmarReserva) throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException {
-		
-		//Si confirmarReserva= false solo se calcularán los campos estrictamente necesarios para mostrar la reserva en el precioReserva.jsp
-		
-		
-		fechaSalidaAnteriorActual(reserva.getFechaSalida(), reserva.getHoraSalida()); //Comprobar fecha
-		Reserva reservaCalculada= new Reserva();
-		reservaCalculada.setDescripcionEquipaje(reserva.getDescripcionEquipaje());
-		reservaCalculada.setFechaSalida(reserva.getFechaSalida());
-		reservaCalculada.setHoraSalida(reserva.getHoraSalida());
-		reservaCalculada.setPlazas_Ocupadas(reserva.getPlazas_Ocupadas());
-		Ruta nuevaRuta= trayectoService.calcularYAsignarTrayectos(reserva.getRuta());
-		reservaCalculada.setRuta(nuevaRuta);
-		reservaCalculada.setNumKmTotales(nuevaRuta.getNumKmTotales());
-		Date fechaHoraLlegada=calcularFechaYHoraLlegada(reserva.getFechaSalida(), reserva.getHoraSalida(),nuevaRuta.getHorasEstimadasCliente());
-		reservaCalculada.setFechaLlegada(fechaHoraLlegada);
-		reservaCalculada.setHoraLlegada(fechaHoraLlegada);
-		Double precioPorKm=tarifaService.findTarifaActiva().getPrecioPorKm();
-		Double precioTotal=calcularPrecioDistancia(nuevaRuta.getNumKmTotales(), precioPorKm);
-		reservaCalculada.setPrecioTotal(precioTotal);
-		if(confirmarReserva ) { //Solo cuando se confirma la reserva se añadirán los siguientes campos
-			
-			//Por motivos de seguridad, tras ver el precio de una reserva, se vuelven a calcular todos los campos de la reserva
-			// en este método,por si alguien ha intentado modificar algo desde el jsp.
-			//Antes de confirmar la reserva no se calculan estos campos, porque en la vista precioReserva.jsp no aparecen
-			
-			//si la ruta creada ya existe en la BD se asignará
-			Optional<Ruta> rutaExistente= rutaService.findRutaByRuta(nuevaRuta);
-		
-			if(rutaExistente.isPresent()) {
-				System.out.println("Ya existe una ruta similar! No hace falta guardarla en la BD");
-				nuevaRuta.setId(rutaExistente.get().getId());
-				reserva.setRuta(nuevaRuta);
-				System.out.println("Trayectos de la ruta existente: " + rutaExistente.get().getTrayectos());
-				System.out.println("Ruta existente: " + rutaExistente.get());
-				
-			}else {
-				
-				System.out.println("No existe la ruta, se asignará una  una nueva a la reserva"); //Ya está asignada antes del if(confirmarReserva)
-				
-				rutaService.save(nuevaRuta); //Se guarda en la BD la nueva ruta
-				System.out.println("ruta asignada!");
-			}
-			reservaCalculada.setHorasEspera(0.0);
-			reservaCalculada.setEstadoReserva(estadoService.findEstadoById(1).get());
-			
-		}
-		return reservaCalculada;
-		
-	}
-	*/
+	
 	@Transactional
 	public Reserva guardarReservaEditada(Reserva reservaEditada,Reserva reservaBD) throws DuplicatedParadaException,FechaLlegadaAnteriorSalidaException{
 		
-		if(reservaEditada.getFechaLlegada().compareTo(reservaEditada.getFechaSalida())<0) { //Si la fecha de llegada es anterior a la de salida se lanza excepción
-			throw new FechaLlegadaAnteriorSalidaException();
-		}else if(reservaEditada.getHoraLlegada().compareTo(reservaEditada.getHoraSalida())<0) {
+		
+		Date fechaHoraLlegada= utilService.unirFechaHora(reservaEditada.getFechaLlegada(), reservaEditada.getHoraLlegada());
+		Date fechaHoraSalida= utilService.unirFechaHora(reservaEditada.getFechaSalida(), reservaEditada.getHoraSalida());
+		
+		
+		if(fechaHoraLlegada.compareTo(fechaHoraSalida)<0) { //Si la fecha/hora de llegada es anterior a la de salida se lanza excepción
+			log.error("Fecha/hora de llegada anterior a la de salida, se lanza excepción");
 			throw new FechaLlegadaAnteriorSalidaException();
 		}
+		
+		
+		
 		Ruta rutaConstruida= trayectoService.calcularYAsignarTrayectos(reservaEditada.getRuta());
 		reservaEditada.setRuta(rutaConstruida);
 		System.out.println("Guardar ruta editada: " + rutaConstruida);
@@ -338,7 +300,6 @@ public class ReservaService {
 		Reserva reservaCalculada= calcularReservaAPartirDeRuta(reserva,true,true);
 		Set<String> authorities= authoService.findAuthoritiesByUsername(username);
 		//Si la reserva la solicita un taxista, el cliente ya viene desde el formulario construido
-		
 		//Si la reserva la solicita un cliente desde su cuenta, se le asocia a él.
 		
 		if (!(authorities.contains("admin") || authorities.contains("taxista"))) { 
@@ -370,7 +331,7 @@ public class ReservaService {
 	}
 
 	@Transactional
-	public void rechazarReserva(Reserva reserva) throws DataAccessException,ParadaYaAceptadaRechazadaException {
+	public Reserva rechazarReserva(Reserva reserva) throws DataAccessException,ParadaYaAceptadaRechazadaException {
 		
 		if(!reserva.getEstadoReserva().getName().equals("Solicitada")) {
 			throw new ParadaYaAceptadaRechazadaException();
@@ -379,18 +340,18 @@ public class ReservaService {
 			EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); //Estado 3= Rechazada
 			reserva.setEstadoReserva(estadoReserva);
 			save(reserva);
-			
+			return reserva;
 		}
 		
 	}
 	@Transactional
-	public void aceptarReserva(Reserva reserva,Automovil auto,Principal p) throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException,ExisteViajeEnEsteHorarioException {
+	public Reserva aceptarReserva(Reserva reserva,Automovil auto,String username) throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException,ExisteViajeEnEsteHorarioException {
 	
 		if(!reserva.getEstadoReserva().getName().equals("Solicitada")) {
 			throw new ParadaYaAceptadaRechazadaException();
 		}else {
-			System.out.println("P GET NAME: " + p.getName());
-			Trabajador trabajador= trabajadorService.findByUsername(p.getName());
+			
+			Trabajador trabajador= trabajadorService.findByUsername(username);
 			
 			if(auto.getNumPlazas()-1<reserva.getPlazas_Ocupadas()){
 				throw new AutomovilPlazasInsuficientesException();
@@ -404,6 +365,7 @@ public class ReservaService {
 				reserva.setAutomovil(auto);
 				reserva.setEstadoReserva(estadoReserva);
 				save(reserva);
+				return reserva;
 			}
 		
 		}
@@ -412,12 +374,12 @@ public class ReservaService {
 	}
 	
 	@Transactional
-	public void delete(Reserva reserva) throws DataAccessException  {
+	public void delete(Reserva reserva) throws DataAccessException  { //Método CRUD REPOSITORY
 			reservaRepo.delete(reserva);
 	}
 
 	@Transactional
-	public void save(Reserva reserva)  {
+	public void save(Reserva reserva)  { //Método CRUD REPOSITORY
 		
 		reservaRepo.save(reserva);
 	}
@@ -460,12 +422,7 @@ public class ReservaService {
 	
 		Date today = new Date();
 
-		Date fechaSalida= new Date();
-		fechaSalida.setDate(reserva.getFechaSalida().getDate());
-		fechaSalida.setMonth(reserva.getFechaSalida().getMonth());
-		fechaSalida.setYear(reserva.getFechaSalida().getYear());
-		fechaSalida.setHours(reserva.getHoraSalida().getHours());
-		fechaSalida.setMinutes(reserva.getHoraSalida().getMinutes());
+		Date fechaSalida= utilService.unirFechaHora(reserva.getFechaSalida(), reserva.getHoraSalida());
 		Date fechaAux = utilService.addFecha(fechaSalida, Calendar.HOUR_OF_DAY, -24); //REstamos 24 horas
         if(!(reserva.getEstadoReserva().getName().equals("Solicitada") || reserva.getEstadoReserva().getName().equals("Aceptada"))) {
         	log.error("El estado de la reserva tiene que ser 'Solicitada' o 'Aceptada' para poder cancelarla");
@@ -482,7 +439,7 @@ public class ReservaService {
     }
 	
 	@Transactional(readOnly = true)
-	public Reserva findResById(int id) throws DataAccessException {
+	public Reserva findResById(int id) throws DataAccessException { //Método CRUD REPOSITORY
 		return reservaRepo.findResById(id);
 	}
 	
