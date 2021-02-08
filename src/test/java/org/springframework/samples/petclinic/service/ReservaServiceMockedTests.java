@@ -33,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -62,8 +63,6 @@ import aj.org.objectweb.asm.ClassTooLargeException;
 
 @ExtendWith(MockitoExtension.class)
 class ReservaServiceMockedTests {
-
- 
     
     @Mock
     private ReservaRepository reservaRepository;
@@ -91,6 +90,7 @@ class ReservaServiceMockedTests {
     @Spy
     private UtilService utilService= new UtilService(); //Es necesario utilizar sus métodos reales, por ello es Spy
   
+
     protected ReservaService reservaService;
 
     @BeforeEach
@@ -274,6 +274,7 @@ class ReservaServiceMockedTests {
     		    	
     		    }
     	
+
     	public EstadoReserva arrangeEstadoReserva() {
 	    	//Retorna un estado del tipo "Solicitada"
     		EstadoReserva estadoSolicitada= new EstadoReserva();
@@ -599,7 +600,6 @@ class ReservaServiceMockedTests {
 		
 	}
 	
-		
 
 //    @Test
 //    @Transactional
