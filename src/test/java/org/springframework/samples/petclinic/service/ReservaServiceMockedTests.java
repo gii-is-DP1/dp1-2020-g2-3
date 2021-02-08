@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
@@ -12,6 +13,7 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -39,20 +41,26 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.model.Authorities;
+import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Cliente;
 import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.model.EstadoReserva;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
 import org.springframework.samples.petclinic.model.Tarifa;
+import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.ReservaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
+import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasInsuficientesException;
 import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
+import org.springframework.samples.petclinic.service.exceptions.ExisteViajeEnEsteHorarioException;
 import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.HoraSalidaSinAntelacionException;
+import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
 import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
 import org.springframework.samples.petclinic.util.EntityUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -261,6 +269,7 @@ class ReservaServiceMockedTests {
     		    	horaSalida.setDate(fechaSalida.getDate()); //hora de salida por defecto la actual
     		    	reservaSinCalcular.setFechaSalida(fechaSalida);
     		    	reservaSinCalcular.setHoraSalida(horaSalida);
+    		    	reservaSinCalcular.setPlazas_Ocupadas(3);
     		    	return reservaSinCalcular;
     		    }
     		    
@@ -282,6 +291,7 @@ class ReservaServiceMockedTests {
     		return estadoSolicitada;
 	    	
 	    }
+    
     	@Test
         @Transactional
         @DisplayName("Calcular datos (km,ruta,horaLlegada,precio...) de una reserva para mostrarla ANTES DE CONFIRMARLA")
@@ -483,23 +493,40 @@ class ReservaServiceMockedTests {
       	    assertEquals(reservaBD.getDescripcionEquipaje(),"Descripción nueva");
       	    
      	    }
+    	  
+    	  public User arrangeUser(String username, String Authority) {
+    		  User user= new User();
+  	  		user.setUsername(username);
+  	  		user.setEnabled(true);
+  	  		user.setPassword("123");
+  	  		Authorities a1= new Authorities();
+  	  		a1.setAuthority(Authority);
+  	  		a1.setUser(user);
+  	  		Set<Authorities> set= new HashSet<Authorities>();
+  	  		set.add(a1);
+  	  		user.setAuthorities(set);
+  	  		return user;
+    	  }
+    	  public Cliente arrangeCliente() {
+    		  Cliente cliente= new Cliente();
+  	  		cliente.setDni("80097910L");
+  	  		cliente.setApellidos("Castillo Salcedo");
+  	  		cliente.setNombre("Lucas");
+  	  		cliente.setEmail("vicwork44@gmail.com");
+  	  		cliente.setId(40);
+  	  		cliente.setTelefono("638542987");
+  	  		cliente.setUser(this.arrangeUser("cliente", "cliente"));
+  	  		return cliente;
+    	  }
     	  	@Test
     		@Transactional
     		@DisplayName("CLIENTE y taxista confirman una NUEVA RESERVA y se guarda en la BD. Si lo hace el CLIENTE la reserva se asocia a él")
     		void calcularYConfirmarNuevaReservaClienteTest() throws FechaSalidaAnteriorActualException,DataAccessException,DuplicatedParadaException,HoraSalidaSinAntelacionException {
     	  	
     	  	//ARRANGE
-    	  		Cliente cliente= new Cliente();
-    	  		cliente.setDni("80097910L");
-    	  		cliente.setApellidos("Castillo Salcedo");
-    	  		cliente.setNombre("Lucas");
-    	  		cliente.setEmail("vicwork44@gmail.com");
-    	  		cliente.setId(40);
-    	  		cliente.setTelefono("638542987");
     	  		
-    	  		User user= new User();
-    	  		user.setUsername("cliente");
-    	  		cliente.setUser(user);
+    	  		
+    	  	Cliente cliente= this.arrangeCliente();
     	  	Set<String> authorities= new HashSet<String>();
     	  	authorities.add("cliente");
     	  	
@@ -529,6 +556,140 @@ class ReservaServiceMockedTests {
       	    //ninguna de las 2 reservas tiene asociado ningún taxista o automóvil, eso ocurre al aceptar las reservas
       	    
     	}
+    	  	public Automovil arrangeAutomovil() {
+    	  		Automovil auto= new Automovil();
+    	  		
+    	  		auto.setKmRecorridos(123.0);
+    	  		auto.setMarca("Toyota");
+    	  		auto.setModelo("Verso");
+    	  		auto.setNumPlazas(5);
+    	  		return auto;
+    	  	}
+    	  	public Trabajador arrangeTrabajador() {
+    	  		
+    	  		Trabajador trab= new Trabajador();
+    	  		trab.setApellidos("Castillo Ruiz");
+    	  		trab.setDni("80065692P");
+    	  		trab.setEmail("arcg@gmail.com");
+    	  		trab.setNombre("Alfredo");
+    	  		trab.setTelefono("635698145");
+    	  		trab.setId(1);
+    	  		User user= this.arrangeUser("trabajador", "taxista");
+    	  		trab.setUser(user);
+    	  		return trab;
+    	  		
+    	  	}
+    	  	
+    	    @Test
+    	   	@Transactional
+    	   	@DisplayName("Exepción tras intentar aceptar una reserva que ya ha sido aceptada/rechazada anteriormente")
+    	   	void aceptarReservaSolicitadaTest()  {
+    	   		  //ARRANGE
+    	    	reservaSinCalcular.setRuta(rutaCalculada);
+    	    	estadoSolicitada.setName("Aceptada");
+    	    	reservaSinCalcular.setEstadoReserva(estadoSolicitada);
+    	    	Automovil auto= this.arrangeAutomovil();
+    	    	Trabajador trabajador= this.arrangeTrabajador();	
+    	   		  //ACT & ASSERT
+    	   		  assertThrows(ParadaYaAceptadaRechazadaException.class,()->reservaService.aceptarReserva(reservaSinCalcular, auto, trabajador.getUser().getUsername()));
+    	   	  }
+    	    
+    	    @Test
+    	   	@Transactional
+    	   	@DisplayName("Aceptar una reserva asociando el trabajador que la acepta y el automóvil con el que realizará la reserva")
+    	   	void aceptarReservaSolicitadaTest2() throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException,ExisteViajeEnEsteHorarioException   {
+    	   		  //ARRANGE
+    	    	reservaSinCalcular.setRuta(rutaCalculada);
+    	    	reservaSinCalcular.setEstadoReserva(estadoSolicitada);
+    	    	
+    	    	Date fechaLlegada= utilService.addFecha(reservaSinCalcular.getFechaSalida(), Calendar.HOUR, 2);
+    	    	Date horaLlegada= utilService.addFecha(reservaSinCalcular.getFechaSalida(), Calendar.HOUR, 2);
+    	    	reservaSinCalcular.setFechaLlegada(fechaLlegada); //Necesitamos completar este campo de la reserva
+    	    	reservaSinCalcular.setHoraLlegada(horaLlegada);
+    	    	Automovil auto= this.arrangeAutomovil();
+    	    	Trabajador trabajador= this.arrangeTrabajador();
+    	    	EstadoReserva estadoAceptada= new EstadoReserva();
+    	    	estadoAceptada.setName("Aceptada");
+    	    	estadoAceptada.setId(2);
+    	    	when(trabajadorService.findByUsername(trabajador.getUser().getUsername())).thenReturn(trabajador);
+    	    	when(estadoService.findEstadoById(2)).thenReturn(Optional.ofNullable(estadoAceptada));
+    	    	when(reservaRepository.findReservasAceptadasByTrabajadorId(trabajador.getId())).thenReturn(new ArrayList<Reserva>());
+    	    	
+    	   		  //ACT
+    	    	Reserva reservaAceptada= reservaService.aceptarReserva(reservaSinCalcular, auto, trabajador.getUser().getUsername());
+    	    	
+    	    	//ASSERT
+    	    	assertEquals(reservaAceptada.getAutomovil(), auto);
+    	    	assertEquals(reservaAceptada.getTrabajador(),trabajador);
+    	    	assertEquals(reservaAceptada.getEstadoReserva().getName(),"Aceptada");
+    	   	  }
+    	    @Test
+    	   	@Transactional
+    	   	@DisplayName("Exepción tras intentar aceptar una reserva con un automóvil que tenga un número de plazas menor al solicitado por la reserva")
+    	   	void aceptarReservaSolicitadaTest3()  {
+    	   		  //ARRANGE
+    	    	reservaSinCalcular.setRuta(rutaCalculada);
+    	    	reservaSinCalcular.setEstadoReserva(estadoSolicitada);
+    	    	Automovil auto= this.arrangeAutomovil();
+    	    	auto.setNumPlazas(2); //La reserva tiene un número de plazas ocupadas de 3
+    	    	Trabajador trabajador= this.arrangeTrabajador();	
+    	   		  //ACT & ASSERT
+    	   		  assertThrows(AutomovilPlazasInsuficientesException.class,()->reservaService.aceptarReserva(reservaSinCalcular, auto, trabajador.getUser().getUsername()));
+    	   	  }
+    	    
+    	    @Test
+    	   	@Transactional
+    	   	@DisplayName("Exepción cuando un trabajador intenta aceptar una reserva que se solapa en horario con otra haya aceptado anteriormente")
+    	   	void aceptarReservaSolicitadaTest4()  {
+    	   		  //ARRANGE
+    	    	reservaSinCalcular.setRuta(rutaCalculada);
+    	    	reservaSinCalcular.setEstadoReserva(estadoSolicitada);
+    	    	Date fechaLlegada= utilService.addFecha(reservaSinCalcular.getFechaSalida(), Calendar.HOUR, 2);
+    	    	Date horaLlegada= utilService.addFecha(reservaSinCalcular.getFechaSalida(), Calendar.HOUR, 2);
+    	    	reservaSinCalcular.setFechaLlegada(fechaLlegada);
+    	    	reservaSinCalcular.setHoraLlegada(horaLlegada);
+    	    	Automovil auto= this.arrangeAutomovil();
+    	    	Trabajador trabajador= this.arrangeTrabajador();
+    	    	List<Reserva> reservasAceptadasAnteriormente= new ArrayList<Reserva>();
+    	    	reservasAceptadasAnteriormente.add(reservaSinCalcular); //La añadiremos la misma reserva que se intenta aceptar para que se solapen en horario
+    	    	
+    	    	when(trabajadorService.findByUsername(trabajador.getUser().getUsername())).thenReturn(trabajador);    	    	
+    	    	when(reservaRepository.findReservasAceptadasByTrabajadorId(trabajador.getId())).thenReturn(reservasAceptadasAnteriormente);
+
+    	   		  //ACT & ASSERT
+    	   		  assertThrows(ExisteViajeEnEsteHorarioException.class,()->reservaService.aceptarReserva(reservaSinCalcular, auto, trabajador.getUser().getUsername()));
+    	   	  }
+    	    
+    	    @Test
+    	   	@Transactional
+    	   	@DisplayName("Exepción tras intentar RECHAZAR una reserva que ya ha sido aceptada/rechazada anteriormente")
+    	   	void rechazarReservaTest1()  {
+    	   		  //ARRANGE
+    	    	reservaSinCalcular.setRuta(rutaCalculada);
+    	    	estadoSolicitada.setName("Rechazada");
+    	    	reservaSinCalcular.setEstadoReserva(estadoSolicitada);
+    	    	
+    	   		  //ACT & ASSERT
+    	   		  assertThrows(ParadaYaAceptadaRechazadaException.class,()->reservaService.rechazarReserva(reservaSinCalcular));
+    	   	  }
+    	    
+    	    @Test
+    	   	@Transactional
+    	   	@DisplayName("Rechazar una reserva solicitada por un cliente")
+    	   	void rechazarReservaTest2() throws ParadaYaAceptadaRechazadaException {
+    	   		  //ARRANGE
+    	    	reservaSinCalcular.setRuta(rutaCalculada);
+    	    	reservaSinCalcular.setEstadoReserva(estadoSolicitada);
+    	    	EstadoReserva estadoRechazada= new EstadoReserva();
+    	    	estadoRechazada.setName("Rechazada");
+    	    	estadoRechazada.setId(3);
+    	    	when(estadoService.findEstadoById(3)).thenReturn(Optional.ofNullable(estadoRechazada));
+
+    	   		  //ACT
+    	   		 Reserva reservaRechazada= reservaService.rechazarReserva(reservaSinCalcular);
+    	   		 //ASSERT
+    	   		 assertEquals(reservaRechazada.getEstadoReserva().getName(),"Rechazada");
+    	   	  }
     }
    
     
@@ -547,6 +708,8 @@ class ReservaServiceMockedTests {
 		  //ACT & ASSERT
 		  assertThrows(FechaLlegadaAnteriorSalidaException.class,()->reservaService.guardarReservaEditada(reserva, reserva));
 	  }
+    
+  
     
     
     @Test
@@ -586,14 +749,7 @@ class ReservaServiceMockedTests {
     	*/
         
         Reserva reserva1 = reservaService.findReservaById(1).get();
-       
-           
-
-    	
     	when(reservaRepository.findById(any())).thenReturn(Optional.of(reserva1));
-       
-        
- 	
 
 		//ACT & ASSERT
 	assertNotEquals(res, reservaService.calcularFactura(1));

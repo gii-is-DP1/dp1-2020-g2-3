@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic.service;
 
 import java.security.Principal;
 
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -110,11 +111,11 @@ public class ReservaService {
 	@Transactional
 	public void fechaSalidaSinAntelacion(Date fechaSalida, Date horaSalida) throws HoraSalidaSinAntelacionException{
 		Date today = new Date();
-		fechaSalida.setHours(horaSalida.getHours());
-		fechaSalida.setMinutes(horaSalida.getMinutes());
-		fechaSalida = utilService.addFecha(fechaSalida, Calendar.MINUTE, -40);
+		Date fechaHoraSalida= utilService.unirFechaHora(fechaSalida, horaSalida);
 		
-		if(fechaSalida.compareTo(today)<0) {
+		fechaHoraSalida = utilService.addFecha(fechaSalida, Calendar.MINUTE, -40);
+		
+		if(fechaHoraSalida.compareTo(today)<0) {
 			System.out.println("hora de salida con menos de 40 minutos de antelación, se lanza excepción");
 			throw new HoraSalidaSinAntelacionException();
 		}else {
@@ -138,38 +139,33 @@ public class ReservaService {
 		}
 		
 	}
-	
+	//Comprueba si un taxista ya tiene una reserva aceptada en el horario en el que esta intentando aceptar otra reserva.
 	@Transactional
-	public void existeViajeEnEsteHorario(Date horaSalida, Date horaLlegada, Date fechaSalida, int trabajadorId) throws ExisteViajeEnEsteHorarioException{
-		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(trabajadorId);
+	public boolean taxistaConViaje(int taxistaId,Reserva reserva){
+	
+		boolean res= false;
+		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(taxistaId);
+		log.debug("" + reservasTrabajador.size());
+		Date fechaHoraSalida= utilService.unirFechaHora(reserva.getFechaSalida(), reserva.getHoraSalida());
+		Date fechaHoraLlegada= utilService.unirFechaHora(reserva.getFechaLlegada(), reserva.getHoraLlegada());
+		if(reservasTrabajador.size()>0) {
+			
 		
 		for (Reserva r: reservasTrabajador) {
-			Boolean cond1 = horaSalida.before(r.getHoraSalida()) && horaLlegada.before(r.getHoraSalida());
-			Boolean cond2 = horaSalida.after(r.getHoraSalida()) && horaLlegada.after(r.getHoraLlegada());
-			if((r.getFechaSalida().equals(fechaSalida)) && !(cond1 || cond2)){
-				System.out.println("El taxista ya tiene un viaje aceptado en ese periodo de tiempo.");
-				throw new ExisteViajeEnEsteHorarioException();
-			}else {
-				System.out.println("El taxista acepta el viaje.");
+			Date fechaHoraSalidaReservaAceptada= utilService.unirFechaHora(r.getFechaSalida(), r.getHoraSalida());
+			Date fechaHoraLlegadaReservaAceptada= utilService.unirFechaHora(r.getFechaLlegada(), r.getHoraLlegada());
+			Boolean cond1 = fechaHoraSalida.before(fechaHoraSalidaReservaAceptada) && fechaHoraLlegada.before(fechaHoraSalidaReservaAceptada);
+			Boolean cond2 = fechaHoraSalida.after(fechaHoraLlegadaReservaAceptada) && fechaHoraLlegada.after(fechaHoraLlegadaReservaAceptada);
+			if(!(cond1 || cond2)){
+				log.info("El taxista ya tiene un viaje aceptado en ese periodo de tiempo.");
+				res=true;
+				break;
 			}
-		}
-	}
-	
-	//Comprueba si un taxista ya tiene una reserva aceptada en el horario en el que esta intentando aceptar otra reserva.
-	public boolean taxistaConViaje(int taxistaId, Reserva reserva) {
-		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(taxistaId);
-		boolean res = false;
-		for (Reserva r: reservasTrabajador) {
-			Date horaSalida = reserva.getHoraSalida();
-			Date horaLlegada = reserva.getHoraLlegada();
-			Boolean cond1 = horaSalida.before(r.getHoraSalida()) && horaLlegada.before(r.getHoraSalida());
-			Boolean cond2 = horaSalida.after(r.getHoraLlegada()) && horaLlegada.after(r.getHoraLlegada());
-			if((r.getFechaSalida().equals(reserva.getFechaSalida())) && !(cond1 || cond2)){
-				res = true;
 			}
 		}
 		return res;
 	}
+	
 	
 	
 	@Transactional
@@ -242,7 +238,6 @@ public class ReservaService {
 					//si la ruta creada ya existe en la BD se asignará, y si no,se creará una nueva Ruta
 			
 			reserva=asignarRutaExistenteOCrearla(reserva);
-			log.info("Vamos a asignar las horas de espera");
 			reserva.setHorasEspera(0.0);
 			reserva.setEstadoReserva(estadoService.findEstadoById(1).get());
 		
@@ -336,7 +331,7 @@ public class ReservaService {
 	}
 
 	@Transactional
-	public void rechazarReserva(Reserva reserva) throws DataAccessException,ParadaYaAceptadaRechazadaException {
+	public Reserva rechazarReserva(Reserva reserva) throws DataAccessException,ParadaYaAceptadaRechazadaException {
 		
 		if(!reserva.getEstadoReserva().getName().equals("Solicitada")) {
 			throw new ParadaYaAceptadaRechazadaException();
@@ -345,18 +340,18 @@ public class ReservaService {
 			EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); //Estado 3= Rechazada
 			reserva.setEstadoReserva(estadoReserva);
 			save(reserva);
-			
+			return reserva;
 		}
 		
 	}
 	@Transactional
-	public void aceptarReserva(Reserva reserva,Automovil auto,Principal p) throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException,ExisteViajeEnEsteHorarioException {
+	public Reserva aceptarReserva(Reserva reserva,Automovil auto,String username) throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException,ExisteViajeEnEsteHorarioException {
 	
 		if(!reserva.getEstadoReserva().getName().equals("Solicitada")) {
 			throw new ParadaYaAceptadaRechazadaException();
 		}else {
-			System.out.println("P GET NAME: " + p.getName());
-			Trabajador trabajador= trabajadorService.findByUsername(p.getName());
+			
+			Trabajador trabajador= trabajadorService.findByUsername(username);
 			
 			if(auto.getNumPlazas()-1<reserva.getPlazas_Ocupadas()){
 				throw new AutomovilPlazasInsuficientesException();
@@ -370,6 +365,7 @@ public class ReservaService {
 				reserva.setAutomovil(auto);
 				reserva.setEstadoReserva(estadoReserva);
 				save(reserva);
+				return reserva;
 			}
 		
 		}
@@ -426,12 +422,7 @@ public class ReservaService {
 	
 		Date today = new Date();
 
-		Date fechaSalida= new Date();
-		fechaSalida.setDate(reserva.getFechaSalida().getDate());
-		fechaSalida.setMonth(reserva.getFechaSalida().getMonth());
-		fechaSalida.setYear(reserva.getFechaSalida().getYear());
-		fechaSalida.setHours(reserva.getHoraSalida().getHours());
-		fechaSalida.setMinutes(reserva.getHoraSalida().getMinutes());
+		Date fechaSalida= utilService.unirFechaHora(reserva.getFechaSalida(), reserva.getHoraSalida());
 		Date fechaAux = utilService.addFecha(fechaSalida, Calendar.HOUR_OF_DAY, -24); //REstamos 24 horas
         if(!(reserva.getEstadoReserva().getName().equals("Solicitada") || reserva.getEstadoReserva().getName().equals("Aceptada"))) {
         	log.error("El estado de la reserva tiene que ser 'Solicitada' o 'Aceptada' para poder cancelarla");
@@ -448,7 +439,7 @@ public class ReservaService {
     }
 	
 	@Transactional(readOnly = true)
-	public Reserva findResById(int id) throws DataAccessException {
+	public Reserva findResById(int id) throws DataAccessException { //Método CRUD REPOSITORY
 		return reservaRepo.findResById(id);
 	}
 	
