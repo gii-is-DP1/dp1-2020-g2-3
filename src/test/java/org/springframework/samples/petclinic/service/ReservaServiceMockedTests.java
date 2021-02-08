@@ -8,9 +8,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -35,17 +37,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Cliente;
+import org.springframework.samples.petclinic.model.Contrato;
 import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.model.EstadoReserva;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
 import org.springframework.samples.petclinic.model.Tarifa;
+import org.springframework.samples.petclinic.model.TipoTrabajador;
+import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.ReservaRepository;
 import org.springframework.samples.petclinic.repository.TrayectoRepository;
 import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
+import org.springframework.samples.petclinic.service.exceptions.ExisteViajeEnEsteHorarioException;
+import org.springframework.samples.petclinic.service.exceptions.FechaFinAnteriorInicioException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
+import org.springframework.samples.petclinic.service.exceptions.HoraSalidaSinAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
 import org.springframework.samples.petclinic.util.EntityUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +87,8 @@ class ReservaServiceMockedTests {
     
     @Mock
     private TrabajadorService trabajadorService;
+    @Mock
+    TipoTrabajadorService tipoTrabajadorService;
     @Mock
     private AuthoritiesService authoService;
     @Spy
@@ -499,4 +509,180 @@ class ReservaServiceMockedTests {
 //    @DisplayName("Cancelar una reserva con fecha de salida anterior a la fecha actual")
 //    void cancelarReservaFechaSalidaAnteriorTest() {
 //    }
+    
+    @Test
+    @Transactional
+    @DisplayName("Calcula los ingresos en un rango de fechas determinado.")
+    void calculaIngresosTest() {
+    	
+    	//ARRANGE
+    	User user = new User();
+		user.setUsername("Test1");
+		user.setPassword("Test1");
+		user.setEnabled(true);
+		
+		Cliente cliente = new Cliente();
+		cliente.setId(1);
+		cliente.setNombre("Bad");
+		cliente.setApellidos("Bunny");
+		cliente.setTelefono("666999666");
+		cliente.setUser(user);
+		clienteService.saveCliente(cliente);
+	
+		
+		Reserva reserva = new Reserva();
+    	
+    	Date horaSalida= new Date(); 
+    	horaSalida.setHours(18);
+    	horaSalida.setMinutes(0);
+    	
+		Date fechaSalida= new Date();
+		fechaSalida.setDate(15);
+		fechaSalida.setMonth(8);
+		fechaSalida.setYear(2020);
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
+    	
+    	EstadoReserva estado = new EstadoReserva();
+    	estado.setId(4);
+    	estado.setName("Completada");
+    	estadoService.save(estado);
+    	
+    	reserva.setId(1);
+    	reserva.setEstadoReserva(estado);
+    	reserva.setFechaSalida(fechaSalida);
+    	reserva.setHoraSalida(horaSalida);
+    	reserva.setPlazas_Ocupadas(2);
+		reserva.setCliente(cliente);
+		reserva.setPrecioTotal(Double.valueOf(100));
+		reservaService.save(reserva);
+		
+		Date fecha1 = new Date();
+		fecha1.setDate(01);
+		fecha1.setMonth(01);
+		fecha1.setYear(2000);
+		fecha1.setHours(18);
+		fecha1.setMinutes(0);
+		Date fecha2 = new Date();
+		fecha2.setDate(01);
+		fecha2.setMonth(01);
+		fecha2.setYear(2030);
+		fecha2.setHours(18);
+		fecha2.setMinutes(0);
+		
+		//ACT			
+		Double ingresos = reservaService.calcularIngresos(fecha1, fecha2);
+		
+		//ASSERT
+		System.out.println("DEBUG: "+ ingresos );
+		assertEquals(Double.valueOf(100), ingresos);
+    }
+    
+    @Test
+    @Transactional
+    @DisplayName("Comprueba si hay suficiente antelación en la fecha (40 minutos). Al no cumplirse, lanza la excepcion")
+    void fechaSalidaSinAntelacionTest() {
+    	//ARRANGE
+    	Date today= new Date();
+    	Date horaSalida= utilService.addFecha(today,Calendar.MINUTE,-20); //Hora actual restándole 20 min, este método ya está testeado
+	    
+    	//ACT y ASSERT
+    	assertThrows(HoraSalidaSinAntelacionException.class,()->reservaService.fechaSalidaSinAntelacion(today, horaSalida));
+    }
+    
+    @Test
+    @Transactional
+    @DisplayName("Comprueba si hay suficiente antelación en la fecha (40 minutos). Al cumplirse, no lanza la excepcion")
+    void fechaSalidaSinAntelacionNoLanzaExcepcionTest() {
+    	//ARRANGE
+    	Date today= new Date();
+    	Date horaSalida= utilService.addFecha(today,Calendar.HOUR,-4); //Hora actual restándole 4 horas, este método ya está testeado
+	    
+    	//ACT y ASSERT
+    	assertDoesNotThrow(()->reservaService.fechaSalidaSinAntelacion(today, horaSalida));
+    }
+    
+    @Test
+    @Transactional
+    @DisplayName("")
+    void findReservasAceptadasByTrabajadorIdTest() throws FechaFinAnteriorInicioException {
+    	//ARRANGE
+    	User user = new User();
+		user.setUsername("Test1");
+		user.setPassword("Test1");
+		user.setEnabled(true);
+		
+		Cliente cliente = new Cliente();
+		cliente.setId(1);
+		cliente.setNombre("Bad");
+		cliente.setApellidos("Bunny");
+		cliente.setTelefono("666999666");
+		cliente.setUser(user);
+	
+		
+		Reserva reserva = new Reserva();
+    	
+    	Date horaSalida= new Date(); 
+    	horaSalida.setHours(18);
+    	horaSalida.setMinutes(0);
+    	
+		Date fechaSalida= new Date();
+		fechaSalida.setDate(15);
+		fechaSalida.setMonth(8);
+		fechaSalida.setYear(2020);
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
+    	
+    	EstadoReserva estado = new EstadoReserva();
+    	estado.setId(2);
+    	estado.setName("Aceptada");
+    	
+    	reserva.setId(1);
+    	reserva.setEstadoReserva(estado);
+    	reserva.setFechaSalida(fechaSalida);
+    	reserva.setHoraSalida(horaSalida);
+    	reserva.setPlazas_Ocupadas(2);
+		reserva.setCliente(cliente);
+		reserva.setPrecioTotal(Double.valueOf(100));
+		
+		User  nuevoUser = new User();
+		nuevoUser.setUsername("Trabajador1");
+		nuevoUser.setPassword("Trabajador1");
+		TipoTrabajador   nuevoTipoTrabajador = new TipoTrabajador();
+		nuevoTipoTrabajador.setId(2);
+		nuevoTipoTrabajador.setName("Taxista");
+		tipoTrabajadorService.save(nuevoTipoTrabajador);
+		Contrato nuevoContrato = new Contrato();
+		Date fechaInicio= new Date();
+		fechaInicio.setDate(15);
+		fechaInicio.setMonth(8);
+		fechaInicio.setYear(2015);
+		Date fechaFin= new Date();
+		fechaFin.setDate(15);
+		fechaFin.setMonth(8);
+		fechaFin.setYear(2025);
+		nuevoContrato.setFechaInicio(fechaInicio);
+		nuevoContrato.setFechaFin(fechaFin);
+		nuevoContrato.setSalarioMensual(1200.00);
+		Trabajador nuevoTrabajador= new Trabajador();
+		nuevoTrabajador.setId(1);
+		nuevoTrabajador.setNombre("Sergio");
+		nuevoTrabajador.setApellidos("Canales");
+		nuevoTrabajador.setDni("28555777Q");
+		nuevoTrabajador.setTelefono("954401212");
+		nuevoTrabajador.setTipoTrabajador(nuevoTipoTrabajador);
+		nuevoTrabajador.setUser(nuevoUser);
+		nuevoTrabajador.setContrato(nuevoContrato);
+		trabajadorService.save(nuevoTrabajador);
+		Integer id = nuevoTrabajador.getId();
+		
+		reserva.setTrabajador(nuevoTrabajador);
+		reservaService.save(reserva);
+		
+		//ACT
+		Collection<Reserva> r = reservaService.findReservasAceptadasByTrabajadorId(id);
+		
+		//ASSERT
+		assertEquals(1, r.size());
+    }
 }

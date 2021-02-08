@@ -350,7 +350,7 @@ public class ReservaService {
 	
 	@Transactional
 	public Double calcularIngresos(Date fecha1, Date fecha2) {
-		Collection<Reserva> reservas = reservaRepo.findByEstadoReservaCompletadaOAceptada();
+		Collection<Reserva> reservas = reservaRepo.findByEstadoReservaCompletada();
 		Double ingresos = 0.0;
 		for(Reserva r:reservas) {
 			if(r.getFechaSalida().after(fecha1) && r.getFechaSalida().before(fecha2)) {
@@ -366,6 +366,11 @@ public class ReservaService {
 	public Iterable<Reserva> findPeticionesReserva() throws DataAccessException {
 		 return reservaRepo.findPeticionesReserva();
 		
+	}
+	
+	@Transactional
+	public Collection<Reserva> findReservasAceptadasByTrabajadorId(int id){
+		return reservaRepo.findReservasAceptadasByTrabajadorId(id);
 	}
 
 	@Transactional
