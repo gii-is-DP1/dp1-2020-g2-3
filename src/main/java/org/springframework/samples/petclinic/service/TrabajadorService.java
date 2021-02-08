@@ -57,7 +57,7 @@ private TrabajadorRepository trabRepo;
 	}
 
 	@Transactional
-	public void save(Trabajador trabajador) throws FechaFinAnteriorInicioException  {
+	public Trabajador save(Trabajador trabajador) throws FechaFinAnteriorInicioException  {
 		
 		trabRepo.save(trabajador);
 		userService.saveUser(trabajador.getUser());
@@ -68,6 +68,7 @@ private TrabajadorRepository trabRepo;
 		}else {
 			log.info("la fecha de fin es posterior o igual a la de inicio, no se lanza excepción");
 		}
+		return trabajador;
 	}
 	
 	@Transactional

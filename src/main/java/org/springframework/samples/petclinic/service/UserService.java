@@ -55,7 +55,7 @@ public class UserService {
 	}
 	
 	@Transactional
-	public void despedirTrabajador(User user) throws DataAccessException,TrabajadorNoActivo {
+	public User despedirTrabajador(User user) throws DataAccessException,TrabajadorNoActivo {
 		
 		if(!user.isEnabled()) {
 			log.error("El trabajador no está activo, no se puede despedir");
@@ -66,6 +66,7 @@ public class UserService {
 			log.info("Trabajador despedido");
 			
 		}
+		return user;
 		
 	}
 	
