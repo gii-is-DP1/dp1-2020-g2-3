@@ -774,7 +774,7 @@ class ReservaServiceMockedTests {
 //    	horaSalida.setMinutes(0);
 //    	
 //		Date fechaSalida= new Date();
-//		fechaSalida.setDate(9);
+//		fechaSalida.setDate(28);
 //		fechaSalida.setMonth(2);
 //		fechaSalida.setYear(2021);
 //		fechaSalida.setHours(horaSalida.getHours());
@@ -789,7 +789,7 @@ class ReservaServiceMockedTests {
 //    	reserva.setPlazas_Ocupadas(3);
 //    	reserva.setRuta(ruta);
 //    
-//    //ACT
+//    //ASSERT
 //    	assertThrows(CancelacionViajeAntelacionException.class, ()->reservaService.save(reserva));
 //    }
     
@@ -862,10 +862,5 @@ class ReservaServiceMockedTests {
 //    	assertThrows(CancelacionViajeAntelacionException.class,()->reservaService.cancelarReserva(reserva));
 //    }
     
-//    @Test
-//    @Transactional
-//    @DisplayName("Cancelar una reserva con fecha de salida anterior a la fecha actual")
-//    void cancelarReservaFechaSalidaAnteriorTest() {
-//    }
     
 }
