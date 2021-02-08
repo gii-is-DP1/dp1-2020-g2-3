@@ -80,7 +80,7 @@
 				</petclinic:menuItem>
 			</sec:authorize>
 			
-				<petclinic:menuItem active="${name eq 'miPerfil'}" url=""
+				<petclinic:menuItem active="${name eq 'miPerfil'}" url="/miPerfil"
 					title="clientes">
 					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 					<span>Mi perfil</span>
