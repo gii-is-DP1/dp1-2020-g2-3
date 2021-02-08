@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -757,41 +758,42 @@ class ReservaServiceMockedTests {
 	}
 	
 
-//    @Test
-//    @Transactional
-//    @DisplayName("Cancelar una reserva con estado Solicitada o Aceptada")
-//    void cancelarReservaSolicitadaAceptadaTest() {
-//    //ARRANGE	
-//    	Ruta ruta= new Ruta(); 
-//    	Double numKmTotales=142.0;
-//    	ruta.setNumKmTotales(numKmTotales);
-//    	ruta.setHorasEstimadasCliente(1.0);
-//    	
-//    	Reserva reserva = new Reserva();
-//    	
-//    	Date horaSalida= new Date(); 
-//    	horaSalida.setHours(8);
-//    	horaSalida.setMinutes(0);
-//    	
-//		Date fechaSalida= new Date();
-//		fechaSalida.setDate(28);
-//		fechaSalida.setMonth(2);
-//		fechaSalida.setYear(2021);
-//		fechaSalida.setHours(horaSalida.getHours());
-//		fechaSalida.setMinutes(horaSalida.getMinutes());
-//    	
-//    	EstadoReserva estado = new EstadoReserva();
-//    	estado.setId(2);
-//    	estado.setName("Aceptada");
-//    	reserva.setEstadoReserva(estado);
-//    	reserva.setFechaSalida(fechaSalida);
-//    	reserva.setHoraSalida(horaSalida);
-//    	reserva.setPlazas_Ocupadas(3);
-//    	reserva.setRuta(ruta);
-//    
-//    //ASSERT
+    @Test
+    @Transactional
+    @DisplayName("Cancelar una reserva con estado Solicitada o Aceptada")
+    void cancelarReservaSolicitadaAceptadaTest() {
+    //ARRANGE	
+    	Ruta ruta= new Ruta(); 
+    	Double numKmTotales=142.0;
+    	ruta.setNumKmTotales(numKmTotales);
+    	ruta.setHorasEstimadasCliente(1.0);
+    	
+    	Reserva reserva = new Reserva();
+    	
+    	Date horaSalida= new Date(); 
+    	horaSalida.setHours(8);
+    	horaSalida.setMinutes(0);
+    	
+		Date fechaSalida= new Date();
+		fechaSalida.setDate(28);
+		fechaSalida.setMonth(2);
+		fechaSalida.setYear(2021);
+		fechaSalida.setHours(horaSalida.getHours());
+		fechaSalida.setMinutes(horaSalida.getMinutes());
+    	
+    	EstadoReserva estado = new EstadoReserva();
+    	estado.setId(2);
+    	estado.setName("Aceptada");
+    	reserva.setEstadoReserva(estado);
+    	reserva.setFechaSalida(fechaSalida);
+    	reserva.setHoraSalida(horaSalida);
+    	reserva.setPlazas_Ocupadas(3);
+    	reserva.setRuta(ruta);
+    
+    //ASSERT
 //    	assertThrows(CancelacionViajeAntelacionException.class, ()->reservaService.save(reserva));
-//    }
+    	assertDoesNotThrow(()->reservaService.save(reserva),"Estado Rechazada o intervalo de fecha salida y actual menor a 24h, se lanza excepción");
+    }
     
     @Test
     @Transactional
@@ -824,7 +826,7 @@ class ReservaServiceMockedTests {
     	assertThrows(ReservaYaRechazada.class, ()->reservaService.cancelarReserva(reserva));
     	
     }
-  
+//  
 //    @Test
 //    @Transactional
 //    @DisplayName("Cancelar una reserva con fecha de salida con intervalo menor a 24 horas respecto a la actualidad")
@@ -843,7 +845,7 @@ class ReservaServiceMockedTests {
 //    	horaSalida.setMinutes(0);
 //    	
 //		Date fechaSalida= new Date();
-//		fechaSalida.setDate(6);
+//		fechaSalida.setDate(7);
 //		fechaSalida.setMonth(2);
 //		fechaSalida.setYear(2021);
 //		fechaSalida.setHours(horaSalida.getHours());

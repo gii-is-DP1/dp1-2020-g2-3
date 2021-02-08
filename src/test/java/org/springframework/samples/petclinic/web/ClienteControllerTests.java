@@ -250,6 +250,7 @@ void testInitUpdateClienteForm() throws Exception {
 		mockMvc.perform(get("/clientes/myReservas", TEST_CLIENTE_ID)).andExpect(status().isOk())
 			.andExpect(view().name("reservas/misReservas"));
 	}
+    
 
     @WithMockUser(value = "spring")
     @Test
