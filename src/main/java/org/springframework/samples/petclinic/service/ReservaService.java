@@ -242,7 +242,6 @@ public class ReservaService {
 					//si la ruta creada ya existe en la BD se asignará, y si no,se creará una nueva Ruta
 			
 			reserva=asignarRutaExistenteOCrearla(reserva);
-			log.info("Vamos a asignar las horas de espera");
 			reserva.setHorasEspera(0.0);
 			reserva.setEstadoReserva(estadoService.findEstadoById(1).get());
 		
@@ -336,7 +335,7 @@ public class ReservaService {
 	}
 
 	@Transactional
-	public void rechazarReserva(Reserva reserva) throws DataAccessException,ParadaYaAceptadaRechazadaException {
+	public Reserva rechazarReserva(Reserva reserva) throws DataAccessException,ParadaYaAceptadaRechazadaException {
 		
 		if(!reserva.getEstadoReserva().getName().equals("Solicitada")) {
 			throw new ParadaYaAceptadaRechazadaException();
@@ -345,18 +344,18 @@ public class ReservaService {
 			EstadoReserva estadoReserva= estadoService.findEstadoById(3).get(); //Estado 3= Rechazada
 			reserva.setEstadoReserva(estadoReserva);
 			save(reserva);
-			
+			return reserva;
 		}
 		
 	}
 	@Transactional
-	public void aceptarReserva(Reserva reserva,Automovil auto,Principal p) throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException,ExisteViajeEnEsteHorarioException {
+	public Reserva aceptarReserva(Reserva reserva,Automovil auto,String username) throws DataAccessException,ParadaYaAceptadaRechazadaException,AutomovilPlazasInsuficientesException,ExisteViajeEnEsteHorarioException {
 	
 		if(!reserva.getEstadoReserva().getName().equals("Solicitada")) {
 			throw new ParadaYaAceptadaRechazadaException();
 		}else {
-			System.out.println("P GET NAME: " + p.getName());
-			Trabajador trabajador= trabajadorService.findByUsername(p.getName());
+			
+			Trabajador trabajador= trabajadorService.findByUsername(username);
 			
 			if(auto.getNumPlazas()-1<reserva.getPlazas_Ocupadas()){
 				throw new AutomovilPlazasInsuficientesException();
@@ -370,6 +369,7 @@ public class ReservaService {
 				reserva.setAutomovil(auto);
 				reserva.setEstadoReserva(estadoReserva);
 				save(reserva);
+				return reserva;
 			}
 		
 		}
@@ -426,12 +426,7 @@ public class ReservaService {
 	
 		Date today = new Date();
 
-		Date fechaSalida= new Date();
-		fechaSalida.setDate(reserva.getFechaSalida().getDate());
-		fechaSalida.setMonth(reserva.getFechaSalida().getMonth());
-		fechaSalida.setYear(reserva.getFechaSalida().getYear());
-		fechaSalida.setHours(reserva.getHoraSalida().getHours());
-		fechaSalida.setMinutes(reserva.getHoraSalida().getMinutes());
+		Date fechaSalida= utilService.unirFechaHora(reserva.getFechaSalida(), reserva.getHoraSalida());
 		Date fechaAux = utilService.addFecha(fechaSalida, Calendar.HOUR_OF_DAY, -24); //REstamos 24 horas
         if(!(reserva.getEstadoReserva().getName().equals("Solicitada") || reserva.getEstadoReserva().getName().equals("Aceptada"))) {
         	log.error("El estado de la reserva tiene que ser 'Solicitada' o 'Aceptada' para poder cancelarla");
@@ -448,7 +443,7 @@ public class ReservaService {
     }
 	
 	@Transactional(readOnly = true)
-	public Reserva findResById(int id) throws DataAccessException {
+	public Reserva findResById(int id) throws DataAccessException { //Método CRUD REPOSITORY
 		return reservaRepo.findResById(id);
 	}
 	
