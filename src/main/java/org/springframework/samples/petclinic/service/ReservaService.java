@@ -110,11 +110,11 @@ public class ReservaService {
 	@Transactional
 	public void fechaSalidaSinAntelacion(Date fechaSalida, Date horaSalida) throws HoraSalidaSinAntelacionException{
 		Date today = new Date();
-		fechaSalida.setHours(horaSalida.getHours());
-		fechaSalida.setMinutes(horaSalida.getMinutes());
-		fechaSalida = utilService.addFecha(fechaSalida, Calendar.MINUTE, -40);
+		Date fechaHoraSalida= utilService.unirFechaHora(fechaSalida, horaSalida);
 		
-		if(fechaSalida.compareTo(today)<0) {
+		fechaHoraSalida = utilService.addFecha(fechaSalida, Calendar.MINUTE, -40);
+		
+		if(fechaHoraSalida.compareTo(today)<0) {
 			System.out.println("hora de salida con menos de 40 minutos de antelación, se lanza excepción");
 			throw new HoraSalidaSinAntelacionException();
 		}else {
@@ -138,38 +138,33 @@ public class ReservaService {
 		}
 		
 	}
-	
+	//Comprueba si un taxista ya tiene una reserva aceptada en el horario en el que esta intentando aceptar otra reserva.
 	@Transactional
-	public void existeViajeEnEsteHorario(Date horaSalida, Date horaLlegada, Date fechaSalida, int trabajadorId) throws ExisteViajeEnEsteHorarioException{
-		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(trabajadorId);
+	public boolean taxistaConViaje(int taxistaId,Reserva reserva){
+	
+		boolean res= false;
+		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(taxistaId);
+		log.debug("" + reservasTrabajador.size());
+		Date fechaHoraSalida= utilService.unirFechaHora(reserva.getFechaSalida(), reserva.getHoraSalida());
+		Date fechaHoraLlegada= utilService.unirFechaHora(reserva.getFechaLlegada(), reserva.getHoraLlegada());
+		if(reservasTrabajador.size()>0) {
+			
 		
 		for (Reserva r: reservasTrabajador) {
-			Boolean cond1 = horaSalida.before(r.getHoraSalida()) && horaLlegada.before(r.getHoraSalida());
-			Boolean cond2 = horaSalida.after(r.getHoraSalida()) && horaLlegada.after(r.getHoraLlegada());
-			if((r.getFechaSalida().equals(fechaSalida)) && !(cond1 || cond2)){
-				System.out.println("El taxista ya tiene un viaje aceptado en ese periodo de tiempo.");
-				throw new ExisteViajeEnEsteHorarioException();
-			}else {
-				System.out.println("El taxista acepta el viaje.");
+			Date fechaHoraSalidaReservaAceptada= utilService.unirFechaHora(r.getFechaSalida(), r.getHoraSalida());
+			Date fechaHoraLlegadaReservaAceptada= utilService.unirFechaHora(r.getFechaLlegada(), r.getHoraLlegada());
+			Boolean cond1 = fechaHoraSalida.before(fechaHoraSalidaReservaAceptada) && fechaHoraLlegada.before(fechaHoraSalidaReservaAceptada);
+			Boolean cond2 = fechaHoraSalida.after(fechaHoraLlegadaReservaAceptada) && fechaHoraLlegada.after(fechaHoraLlegadaReservaAceptada);
+			if(!(cond1 || cond2)){
+				log.info("El taxista ya tiene un viaje aceptado en ese periodo de tiempo.");
+				res=true;
+				break;
 			}
-		}
-	}
-	
-	//Comprueba si un taxista ya tiene una reserva aceptada en el horario en el que esta intentando aceptar otra reserva.
-	public boolean taxistaConViaje(int taxistaId, Reserva reserva) {
-		Collection<Reserva> reservasTrabajador = reservaRepo.findReservasAceptadasByTrabajadorId(taxistaId);
-		boolean res = false;
-		for (Reserva r: reservasTrabajador) {
-			Date horaSalida = reserva.getHoraSalida();
-			Date horaLlegada = reserva.getHoraLlegada();
-			Boolean cond1 = horaSalida.before(r.getHoraSalida()) && horaLlegada.before(r.getHoraSalida());
-			Boolean cond2 = horaSalida.after(r.getHoraLlegada()) && horaLlegada.after(r.getHoraLlegada());
-			if((r.getFechaSalida().equals(reserva.getFechaSalida())) && !(cond1 || cond2)){
-				res = true;
 			}
 		}
 		return res;
 	}
+	
 	
 	
 	@Transactional

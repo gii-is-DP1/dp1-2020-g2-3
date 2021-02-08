@@ -599,6 +599,11 @@ class ReservaServiceMockedTests {
     	   		  //ARRANGE
     	    	reservaSinCalcular.setRuta(rutaCalculada);
     	    	reservaSinCalcular.setEstadoReserva(estadoSolicitada);
+    	    	
+    	    	Date fechaLlegada= utilService.addFecha(reservaSinCalcular.getFechaSalida(), Calendar.HOUR, 2);
+    	    	Date horaLlegada= utilService.addFecha(reservaSinCalcular.getFechaSalida(), Calendar.HOUR, 2);
+    	    	reservaSinCalcular.setFechaLlegada(fechaLlegada); //Necesitamos completar este campo de la reserva
+    	    	reservaSinCalcular.setHoraLlegada(horaLlegada);
     	    	Automovil auto= this.arrangeAutomovil();
     	    	Trabajador trabajador= this.arrangeTrabajador();
     	    	EstadoReserva estadoAceptada= new EstadoReserva();
