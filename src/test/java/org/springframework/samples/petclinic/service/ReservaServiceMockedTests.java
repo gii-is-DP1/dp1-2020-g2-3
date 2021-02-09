@@ -692,7 +692,7 @@ class ReservaServiceMockedTests {
     	    	reservaSinCalcular.setFechaSalida(fechaSalida);
     	    	reservaSinCalcular.setHoraSalida(horaSalida);
     	    
-    	    //ASSERT
+    	    // ACT & ASSERT
     	    	assertDoesNotThrow(()->reservaService.save(reservaSinCalcular),"Estado Rechazada o intervalo de fecha salida y actual menor a 24h, se lanza excepción");
     	    }
     	    
@@ -712,7 +712,7 @@ class ReservaServiceMockedTests {
     	    	
     	      		
     	     	
-    	     	//ASSERT
+    	     	//ACT & ASSERT
     	     	assertThrows(CancelacionViajeAntelacionException.class,()->reservaService.cancelarReserva(reservaSinCalcular));
     	     }
     	    
@@ -730,7 +730,7 @@ class ReservaServiceMockedTests {
     	    	reservaSinCalcular.setFechaSalida(fechaSalida);
     	    	reservaSinCalcular.setHoraSalida(horaSalida);
     	    	
-    	      //ASSERT
+    	      //ACT & ASSERT
     	    	assertThrows(ReservaYaRechazada.class, ()->reservaService.cancelarReserva(reservaSinCalcular));
     	    	
     	    }

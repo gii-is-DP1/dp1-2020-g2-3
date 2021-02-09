@@ -60,7 +60,7 @@ public class ClienteServiceTests {
 	@Test
 	@Transactional
 	public void newClienteTest() {
-		
+		//ARRANGE
 		Cliente cliente = new Cliente();
 		cliente.setId(8);
 		cliente.setNombre("Pablo");
@@ -69,6 +69,7 @@ public class ClienteServiceTests {
 		cliente.setTelefono("678823472");
 		cliente.setDni("43434343K");
 	
+		//ASSERT
 		assertEquals(cliente.getId(), 8);
 		assertNotEquals(cliente.getId(), 7);
 		assertTrue(cliente.getNombre().equals("Pablo"));
@@ -78,22 +79,23 @@ public class ClienteServiceTests {
 	@Test
 	@Transactional
 	public void editClienteTest() {
-		
+		//ARRANGE
 		Cliente cliente = clienteService.findClienteById(1);
 		
 		String telefono = cliente.getTelefono();
 		String nuevoTelefono="659874123";
 		cliente.setTelefono(nuevoTelefono);
 		clienteService.saveCliente(cliente);
-		
+		//ACT
 		Cliente clienteActualizado=clienteService.findClienteById(1);
+		//ASSERT
 		assertEquals(telefono,clienteActualizado.getTelefono());
 	}
 	@Test
 	@Transactional
 	public void findReservaByIdTest() {	
 		
-		//ACT
+		//ARRANG & ACT
 		Reserva reserva1 = reservaService.findResById(1);
 
 		//ASSERT
@@ -109,7 +111,7 @@ public class ClienteServiceTests {
 	@Transactional
 	public void findByUsernameTest() {
 		
-		//ACT
+		//ARRANGE & ACT
 		Cliente cliente =clienteService.findClienteByUsername("pepe33");
 		Cliente cliente2 =clienteService.findClienteByUsername("manuel84");
 		
@@ -122,7 +124,7 @@ public class ClienteServiceTests {
 	@Test
 	@Transactional
 	public void findByNombreTest1() {
-		//ACT
+		//ARRANGE & ACT
 		Collection <Cliente> clientes = clienteService.findClienteByNombre("Perez");
 		//ASSERT
 		assertEquals(clientes.size(), 2);
@@ -130,7 +132,7 @@ public class ClienteServiceTests {
 	
 	@Test
 	public void findAllTest() {
-		//ACT
+		//ARRANGE & ACT
 		Iterable <Cliente> clientes = clienteService.findAll();
 		Set <Cliente> res = new HashSet<>();
 		for(Cliente c: clientes) {
@@ -143,7 +145,7 @@ public class ClienteServiceTests {
 	
 	@Test
 	public void findIdByUsernameTest() {
-		//ACT
+		//ARRANGE & ACT
 		Integer id = clienteService.findIdByUsername("manuel84");
 		//ASSERT
 		assertEquals(id ,4);
