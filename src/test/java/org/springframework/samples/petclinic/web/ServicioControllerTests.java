@@ -165,16 +165,16 @@ public class ServicioControllerTests {
     @WithMockUser(value = "spring")
     @Test
     void testInitUpdateServicioForm() throws Exception {
-	mockMvc.perform(get("/servicios/edit/{clienteId}", TEST_SERVICIO_ID)).andExpect(status().isOk())
+	mockMvc.perform(get("/servicios/edit/{servicioId}", TEST_SERVICIO_ID)).andExpect(status().isOk())
 			.andExpect(model().attributeExists("servicio"))
-			.andExpect(model().attribute("servicio", hasProperty("fecha", is("3915-03-15"))))
-			.andExpect(model().attribute("servicio", hasProperty("precio", is("53.98"))))
-			.andExpect(model().attribute("servicio", hasProperty("trabajador", is("t1"))))
-			.andExpect(model().attribute("servicio", hasProperty("automovil", is("a1"))))
-			.andExpect(model().attribute("servicio", hasProperty("taller", is("t1"))))
+			.andExpect(model().attribute("servicio", hasProperty("fecha", is(s1.getFecha()))))
+			.andExpect(model().attribute("servicio", hasProperty("precio", is(53.98))))
+			.andExpect(model().attribute("servicio", hasProperty("trabajador", is(s1.getTrabajador()))))
+			.andExpect(model().attribute("servicio", hasProperty("automovil", is(s1.getAutomovil()))))
+			.andExpect(model().attribute("servicio", hasProperty("taller", is(s1.getTaller()))))
 			.andExpect(model().attribute("servicio", hasProperty("descripcion", is("Revisión de GPS"))))
-			.andExpect(model().attribute("servicio", hasProperty("completado", is("true"))))
-			.andExpect(model().attribute("servicio", hasProperty("fechaCompletado", is("2015-02-27"))))
+			.andExpect(model().attribute("servicio", hasProperty("completado", is(true))))
+			.andExpect(model().attribute("servicio", hasProperty("fechaCompletado", is(s1.getFechaCompletado()))))
 			.andExpect(view().name("servicios/updateServicioForm"));
 }
 
