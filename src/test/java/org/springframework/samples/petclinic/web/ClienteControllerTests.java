@@ -307,8 +307,13 @@ public class ClienteControllerTests {
     @WithMockUser(value = "spring")
     @Test
     void testNoEncuentraReserva() throws Exception {
-		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}",TEST_CLIENTE_ID, TEST_RESERVA_ID)).andExpect(status().isOk())
-		.andExpect(model().attribute("error", is("Reserva no encontrada")));
+    	
+    	given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(null));
+    	given(this.reservaService.findReservasByUsername(lucas.getUser().getUsername())).willReturn(listaReservas);
+    	
+		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}", 9)).andExpect(status().isOk())
+		.andExpect(model().attribute("error", "Reserva no encontrada"))
+		.andExpect(view().name("reservas/misReservas"));
 		
 	}
     
