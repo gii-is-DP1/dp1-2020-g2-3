@@ -223,7 +223,7 @@ public class ReservaController {
 	// dependiendo del botón pulsado
 	
 	public String calcularMostrarReserva(Reserva reserva, ModelMap modelMap, Iterable<String> paradas,Integer numCiudadesIntermedias,String formularioError, String formularioExito,boolean nuevaReserva,boolean confirmarReserva,Principal p) {
-		
+		log.info("Se procederá a calcular la reserva");
 		try {
 			
 			List<Trayecto> trayectosIntermedios= reserva.getRuta().getTrayectos(); //Trayectos intermedios, que serán los que tenga la ruta antigua que vino desde el formulario
@@ -270,7 +270,7 @@ public class ReservaController {
 	}
 	
 	public String mostrarReservaCalculada(Reserva reserva, ModelMap modelMap,String formularioExito,List<Trayecto> trayectosIntermedios,int horasRutaCliente,int minutosRutaCliente,Principal p) {
-				
+				log.info("Se procedera a mostrar la reserva en el formulario");
 		Set<String> authorities= authoService.findAuthoritiesByUsername(p.getName());
 			
 				if(formularioExito.equals("reservas/editReservaForm")) { //Si hemos solicitado EDITAR la ruta, aparecerán más campos en el formulario
@@ -299,13 +299,15 @@ public class ReservaController {
 				modelMap.put("minutosRutaCliente", minutosRutaCliente);
 				Integer numCiudadesIntermedias= trayectosIntermedios.size();
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
-				modelMap.put("finBucle",numCiudadesIntermedias-1);				
+				modelMap.put("finBucle",numCiudadesIntermedias-1);
+				log.info("Mostrando reserva calculada");
 				return formularioExito;
 	}
 	
 	//Cambiar
 	public String confirmarNuevaReserva(Reserva reserva,ModelMap modelMap,Iterable<String> paradas,Integer numCiudadesIntermedias,Principal p) {
 		try {
+			log.info("Se ha solicitado confirmar una nueva reserva");
 				reservaService.calcularYConfirmarNuevaReserva(reserva,p.getName());
 				modelMap.addAttribute("message", "¡Reserva solicitada con éxito!");
 				return newReserva(modelMap);
@@ -343,6 +345,7 @@ public class ReservaController {
 	
 	@GetMapping(value="/delete/{reservaId}")
 	public String borrarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
+		log.info("Se ha solicitado eliminar una reserva");
 		Optional<Reserva> reserva=reservaService.findReservaById(reservaId);
 		if (reserva.isPresent()) {
 			reservaService.delete(reserva.get()); 
@@ -356,13 +359,12 @@ public class ReservaController {
 	
 	@GetMapping(value= "/edit/{reservaId}")
 	public String editReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap,Principal p) {
-		
+		log.info("Se ha solicitado editar una reserva");
 		Optional<Reserva> reservaOptional=reservaService.findReservaById(reservaId);
 		if(reservaOptional.isPresent()) {
 			Reserva reserva= reservaOptional.get();
 			List<Trayecto> trayectosIntermedios= rutaService.obtenerTrayectosIntermedios(reserva.getRuta()); //La reserva viene construida totalmente desde la base de datos, por ello tenemos que detectar cuáles de sus trayectos son los intermedios
 			int horasRutaCliente=rutaService.calcularHorasRutaCliente(reserva.getRuta());
-			log.info("horasRutaCliente " + horasRutaCliente);
 		    int minutosRutaCliente= rutaService.calcularMinutosRutaCliente(reserva.getRuta());
 			return mostrarReservaCalculada(reserva, modelMap,"reservas/editReservaForm",trayectosIntermedios,horasRutaCliente,minutosRutaCliente,p);
 		}else {
@@ -388,6 +390,7 @@ public class ReservaController {
 		}else {
 			if(action.equals("editarRuta")) { //Editar la RUTA de una reserva	
 				
+				log.info("Se ha solcitado editar la ruta de una reserva");
 				
 				Iterable<String> paradas= trayectoService.findDistinctParadas();
 				modelMap.put("paradas", paradas);
@@ -401,6 +404,7 @@ public class ReservaController {
 				Optional<Reserva> reservaBD= reservaService.findReservaById(reserva.getId());
 				if(reservaBD.isPresent()) {
 					try {
+						log.info("Se ha solicitado guardar una reserva editada");
 						reservaService.guardarReservaEditada(reserva, reservaBD.get());
 						return listadoReservas(modelMap);
 					}catch(DuplicatedParadaException e) {
@@ -447,6 +451,7 @@ public class ReservaController {
 		
 		Iterable<String> paradas= trayectoService.findDistinctParadas();
 		if(action.equals("recalcularReserva")) {
+			log.info("Se ha solicitado recalcular una reserva en función de una nueva ruta");
 			//Solo queremos comprobar el binding aquí
 			if(binding.hasErrors()) {
 				log.error("Errores de binding");
@@ -473,6 +478,7 @@ public class ReservaController {
 	
 	@GetMapping(value = "/peticionesReservas")
 	public String listadoPeticionesReservas(ModelMap modelMap) {
+		log.info("Se ha solicitado ver un listado con las peticiones de reserva");
 		String vista="reservas/peticionesReservas";
 		Iterable<Reserva> reservas= reservaService.findPeticionesReserva();
 		modelMap.addAttribute("reservas", reservas);
@@ -483,7 +489,7 @@ public class ReservaController {
 
 	@GetMapping(value= "/aceptar/{reservaId}")
 	public String aceptarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
-		
+		log.info("Se ha solicitado aceptar una reserva");
 		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
 		if(!reservaOptional.isPresent()) {
 			modelMap.addAttribute("error", "Reserva no encontrada");
@@ -498,7 +504,7 @@ public class ReservaController {
 	
 	@PostMapping(value= "/aceptar/{reservaId}")
 	public String aceptarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap,@RequestParam("autoId") int autoId, Principal p) {
-	
+	log.info("Se ha intentado aceptar una reserva");
 		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
 		if(!reservaOptional.isPresent()) {
 			modelMap.addAttribute("error", "Reserva no encontrada");
@@ -529,7 +535,7 @@ public class ReservaController {
 	
 	@GetMapping(value= "/rechazar/{reservaId}")
 	public String rechazarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap) {
-		
+		log.info("Se ha solicitado rechazar una reserva");
 		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
 		if(!reservaOptional.isPresent()) {
 			modelMap.addAttribute("error", "Reserva no encontrada");
@@ -549,6 +555,7 @@ public class ReservaController {
 	@GetMapping("/reservaFactura/{reservaId}")
 	public String reservaFactura(@PathVariable("reservaId") int reservaId,ModelMap modelMap) throws DataAccessException, EstadoReservaFacturaException {
 		try {
+			log.info("Se ha solicitado ver la factura de una reserva");
 			Optional<Reserva> reserva=reservaService.findFacturaReservaById(reservaId);
 		if(reserva.isPresent()) {
 			Map<String,Double> factura = reservaService.calcularFactura(reservaId);
@@ -573,6 +580,7 @@ public class ReservaController {
 	@GetMapping("/reservaMiFactura/{reservaId}")
 	public String reservaMiFactura(@PathVariable("reservaId") int reservaId,ModelMap modelMap, Principal p) throws DataAccessException, EstadoReservaFacturaException {
 		try {
+			log.info("Se ha solicitado ver la factura de una reserva");
 			Optional<Reserva> reserva=reservaService.findFacturaReservaById(reservaId);
 		if(reserva.isPresent()) {
 			Map<String,Double> factura = reservaService.calcularFactura(reservaId);

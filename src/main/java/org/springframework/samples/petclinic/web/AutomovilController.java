@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Controller
 @RequestMapping("/automoviles")
 public class AutomovilController {
@@ -41,6 +43,7 @@ public class AutomovilController {
 		String vista="automoviles/listadoAutomoviles";
 		Iterable<Automovil> automoviles= autoService.findAll();
 		modelMap.addAttribute("automoviles", automoviles);
+		log.info("Mostrando lista de automóviles");
 		return vista;
 	}
 	
@@ -52,6 +55,7 @@ public class AutomovilController {
 				
 				autoService.delete(automovil.get()); 
 				modelMap.addAttribute("message", "Automóvil borrado correctamente");
+				
 			}catch(AutomovilAsignadoServicioReservaException exception) {
 				
 				modelMap.addAttribute("error", "No se puede eliminar un automóvil que haya realizado un servicio o viaje");

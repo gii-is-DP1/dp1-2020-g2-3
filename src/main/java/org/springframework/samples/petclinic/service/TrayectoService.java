@@ -53,6 +53,7 @@ public class TrayectoService {
 		}else {
 			Ruta rutaConstruida= rutaService.inicializarRuta(rutaFormulario);
 			if(!rutaFormulario.getOrigenCliente().equals("Zahinos")) { //Se añade el trayecto Zahinos --> Origen Cliente en caso de que Origen Cliente no sea Zahinos
+				log.info("Se añade el trayecto Zahinos --> Origen Cliente");
 				rutaConstruida=this.recalcularRutaAddTrayecto(rutaConstruida,"Zahinos", rutaFormulario.getOrigenCliente(),false);
 
 			}
@@ -63,7 +64,7 @@ public class TrayectoService {
 				rutaConstruida= this.recalcularRutaAddTrayecto(rutaConstruida, rutaFormulario.getOrigenCliente(), rutaFormulario.getDestinoCliente(),true);
 				
 			}else { //Hay paradas intermedias
-				
+				log.info("Hay paradas intermedias");
 				if(rutaFormulario.getOrigenCliente().equals(paradasIntermedias.get(0).getOrigen())) {
 					log.error("Origen del cliente: " + rutaFormulario.getOrigenCliente() + ", igual a la primera parada intermedia:" + paradasIntermedias.get(0).getOrigen());
 					throw new DuplicatedParadaException();
@@ -103,7 +104,7 @@ public class TrayectoService {
 			rutaConstruida.setNumKmTotales(utilService.aproximarNumero(rutaConstruida.getNumKmTotales()));
 			rutaConstruida.setHorasEstimadasTaxista(utilService.aproximarNumero(rutaConstruida.getHorasEstimadasTaxista()));
 			rutaConstruida.setHorasEstimadasCliente(utilService.aproximarNumero(rutaConstruida.getHorasEstimadasCliente()));
-			
+			log.info("Se ha contruido y calculado la ruta");
 			return rutaConstruida;
 			
 		}

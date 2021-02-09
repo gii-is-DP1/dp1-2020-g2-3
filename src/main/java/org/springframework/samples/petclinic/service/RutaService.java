@@ -65,7 +65,7 @@ public class RutaService {
 							i++;
 						}
 					if(coincidenTodosLosTrayectos) { //Cuando encontremos una ruta paramos el bucle for
-						
+						log.info("Se ha encontrado una ruta igual en la BD, con los mismos trayectos intermedios");
 						rutaEncontrada=true;
 						resultado=Optional.ofNullable(r);
 						break;
@@ -85,6 +85,7 @@ public class RutaService {
 		double totalHoras= ruta.getHorasEstimadasCliente();
 		double parteDecimal= totalHoras%1;
 		int horasCliente= (int) (totalHoras-parteDecimal);
+		log.info("Se han calculado las horas de la ruta del cliente");
 		return horasCliente;
 	}
 	
@@ -92,6 +93,7 @@ public class RutaService {
 	public int calcularMinutosRutaCliente(Ruta ruta) {
 		double totalHoras= ruta.getHorasEstimadasCliente();
 		int minutosRealesAproximados= (int)Math.round((totalHoras%1)*60);
+		log.info("se han calculado los minutos de la ruta del cliente");
 		return minutosRealesAproximados;
 	}
 	@Transactional 
@@ -122,6 +124,7 @@ public class RutaService {
 				}
 				i++;
 			}
+			log.info("Se han obtenido los trayectos intermedios de la ruta");
 		
 		return trayectosIntermedios;
 	}
