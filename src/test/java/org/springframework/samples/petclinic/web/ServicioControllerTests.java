@@ -177,9 +177,33 @@ public class ServicioControllerTests {
 			.andExpect(model().attribute("servicio", hasProperty("fechaCompletado", is(s1.getFechaCompletado()))))
 			.andExpect(view().name("servicios/updateServicioForm"));
 }
+    
+    @WithMockUser(value = "spring")
+    @Test
+    void testProcessUpdateServicioFormSuccess() throws Exception {
+    	mockMvc.perform(post("/servicios/edit/{servicioId}", TEST_SERVICIO_ID)
+						.with(csrf())
+						.param("fecha", "2019-08-09")
+						.param("precio", "60.0")
+						.param("descripcion", "picotazo en la luna"))
+			.andExpect(status().isOk());
+    }
+    
+    @WithMockUser(value = "spring")
+    @Test
+    void testProcessUpdateServicioFormHasErrors() throws Exception {
+    	mockMvc.perform(post("/servicios/edit/{servicioId}", TEST_SERVICIO_ID)
+						.with(csrf())
+						.param("fecha", "")
+						.param("precio", "60.0")
+						.param("descripcion", "picotazo en la luna"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasErrors("servicio"))
+			.andExpect(model().attributeHasFieldErrors("servicio", "fecha"))
+			.andExpect(view().name("servicios/updateServicioForm"));
+    }
 
-	
-	
+		
 
 	@WithMockUser(value = "spring")
     @Test
