@@ -422,7 +422,7 @@ public class ReservaService {
 	
 	
 	@Transactional
-    public void cancelarReserva(Reserva reserva) throws DataAccessException, ReservaYaRechazada, CancelacionViajeAntelacionException {
+    public Reserva cancelarReserva(Reserva reserva) throws DataAccessException, ReservaYaRechazada, CancelacionViajeAntelacionException {
 	
 		Date today = new Date();
 
@@ -438,7 +438,7 @@ public class ReservaService {
         	
             reserva.setEstadoReserva(estadoService.findEstadoById(3).get());
             reservaRepo.save(reserva);
-            log.info("La Reserva ha sido cancelada correctamente");
+            return reserva;
         }
 
     }

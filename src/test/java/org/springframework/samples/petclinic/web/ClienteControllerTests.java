@@ -12,13 +12,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,6 +38,10 @@ import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.UserService;
+import org.springframework.samples.petclinic.service.UtilService;
+import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
+import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
+import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -58,7 +66,10 @@ public class ClienteControllerTests {
         
     @MockBean
 	private UserService userService;
-        
+       
+    @MockBean
+  	private UtilService utilService;
+    
     @MockBean
     private AuthoritiesService authoritiesService; 
 
@@ -71,7 +82,11 @@ public class ClienteControllerTests {
 	
 	private EstadoReserva estRes;
 	
+	private EstadoReserva estRes2;
+	
 	private Ruta ruta;
+	
+	private List<Reserva> listaReservas;
 	
 	@BeforeEach
 	void setup() {
@@ -93,6 +108,10 @@ public class ClienteControllerTests {
 		estRes = new EstadoReserva();
 		estRes.setId(1);
 		estRes.setName("Solicitada");
+		
+		estRes2 = new EstadoReserva();
+		estRes2.setId(3);
+		estRes2.setName("Rechazada");
 		
 		ruta = new Ruta();
 		ruta.setDestinoCliente("Zahinos");
@@ -122,6 +141,45 @@ public class ClienteControllerTests {
 		reserva.setRuta(ruta);
 		
 		given(this.reservaService.findResById(TEST_RESERVA_ID)).willReturn(reserva);
+		
+		
+		 Reserva reserva1= new Reserva();
+		 Date fechaSalidaAux = utilService.addFecha(reserva1.getFechaSalida(), Calendar.HOUR, 25);
+		 Date horaSalidaAux = utilService.addFecha(reserva1.getFechaSalida(), Calendar.HOUR, 25);
+		 reserva1.setFechaSalida(fechaSalidaAux);
+		 reserva1.setHoraSalida(horaSalidaAux);
+		 reserva1.setDescripcionEquipaje("1 maleta mediana");
+		 reserva1.setEstadoReserva(estRes);
+		 reserva1.setCliente(lucas);
+		 reserva1.setId(5);
+		 
+		 
+		 Reserva reserva2= new Reserva();
+		 Date fechaSalidaAux2 = utilService.addFecha(reserva2.getFechaSalida(), Calendar.HOUR, 23);
+		 Date horaSalidaAux2 = utilService.addFecha(reserva2.getFechaSalida(), Calendar.HOUR, 23);
+		 reserva2.setFechaSalida(fechaSalidaAux2);
+		 reserva2.setHoraSalida(horaSalidaAux2);
+		 reserva2.setDescripcionEquipaje("2 maletas medianas");
+		 reserva2.setEstadoReserva(estRes);
+		 reserva2.setCliente(lucas);
+		 reserva2.setId(6);
+		 
+		 Reserva reserva3= new Reserva();
+		 Date fechaSalidaAux3 = utilService.addFecha(reserva3.getFechaSalida(), Calendar.HOUR, 25);
+		 Date horaSalidaAux3 = utilService.addFecha(reserva3.getFechaSalida(), Calendar.HOUR, 25);
+		 reserva3.setFechaSalida(fechaSalidaAux3);
+		 reserva3.setHoraSalida(horaSalidaAux3);
+		 reserva3.setDescripcionEquipaje("3 maletas medianasS");
+		 reserva3.setEstadoReserva(estRes2);
+		 reserva3.setCliente(lucas);
+		 reserva3.setId(7);
+		 
+		 List<Reserva> listaReservas= new ArrayList<Reserva>();
+		 
+		 listaReservas.add(reserva1);
+		 listaReservas.add(reserva2);
+		 listaReservas.add(reserva3);
+		 this.listaReservas=listaReservas;
 		
 	}
 	
@@ -157,6 +215,8 @@ public class ClienteControllerTests {
 			.andExpect(model().attributeHasFieldErrors("cliente", "telefono"))
 			.andExpect(view().name("clientes/createOrUpdateClienteForm"));
 	}	
+	
+	
 
 	@WithMockUser(value = "spring")
     @Test
@@ -262,11 +322,66 @@ public class ClienteControllerTests {
 		
 	}
     
+    
+    @WithMockUser(value = "spring")
+    @Test
+    void testShowClientes() throws Exception {
+		mockMvc.perform(get("/clientes/listado")).andExpect(status().isOk())
+			.andExpect(view().name("clientes/clientesList"));
+	}
+    
+//    @WithMockUser(value = "spring")
+//    @Test
+//    void testShowOneCliente() throws Exception {
+//    	given(clienteService.findClienteByNombre(lucas.getApellidos())).willReturn(Lists.newArrayList(lucas));
+//    	
+//		mockMvc.perform(get("/clientes").param("lastName", "Perez")).andExpect(status().is3xxRedirection())
+//			.andExpect(view().name("redirect:/clientes/" + TEST_CLIENTE_ID));
+//	}
+	
     @WithMockUser(value = "spring")
     @Test
     void testCancelarReserva() throws Exception {
-		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}", 4)).andExpect(status().isOk())
+    	Reserva reserva= new Reserva();
+    	
+    	given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+    	given(this.reservaService.findReservasByUsername(lucas.getUser().getUsername())).willReturn(listaReservas);
+    	
+		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}", 5)).andExpect(status().isOk())
+		.andExpect(model().attribute("message","Reserva cancelada correctamente"))
 		.andExpect(view().name("reservas/misReservas"));
 		
 	}
+    
+    @WithMockUser(value = "spring")
+    @Test
+    void testCancelarReservaWithFechaErronea() throws Exception {
+    	Reserva reserva= new Reserva();
+    	given(this.reservaService.cancelarReserva(Mockito.any(Reserva.class))).willThrow(CancelacionViajeAntelacionException.class);
+    	given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+    	given(this.reservaService.findReservasByUsername(lucas.getUser().getUsername())).willReturn(listaReservas);
+    	
+		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}", 6)).andExpect(status().isOk())
+		.andExpect(model().attribute("error","No puedes cancelar una reserva con una antelación menor a 24 horas a la fecha de salida, ni después de dicha fecha"))
+		.andExpect(view().name("reservas/misReservas"));
+		
+	}
+    
+    @WithMockUser(value = "spring")
+    @Test
+    void testCancelarReservaWithEstadoRechazada() throws Exception {
+    	Reserva reserva= new Reserva();
+    	given(this.reservaService.cancelarReserva(Mockito.any(Reserva.class))).willThrow(ReservaYaRechazada.class);
+    	given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+    	given(this.reservaService.findReservasByUsername(lucas.getUser().getUsername())).willReturn(listaReservas);
+    	
+		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}", 7)).andExpect(status().isOk())
+		.andExpect(model().attribute("error","No puedes cancelar una reserva que no tenga un estado Solicitada o Aceptada"))
+		.andExpect(view().name("reservas/misReservas"));
+		
+	}
+    
+    
+    
+    
 }

@@ -9,7 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,54 +92,60 @@ public class ClienteServiceTests {
 	@Test
 	@Transactional
 	public void findReservaByIdTest() {	
-		//ARRANGE
-		User user = new User();
-		user.setUsername("Pablo33");
-		user.setPassword("Pablo33");
-		user.setEnabled(true);
-		
-		Cliente cliente = new Cliente();
-		cliente.setId(1);
-		cliente.setNombre("Lucas");
-		cliente.setApellidos("Perez");
-		cliente.setTelefono("608555103");
-		cliente.setUser(user);
-	
-		
-		Reserva reserva = new Reserva();
-    	
-    	Date horaSalida= new Date(); 
-    	horaSalida.setHours(8);
-    	horaSalida.setMinutes(0);
-    	
-		Date fechaSalida= new Date();
-		fechaSalida.setDate(22);
-		fechaSalida.setMonth(3);
-		fechaSalida.setYear(2021);
-		fechaSalida.setHours(horaSalida.getHours());
-		fechaSalida.setMinutes(horaSalida.getMinutes());
-    	
-    	EstadoReserva estado = new EstadoReserva();
-    	estado.setId(1);
-    	estado.setName("Solicitada");
-    	reserva.setId(1);
-    	reserva.setEstadoReserva(estado);
-    	reserva.setFechaSalida(fechaSalida);
-    	reserva.setHoraSalida(horaSalida);
-    	reserva.setPlazas_Ocupadas(3);
-		reserva.setCliente(cliente);
 		
 		//ACT
 		Reserva reserva1 = reservaService.findResById(1);
-		reserva1.setEstadoReserva(estado);
+
 		//ASSERT
-		
-		assertEquals(user.getUsername(), "Pablo33");
-		assertEquals(reserva1.getId(), reserva.getId());
+		assertEquals(reserva1.getId(), 1);
 		assertNotEquals(reserva1.getId(), 2);
-		assertTrue(reserva1.getEstadoReserva().getName().equals("Solicitada"));
+		assertTrue(reserva1.getEstadoReserva().getName().equals("Completada"));
 		
 		
 		
+	}
+	
+	@Test
+	@Transactional
+	public void findByUsernameTest() {
+		
+		//ACT
+		Cliente cliente =clienteService.findClienteByUsername("pepe33");
+		Cliente cliente2 =clienteService.findClienteByUsername("manuel84");
+		
+		//ASSERT
+		assertTrue(cliente.getUser().getUsername().equals("pepe33"));
+		assertNotEquals(cliente.getUser().getUsername(), "manuel33");
+		assertFalse(cliente2.getUser().getUsername().equals(cliente.getUser().getUsername()));
+	}
+	
+	@Test
+	@Transactional
+	public void findByNombreTest() {
+		//ACT
+		Collection <Cliente> clientes = clienteService.findClienteByNombre("Perez");
+		//ASSERT
+		assertEquals(clientes.size(), 2);
+	}
+	
+	@Test
+	public void findAllTest() {
+		//ACT
+		Iterable <Cliente> clientes = clienteService.findAll();
+		Set <Cliente> res = new HashSet<>();
+		for(Cliente c: clientes) {
+			res.add(c);
+		}
+		
+		//ASSERT
+		assertEquals(res.size(), 3);
+	}
+	
+	@Test
+	public void findIdByUsernameTest() {
+		//ACT
+		Integer id = clienteService.findIdByUsername("manuel84");
+		//ASSERT
+		assertEquals(id ,4);
 	}
 }
