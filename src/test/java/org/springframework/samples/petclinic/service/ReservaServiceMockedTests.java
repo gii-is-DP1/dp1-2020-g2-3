@@ -700,6 +700,51 @@ class ReservaServiceMockedTests {
     	   		 //ASSERT
     	   		 assertEquals(reservaRechazada.getEstadoReserva().getName(),"Rechazada");
     	   	  }
+    	    
+    	    @Test
+    	    @Transactional
+    	    @DisplayName("Calcula los ingresos en un rango de fechas determinado.")
+    	    void calculaIngresosTest() {
+    	    	
+    	    	//ARRANGE
+    			reservaSinCalcular.setRuta(rutaCalculada);
+    			estadoSolicitada.setName("Completada");
+    			reservaSinCalcular.setEstadoReserva(estadoSolicitada);
+    			reservaSinCalcular.setPrecioTotal(Double.valueOf(100));
+    			
+    			Date fecha1 = new Date();
+    			fecha1.setDate(01);
+    			fecha1.setMonth(01);
+    			fecha1.setYear(2000);
+    			fecha1.setHours(18);
+    			fecha1.setMinutes(0);
+  
+    			Date fechaSalida =utilService.addFecha(fecha1, Calendar.DATE,1);
+    			Date fecha2 = new Date();
+    			fecha2.setDate(01);
+    			fecha2.setMonth(01);
+    			fecha2.setYear(2040);
+    			fecha2.setHours(18);
+    			fecha2.setMinutes(0);
+    			
+    			Date fechaLlegada =utilService.addFecha(fecha2, Calendar.DATE,-1);
+    			reservaSinCalcular.setFechaSalida(fechaSalida);
+    			reservaSinCalcular.setFechaLlegada(fechaLlegada);
+    			
+    			List<Reserva> listaReservas= new ArrayList<Reserva>();
+    			listaReservas.add(reservaSinCalcular);
+    			listaReservas.add(reservaSinCalcular);
+    			
+    			when(reservaRepository.findByEstadoReservaCompletada()).thenReturn(listaReservas);
+    			Double ingresosEsperados= 200.0; //Dos reservas de 100 cada una
+    			    			
+    			//ACT			
+    			Double ingresos = reservaService.calcularIngresos(fecha1, fecha2);
+    			
+    			//ASSERT
+    			System.out.println("DEBUG: "+ ingresos );
+    			assertEquals(ingresosEsperados, ingresos);
+    	    }
     }
    
     
@@ -879,73 +924,7 @@ class ReservaServiceMockedTests {
 //    void cancelarReservaFechaSalidaAnteriorTest() {
 //    }
     
-    @Test
-    @Transactional
-    @DisplayName("Calcula los ingresos en un rango de fechas determinado.")
-    void calculaIngresosTest() {
-    	
-    	//ARRANGE
-    	User user = new User();
-		user.setUsername("Test1");
-		user.setPassword("Test1");
-		user.setEnabled(true);
-		
-		Cliente cliente = new Cliente();
-		cliente.setId(1);
-		cliente.setNombre("Bad");
-		cliente.setApellidos("Bunny");
-		cliente.setTelefono("666999666");
-		cliente.setUser(user);
-		clienteService.saveCliente(cliente);
-	
-		
-		Reserva reserva = new Reserva();
-    	
-    	Date horaSalida= new Date(); 
-    	horaSalida.setHours(18);
-    	horaSalida.setMinutes(0);
-    	
-		Date fechaSalida= new Date();
-		fechaSalida.setDate(15);
-		fechaSalida.setMonth(8);
-		fechaSalida.setYear(2020);
-		fechaSalida.setHours(horaSalida.getHours());
-		fechaSalida.setMinutes(horaSalida.getMinutes());
-    	
-    	EstadoReserva estado = new EstadoReserva();
-    	estado.setId(4);
-    	estado.setName("Completada");
-    	estadoService.save(estado);
-    	
-    	reserva.setId(1);
-    	reserva.setEstadoReserva(estado);
-    	reserva.setFechaSalida(fechaSalida);
-    	reserva.setHoraSalida(horaSalida);
-    	reserva.setPlazas_Ocupadas(2);
-		reserva.setCliente(cliente);
-		reserva.setPrecioTotal(Double.valueOf(100));
-		reservaService.save(reserva);
-		
-		Date fecha1 = new Date();
-		fecha1.setDate(01);
-		fecha1.setMonth(01);
-		fecha1.setYear(2000);
-		fecha1.setHours(18);
-		fecha1.setMinutes(0);
-		Date fecha2 = new Date();
-		fecha2.setDate(01);
-		fecha2.setMonth(01);
-		fecha2.setYear(2040);
-		fecha2.setHours(18);
-		fecha2.setMinutes(0);
-		
-		//ACT			
-		Double ingresos = reservaService.calcularIngresos(fecha1, fecha2);
-		
-		//ASSERT
-		System.out.println("DEBUG: "+ ingresos );
-		assertEquals(Double.valueOf(0), ingresos);
-    }
+   
     
     @Test
     @Transactional
