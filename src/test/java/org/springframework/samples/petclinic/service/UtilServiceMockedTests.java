@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -172,6 +173,21 @@ class UtilServiceMockedTests {
     	
     	//ASSERT
     	assertEquals(numeroAproximado1,numAproximadoPrueba1);
+    }
+    
+    @Test
+    @Transactional
+    @DisplayName("Convertir LocalDate a Date")
+    void asDateTest() {
+    	
+    	//ARRANGE
+    	LocalDate fecha = LocalDate.now();
+    	
+    	//ACT
+    	Date date = utilService.asDate(fecha);
+    	
+    	//ASSERT
+    	assertEquals(Date.class, date.getClass());
     }
     
    

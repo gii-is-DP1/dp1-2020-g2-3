@@ -1,31 +1,23 @@
 package org.springframework.samples.petclinic.service;
 
-import static org.assertj.core.api.Assertions.assertThat; 
-import static org.junit.Assert.assertThat;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
+
+
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.dao.DataAccessException;
+
 import org.springframework.samples.petclinic.model.EstadoReserva;
 import org.springframework.samples.petclinic.model.Reserva;
-import org.springframework.samples.petclinic.model.Ruta;
-import org.springframework.samples.petclinic.model.Trayecto;
+
+import org.springframework.samples.petclinic.model.Trabajador;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +26,12 @@ public class ReservaServiceTests {
 
 	@Autowired
 	ReservaService reservaService;
+	@Autowired
+	TrabajadorService trabajadorService;
+	@Autowired
+	ClienteService clienteService;
+	@Autowired
+	EstadoReservaService estadoService;
 	
 	@Test
 	@Transactional
@@ -72,7 +70,57 @@ public class ReservaServiceTests {
 		
 		assertEquals(numeroSolicitudes1-1,numeroSolicitudes2); //El segundo ACT trae 1 solicitud menos
 		}
-		
-		
+	
+	@Test
+	@Transactional
+	@DisplayName("Obtener todas las reservas cuyo estado sea igual a COMPLETADA")
+	void findPeticionesByEstadoReservaCompletadaTest() { //CUSTOM QUERY
+			//ARRANGE
+			Reserva reserva= reservaService.findReservaById(1).get(); //Metemos una reserva SOLICITADA en la BD
+			EstadoReserva estado= reserva.getEstadoReserva();
+			estado.setName("Completada");
+			reserva.setEstadoReserva(estado);
+			reservaService.save(reserva);
+			
+			//ACT
+			Collection<Reserva> r = reservaService.findByEstadoReservaCompletada();
+			
+			//ASSERT
+			for(Reserva res: r) {
+				assertEquals(res.getEstadoReserva().getName(), "Completada");
+			}
+			assertEquals(true,r.contains(reserva));
 	}
+	
+	@Test
+	@Transactional
+	@DisplayName("Obtener las reservas aceptadas por un trabajador")
+	void findReservasAceptadasByTrabajadorId() {
+		
+		//ARRANGE
+		Reserva reserva= reservaService.findReservaById(3).get(); //Metemos una reserva SOLICITADA en la BD
+		EstadoReserva estado= reserva.getEstadoReserva();
+		estado.setName("Aceptada");
+		reserva.setEstadoReserva(estado);
+		
+		Trabajador trabajador = trabajadorService.findById(1);
+		reserva.setTrabajador(trabajador);
+		reservaService.save(reserva);
+		int id = reserva.getTrabajador().getId();
+		
+		//ACT
+		Collection<Reserva> r = reservaService.findReservasAceptadasByTrabajadorId(id);
+		
+		//ASSERT
+		for(Reserva res: r) {
+			assertEquals(res.getEstadoReserva().getName(), "Aceptada");
+			assertEquals(Integer.valueOf(1),reserva.getTrabajador().getId());
+		}
+		assertEquals("Aceptada",reserva.getEstadoReserva().getName());
+		assertEquals(Integer.valueOf(1),reserva.getTrabajador().getId());
+		assertEquals(true,r.contains(reserva));
+	}
+		
+		
+}
 

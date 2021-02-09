@@ -17,6 +17,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.ServicioService;
+import org.springframework.samples.petclinic.service.UtilService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,6 +36,9 @@ public class EconomiaControllerTests {
 	
 	@MockBean
 	private ServicioService servicioService;
+	
+	@MockBean
+	private UtilService utilService;
 	
 	@Autowired
 	private MockMvc mockMvc;
@@ -69,7 +73,21 @@ public class EconomiaControllerTests {
 				.param("fecha1", "null")
 				.param("fecha2", "null"))
 		.andExpect(status().isOk())
+		.andExpect(model().attributeDoesNotExist("ingresos"))
+		.andExpect(model().attributeDoesNotExist("gastos"))
 		.andExpect(view().name("exception"));
+	}
+	
+	@WithMockUser(value = "spring")
+	@Test
+	void testProcessFindFormConFechasEmpty() throws Exception {
+		mockMvc.perform(get("/economias/calcular")
+				.param("fecha1", "")
+				.param("fecha2", ""))
+		.andExpect(status().isOk())
+		.andExpect(model().attributeDoesNotExist("ingresos"))
+		.andExpect(model().attributeDoesNotExist("gastos"))
+		.andExpect(view().name("economias/findEconomias"));
 	}
 	
 	@WithMockUser(value = "spring")
@@ -79,6 +97,8 @@ public class EconomiaControllerTests {
 				.param("fecha1", "1900-01-01")
 				.param("fecha2", "1800-01-01"))
 		.andExpect(status().isOk())
+		.andExpect(model().attributeDoesNotExist("ingresos"))
+		.andExpect(model().attributeDoesNotExist("gastos"))
 		.andExpect(view().name("economias/findEconomias"));
 	}
 }
