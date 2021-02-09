@@ -131,6 +131,7 @@ public class ReservaController {
 	}
 	
 	
+	
 	@PostMapping("/redirigirNewReservaForm")
 	public String redirigirNewReservaForm(@Valid Reserva reserva,BindingResult binding,ModelMap modelMap,@RequestParam("action") String action,@RequestParam("numCiudadesIntermedias") Integer numCiudadesIntermedias,Principal p) {
 		
