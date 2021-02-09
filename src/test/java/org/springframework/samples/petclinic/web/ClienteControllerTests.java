@@ -171,15 +171,7 @@ public class ClienteControllerTests {
 	given(this.clienteService.findClienteByNombre("")).willReturn(Lists.newArrayList(lucas, new Cliente()));
 	mockMvc.perform(get("/clientes")).andExpect(status().isOk()).andExpect(view().name("clientes/clientesList"));
 	}
-
-//	@WithMockUser(value = "spring")
-//    @Test
-//    void testProcessFindFormByLastName() throws Exception {
-//		given(this.clienteService.findClienteByNombre(lucas.getApellidos())).willReturn(Lists.newArrayList(lucas));
-//
-//		mockMvc.perform(get("/clientes").param("apellidos", "Perez")).andExpect(status().is3xxRedirection())
-//			.andExpect(view().name("redirect:/clientes/" + TEST_CLIENTE_ID));
-//	}
+	
 
     @WithMockUser(value = "spring")
     @Test
@@ -201,17 +193,17 @@ public class ClienteControllerTests {
     }
 
     @WithMockUser(value = "spring")
-@Test
-void testInitUpdateClienteForm() throws Exception {
-	mockMvc.perform(get("/clientes/{clienteId}/edit", TEST_CLIENTE_ID)).andExpect(status().isOk())
-			.andExpect(model().attributeExists("cliente"))
-			.andExpect(model().attribute("cliente", hasProperty("apellidos", is("Perez"))))
-			.andExpect(model().attribute("cliente", hasProperty("nombre", is("Lucas"))))
-			.andExpect(model().attribute("cliente", hasProperty("dni", is("42562345H"))))
-			.andExpect(model().attribute("cliente", hasProperty("email", is("lucas@gmail.com"))))
-			.andExpect(model().attribute("cliente", hasProperty("telefono", is("608555103"))))
-			.andExpect(view().name("clientes/createOrUpdateClienteForm"));
-}
+    @Test
+    void testInitUpdateClienteForm() throws Exception {
+    	mockMvc.perform(get("/clientes/{clienteId}/edit", TEST_CLIENTE_ID)).andExpect(status().isOk())
+				.andExpect(model().attributeExists("cliente"))
+				.andExpect(model().attribute("cliente", hasProperty("apellidos", is("Perez"))))
+				.andExpect(model().attribute("cliente", hasProperty("nombre", is("Lucas"))))
+				.andExpect(model().attribute("cliente", hasProperty("dni", is("42562345H"))))
+				.andExpect(model().attribute("cliente", hasProperty("email", is("lucas@gmail.com"))))
+				.andExpect(model().attribute("cliente", hasProperty("telefono", is("608555103"))))
+				.andExpect(view().name("clientes/createOrUpdateClienteForm"));
+    }
 
     @WithMockUser(value = "spring")
     @Test
@@ -260,20 +252,21 @@ void testInitUpdateClienteForm() throws Exception {
 		mockMvc.perform(get("/clientes/myReservas", TEST_CLIENTE_ID)).andExpect(status().isOk())
 			.andExpect(view().name("reservas/misReservas"));
 	}
+    
 
     @WithMockUser(value = "spring")
     @Test
     void testNoEncuentraReserva() throws Exception {
-		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}", TEST_RESERVA_ID)).andExpect(status().isOk())
+		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}",TEST_CLIENTE_ID, TEST_RESERVA_ID)).andExpect(status().isOk())
 		.andExpect(model().attribute("error", is("Reserva no encontrada")));
 		
 	}
     
-//    @WithMockUser(value = "spring")
-//    @Test
-//    void testCancelarReserva() throws Exception {
-//		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}",4)).andExpect(status().isOk())
-//		.andExpect(model().attribute("message", is("Reserva cancelada correctamente")));
-//		
-//	}
+    @WithMockUser(value = "spring")
+    @Test
+    void testCancelarReserva() throws Exception {
+		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}", 4)).andExpect(status().isOk())
+		.andExpect(view().name("reservas/misReservas"));
+		
+	}
 }

@@ -161,7 +161,8 @@ public class ReservaController {
 			modelMap.put("org.springframework.validation.BindingResult.reserva", null);
 			return addParada(reserva,modelMap,numCiudadesIntermedias,paradas,"reservas/newReservaForm");
 		}else {
-			log.error("Error tras rellenar el formulario de nueva reserva");
+			//Solo ocurrirá si se modifica el valor del botón del formulario desde el jsp
+			log.error("Valor del botón submit diferente al esperado tras rellenar el formulario de nueva reserva");
 			return "exception";
 		}
 	
@@ -175,6 +176,7 @@ public class ReservaController {
 		// se decidirá entre volver al anterior formulario o solicitar la reserva
 		
 		Iterable<String> paradas= trayectoService.findDistinctParadas(); //se usará si hay errores de binding o si se pulsa en el botón "atrás"
+		log.info("paradas: " + paradas);
 		if (action.equals("confirmarReserva")) {
 			
 		//Comprobamos otra vez el binding por si se ha intentado modificar manualmente algún atributo desde el jsp
@@ -199,7 +201,7 @@ public class ReservaController {
 			return "reservas/newReservaForm";
 			
 		}else {
-			log.error("Error al intentar confirmar una nueva reserva");
+			log.error("Error al cambiar el valor del botón submit, tras  intentar confirmar una nueva reserva");
 			return "exception";
 		}
 	
@@ -232,7 +234,6 @@ public class ReservaController {
 			
 		
 		    Reserva reservaCalculada= reservaService.calcularReservaAPartirDeRuta(reserva, confirmarReserva,nuevaReserva); //Reserva con precio,horaEstimada de llegada, km totales...
-		   System.out.println("Reserva recalculada: " +  reservaCalculada.getNumKmTotales());
 		    int horasRutaCliente=rutaService.calcularHorasRutaCliente(reserva.getRuta());
 		    int minutosRutaCliente= rutaService.calcularMinutosRutaCliente(reserva.getRuta());
 			return mostrarReservaCalculada(reservaCalculada,modelMap,formularioExito,trayectosIntermedios,horasRutaCliente,minutosRutaCliente,p);
@@ -286,7 +287,7 @@ public class ReservaController {
 					modelMap.put("automoviles",automoviles);
 					
 				
-				}else if(authorities.contains("admin") || authorities.contains("taxista")) { //Un trabajador está solicitando una NUEVA RESERVA
+				}else if(authorities.contains("admin") || authorities.contains("taxista")) { //Un trabajador está solicitando CREAR  una  RESERVA
 					//debe aparecer el campo "cliente" en el formulario
 					Iterable<Cliente> clientes= clienteService.findAll();
 					modelMap.put("clientes", clientes);
@@ -315,6 +316,7 @@ public class ReservaController {
 			modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
 			modelMap.addAttribute("error", "El origen y destino deben ser diferentes."
 					+ " (Dos paradas consecutivas tampoco pueden ser iguales)");
+			modelMap.put("finBucle", numCiudadesIntermedias-1);
 
 			return "reservas/newReservaForm";	
 
@@ -347,7 +349,7 @@ public class ReservaController {
 			modelMap.addAttribute("message", "Reserva eliminada correctamente");
 		}else {
 			
-			modelMap.addAttribute("message", "Reserva no encontrada!");
+			modelMap.addAttribute("error", "Reserva no encontrada!");
 		}
 		return listadoReservas(modelMap);
 	}
@@ -360,10 +362,11 @@ public class ReservaController {
 			Reserva reserva= reservaOptional.get();
 			List<Trayecto> trayectosIntermedios= rutaService.obtenerTrayectosIntermedios(reserva.getRuta()); //La reserva viene construida totalmente desde la base de datos, por ello tenemos que detectar cuáles de sus trayectos son los intermedios
 			int horasRutaCliente=rutaService.calcularHorasRutaCliente(reserva.getRuta());
+			log.info("horasRutaCliente " + horasRutaCliente);
 		    int minutosRutaCliente= rutaService.calcularMinutosRutaCliente(reserva.getRuta());
 			return mostrarReservaCalculada(reserva, modelMap,"reservas/editReservaForm",trayectosIntermedios,horasRutaCliente,minutosRutaCliente,p);
 		}else {
-			modelMap.addAttribute("message","No se ha encontrado la reserva a editar");
+			modelMap.addAttribute("error","No se ha encontrado la reserva a editar");
 			return listadoReservas(modelMap);
 		}
 	} 
@@ -383,7 +386,7 @@ public class ReservaController {
 			return mostrarReservaCalculada(reserva,modelMap,"reservas/editReservaForm",trayectosIntermedios,horasRutaCliente,minutosRutaCliente,p);
 			
 		}else {
-			if(action.equals("editarRuta")) {	
+			if(action.equals("editarRuta")) { //Editar la RUTA de una reserva	
 				
 				
 				Iterable<String> paradas= trayectoService.findDistinctParadas();
@@ -442,11 +445,11 @@ public class ReservaController {
 	public String redirigirEditRutaForm(@Valid Reserva reserva,BindingResult binding,ModelMap modelMap,@RequestParam("action") String action,@RequestParam("numCiudadesIntermedias") Integer numCiudadesIntermedias,Principal p) {
 		
 		
-		Iterable<String> paradas= trayectoService.findDistinctParadas();	
+		Iterable<String> paradas= trayectoService.findDistinctParadas();
 		if(action.equals("recalcularReserva")) {
 			//Solo queremos comprobar el binding aquí
 			if(binding.hasErrors()) {
-				System.out.println("Errores de binding");
+				log.error("Errores de binding");
 				modelMap.put("reserva",reserva);
 				modelMap.put("paradas", paradas);
 				modelMap.put("numCiudadesIntermedias", numCiudadesIntermedias);
@@ -461,7 +464,7 @@ public class ReservaController {
 			//En esta parte no queremos mostrar los erroes del binding, porque el cliente todavía está editando el formulario
 			//Por ello lo ponemos null
 			modelMap.put("org.springframework.validation.BindingResult.reserva", null);
-			return addParada(reserva,modelMap,numCiudadesIntermedias,paradas,"reservas/editRutaForm"); //Este método cambiarlo para que no redirija al formulario de crear reserva
+			return addParada(reserva,modelMap,numCiudadesIntermedias,paradas,"reservas/editRutaForm");
 		}else {
 			return "exception";
 		}
@@ -553,7 +556,7 @@ public class ReservaController {
 			modelMap.addAttribute("reserva",reserva.get());
 			return "reservas/reservaFactura";
 		}else {
-			modelMap.addAttribute("message","No se ha encontrado la factura");
+			modelMap.addAttribute("error","No se ha encontrado la factura");
 			log.error("No se ha encontrado la factura");
 			return listadoReservas(modelMap);
 		}
@@ -577,7 +580,7 @@ public class ReservaController {
 			modelMap.addAttribute("reserva",reserva.get());
 			return "reservas/reservaFactura";
 		}else {
-			modelMap.addAttribute("message","No se ha encontrado la factura");
+			modelMap.addAttribute("error","No se ha encontrado la factura");
 			return clienteController.showReservas(modelMap, p);
 		}
 	

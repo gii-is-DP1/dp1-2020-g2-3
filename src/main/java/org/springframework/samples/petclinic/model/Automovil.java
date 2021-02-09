@@ -66,4 +66,14 @@ public class Automovil extends BaseEntity {
 		return "Automovil [marca=" + marca + ", modelo=" + modelo + ", numPlazas=" + numPlazas + ", kmRecorridos="
 				+ kmRecorridos + "]";
 	}
+	
+	public static Automovil createAuto(String marca, String modelo,Integer numPlazas, Double kmRecorridos) {
+		
+		Automovil auto= new Automovil();
+  		auto.setKmRecorridos(kmRecorridos);
+  		auto.setMarca(marca);
+  		auto.setModelo(modelo);
+  		auto.setNumPlazas(numPlazas);
+  		return auto;
+	}
 }
