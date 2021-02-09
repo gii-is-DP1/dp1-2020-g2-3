@@ -8,7 +8,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
-<petclinic:layout pageName="Reserva">
+<petclinic:layout pageName="reservas">
     
      <p>
     	<a href="/reservas/new" class="btn  btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Solicitar nueva reserva</a>
@@ -31,8 +31,9 @@
             <th style="width: 150px;">Plazas Ocupadas</th>
             <th style="width: 200px;">Precio total</th>
             <th style="width: 200px;">Estado Reserva</th>
-             <th style="width: 200px;">Detalles/Editar</th>
-              <th style="width: 200px;">Eliminar</th>
+            <th style="width: 200px;">Factura</th>
+            <th style="width: 200px;">Detalles/Editar</th>
+            <th style="width: 200px;">Eliminar</th>
         </tr>
         </thead>
         <tbody>
@@ -68,22 +69,28 @@
                   <td>
                     <c:out value="${reserva.estadoReserva}"/>
                 </td>
+                <td>
+                 <spring:url value="/reservas/reservaFactura/{reservaId}" var="reservaFacturaEditUrl">
+                   <spring:param name="reservaId" value="${reserva.id}"/>                  
+                </spring:url>
+                  <a class="editFacturaReserva" href="${fn:escapeXml(reservaFacturaEditUrl)}"> Ver</a>
+                </td>
                  <td>
                    <spring:url value="/reservas/edit/{reservaId}" var="reservaEditUrl">
                    <spring:param name="reservaId" value="${reserva.id}"/>                  
                 </spring:url>
                   <a  class="btn btn-info" href="${fn:escapeXml(reservaEditUrl)}"> <span class="glyphicon glyphicon-eye-open" aria-hidden="false"> <span class="glyphicon glyphicon-edit" aria-hidden="false"></a>
                 
-               
                 </td>
+                
                 <td>
                  <spring:url value="/reservas/delete/{reservaId}" var="reservaDeleteUrl">
                 <spring:param name="reservaId" value="${reserva.id}"/>
                 </spring:url>
 				<a class="btn btn-danger" href="${fn:escapeXml(reservaDeleteUrl)}"> <span class="glyphicon glyphicon-trash" aria-hidden="false"></a>
                 </td>
-            </tr>
-            <td>
+               
+              
             
         </c:forEach>
         </tbody>

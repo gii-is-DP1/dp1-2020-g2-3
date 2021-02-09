@@ -28,8 +28,8 @@ public class Trabajador extends Person {
 	
 	@Column(name = "telefono")
 	@Digits(fraction = 0, integer = 10)
-	@NotNull
-	private  Integer telefono;
+	@NotEmpty
+	private  String telefono;
 	
 	
 	
@@ -41,7 +41,7 @@ public class Trabajador extends Person {
 	@JoinColumn(name = "tipo_trabajador_id",referencedColumnName="id")
 	private  TipoTrabajador tipoTrabajador;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL,optional=true)
 	@JoinColumn(name = "contrato", referencedColumnName = "id")
 	private Contrato contrato;
 

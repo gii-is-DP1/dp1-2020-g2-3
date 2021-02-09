@@ -47,6 +47,8 @@ public class ClienteService {
 		return clienteRepository.findAll();
 	}
 	
+	
+	
 	@Transactional
 	public void saveCliente(Cliente cliente) throws DataAccessException {
 		//creating owner
@@ -56,6 +58,7 @@ public class ClienteService {
 		//creating authorities
 		authoritiesService.saveAuthorities(cliente.getUser().getUsername(), "cliente");
 	}
+	
 	@Transactional
 	public Integer findIdByUsername(String username) {
 		return clienteRepository.findIdByUsername(username);

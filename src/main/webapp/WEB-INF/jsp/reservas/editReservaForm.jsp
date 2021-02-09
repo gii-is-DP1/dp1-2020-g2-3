@@ -64,12 +64,20 @@
 			
 			
  		<petclinic:inputField label="Precio Total" name="precioTotal"/>
+ 		<br><br>
+		 <h2>Tarifa utilizada (Inmutable):</h2>
+     	  <p> Precio por Kilómetro: <c:out value="${reserva.tarifa.precioPorKm} euros"></c:out> </p>
+     	 <p> Precio por horas de espera: <c:out value="${reserva.tarifa.precioEsperaPorHora} euros"></c:out></p>
+     	 <p> Precio por horas de espera: <c:out value="${reserva.tarifa.precioEsperaPorHora} euros"></c:out></p>
+     	 <p> Porcentaje IVA Repercutido: <c:out value="${reserva.tarifa.porcentajeIvaRepercutido} %"></c:out></p>
+     	 <br> <br>
+     	 
  		  <label for="estadoReserva">Estado de la reserva:</label>
 		<select required="true" name="estadoReserva" id="estadoReserva">
 				 <c:forEach items="${estadosReserva}" var="estado">
 				 <c:choose>
                     <c:when test="${estado.id == reserva.estadoReserva.id}">
-                        <option value="${estado.id}" selected > ${estado.name}</option>
+                        <option value="${estado.id}" selected > <c:out value="${estado.name}"></c:out></option>
                     </c:when>
                     <c:otherwise>
                         <option value="${estado.id}"> ${estado.name}</option>
@@ -83,7 +91,7 @@
 				 <c:forEach items="${clientes}" var="cliente">
 				 <c:choose>
                     <c:when test="${cliente.id == reserva.cliente.id}">
-                        <option value="${cliente.id}" selected > ${cliente.user.username}</option>
+                        <option value="${cliente.id}" selected > <c:out value= "${cliente.user.username}" > </c:out></option>
                     </c:when>
                     <c:otherwise>
                         <option value="${cliente.id}"> ${cliente.user.username}</option>
@@ -91,8 +99,48 @@
                	 </c:choose>
     	        </c:forEach>
 		</select>
+		
+		
+		<label for="trabajador"> Trabajador:</label>
+		<select required  name="trabajador" id="trabajador">
+		
+			<option value="" > <c:out value="null"></c:out></option> <!--  Si no hay un trabajador asociado todavía, se mostrará como null -->
+		
+				 <c:forEach items="${trabajadores}" var="trabajador">
+				 <c:choose>
+                    <c:when test="${trabajador.id == reserva.trabajador.id}">
+                        <option value="${trabajador.id}" selected > <c:out value="${trabajador.user.username}" ></c:out></option>
+                    </c:when>
+                    <c:otherwise>
+                        <option value="${trabajador.id}"> ${trabajador.user.username}</option>
+                    </c:otherwise>
+               	 </c:choose>
+    	        </c:forEach>
+		</select>
+		
+		<label for="automovil"> Automóvil:</label>
+		<select required  name="automovil" id="automovil">
+			
+				
+				<option value="" > <c:out value="null"></c:out></option> <!--  Si no hay un auto asociado todavía, se mostrará como null -->
+		
+				 <c:forEach items="${automoviles}" var="automovil">
+				 <c:choose>
+                    <c:when test="${automovil.id == reserva.automovil.id and not empty reserva.automovil}">
+                        <option value="${automovil.id}" selected > <c:out value="${automovil.marca} ${automovil.modelo}"></c:out></option>
+                    </c:when>
+                    <c:otherwise>
+                        <option value="${automovil.id}"  > <c:out value="${automovil.marca} ${automovil.modelo}"></c:out></option>
+                    </c:otherwise>
+               	 </c:choose>
+    	        </c:forEach>
+		</select>
+		
+		
 		<br><br>
 	<span> &nbsp;&nbsp;<button class="btn btn-default" type="submit" name="action" value="guardarReserva">Guardar reserva</button> </span> 
+     	 
+     	 
      	 
      	 
     	

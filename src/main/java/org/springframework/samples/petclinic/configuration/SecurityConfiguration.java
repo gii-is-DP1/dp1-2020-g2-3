@@ -40,10 +40,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/tarifas/**").hasAnyAuthority("admin","taxista")
 				.antMatchers("/admin/**").hasAnyAuthority("admin")
 				.antMatchers("/clientes/new").permitAll()
+				.antMatchers("/economias/**").hasAnyAuthority("admin","taxista")
+				.antMatchers("/clientes/myReservas/**").hasAnyAuthority("cliente")
 				.antMatchers("/clientes/**").hasAnyAuthority("admin","taxista")
 				.antMatchers("/reservas/**").authenticated()
+				.antMatchers("/miPerfil/**").authenticated()
 				.antMatchers("/trabajadores/**").hasAnyAuthority("admin")
+				.antMatchers("/exception").permitAll()
 				.antMatchers("/contratos/**").hasAnyAuthority("admin")
+
 				.anyRequest().denyAll()
 				.and()
 				 	.formLogin()
@@ -82,5 +87,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	}
 	
 }
-
 

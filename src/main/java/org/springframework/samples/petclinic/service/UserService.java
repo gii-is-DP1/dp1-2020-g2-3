@@ -21,10 +21,15 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.repository.UserRepository;
+import org.springframework.samples.petclinic.service.exceptions.FechaFinAnteriorInicioException;
+import org.springframework.samples.petclinic.service.exceptions.TrabajadorNoActivo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Mostly used as a facade for all Petclinic controllers Also a placeholder
@@ -32,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Michael Isvy
  */
+@Slf4j
 @Service
 public class UserService {
 
@@ -46,6 +52,22 @@ public class UserService {
 	public void saveUser(User user) throws DataAccessException {
 		user.setEnabled(true);
 		userRepository.save(user);
+	}
+	
+	@Transactional
+	public User despedirTrabajador(User user) throws DataAccessException,TrabajadorNoActivo {
+		
+		if(!user.isEnabled()) {
+			log.error("El trabajador no está activo, no se puede despedir");
+			throw new TrabajadorNoActivo();
+		}else {
+			user.setEnabled(false);
+			userRepository.save(user);
+			log.info("Trabajador despedido");
+			
+		}
+		return user;
+		
 	}
 	
 	public Optional<User> findUser(String username) {

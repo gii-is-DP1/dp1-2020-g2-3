@@ -15,36 +15,33 @@
  */
 package org.springframework.samples.petclinic.service;
 
+
 import java.util.Collection;
+import java.util.Date;
 
-import java.util.Optional;
-
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.petclinic.model.Automovil;
+
 import org.springframework.samples.petclinic.model.Servicio;
 import org.springframework.samples.petclinic.repository.ServicioRepository;
-import org.springframework.samples.petclinic.service.exceptions.DuplicatedPetNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * Mostly used as a facade for all Petclinic controllers Also a placeholder
- * for @Transactional and @Cacheable annotations
- *
- * @author Michael Isvy
- */
+@Slf4j
 @Service
 public class ServicioService {
-	
-	@Autowired
+		
 	private ServicioRepository servicioRepository;
 
-
+	@Autowired
+	public ServicioService(ServicioRepository servicioRepository) {
+		this.servicioRepository=servicioRepository;
+		
+	}
+		
 	@Transactional
 	public long servicioCount() {
 		
@@ -56,9 +53,27 @@ public class ServicioService {
 		 return servicioRepository.findAll();
 	}
 	
+	@Transactional
+	public Collection<Servicio> findAllServicios(){
+		 return servicioRepository.findAllServicios();
+	}
+	
 	@Transactional(readOnly = true)
-	public Optional<Servicio> findServicioById(int id) throws DataAccessException {
+	public Servicio findServicioById(int id) throws DataAccessException {
 		return servicioRepository.findById(id);
+	}
+	
+	@Transactional
+	public Double calcularGastos(Date fecha1, Date fecha2) {
+		Collection<Servicio> servicios = servicioRepository.findAllServicios();
+		Double gastos = 0.0;
+		for(Servicio s: servicios) {
+			if(s.getFecha().after(fecha1) && s.getFecha().before(fecha2)) {
+				gastos = gastos + s.getPrecio();
+			}
+		}
+		log.info("Los gastos calculados han sido de:" + gastos);
+		return gastos;
 	}
 	
 	@Transactional()
@@ -72,8 +87,6 @@ public class ServicioService {
 		
 		servicioRepository.save(serv);
 	}
-	
-		
 	
 
 }

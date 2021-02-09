@@ -40,8 +40,8 @@ public class TrayectoServiceTest {
 			Trayecto trayecto= trayectoService.findByOrigenAndDestino("ciudad1", "ciudad2"); 
 			
 			//ASSERT
-			assertThat(trayecto.getOrigen().equals("Zahinos"));
-			assertThat(trayecto.getOrigen().equals("Badajoz"));
+			assertThat(trayecto.getOrigen().equals("ciudad1"));
+			assertThat(trayecto.getOrigen().equals("ciudad2"));
 			assertThat(trayecto.getNumKmTotales()==20.0);
 			assertThat(trayecto.getHorasEstimadas()==0.2);
 			
@@ -54,7 +54,8 @@ public class TrayectoServiceTest {
 	 		Iterable<Trayecto> trayectos= trayectoService.findAll(); //método nativo de Spring
 	 		Set<String> diferentesParadas= new HashSet<String>();
 	 		for(Trayecto t:trayectos) {
-	 			if(!diferentesParadas.contains(t.getOrigen())) {
+	 			if(!diferentesParadas.contains(t.getOrigen())) { //Añadimos las diferntes paradas que encontremos en el sistema
+	 															// (Conjunto de los diferentes orígenes de los trayectos)
 	 				diferentesParadas.add(t.getOrigen());
 	 			}
 	 		}
@@ -64,7 +65,7 @@ public class TrayectoServiceTest {
 	 		//ASSERT
 	 		Set<String> diferentesParadasQuery=new HashSet<String>();
 	 		for(String parada:distinctParada) {
-	 			assertThat(diferentesParadas.contains(parada)); //Comprobamos que las paradas traidas por la Custom Query
+	 			assertThat(diferentesParadas.contains(parada)); //Comprobamos que las paradas traídas por la Custom Query
 	 															//son las mismas que las calculadas en el Arrange
 	 			diferentesParadasQuery.add(parada);
 	 		}
