@@ -434,6 +434,7 @@ public class ReservaService {
         	
             reserva.setEstadoReserva(estadoService.findEstadoById(3).get());
             reservaRepo.save(reserva);
+            log.info("La Reserva ha sido cancelada correctamente");
         }
 
     }
