@@ -310,7 +310,7 @@ public class ReservaService {
 	
 	@Transactional
 	public Double calcularIngresos(Date fecha1, Date fecha2) {
-		Collection<Reserva> reservas = reservaRepo.findByEstadoReservaCompletadaOAceptada();
+		Collection<Reserva> reservas = reservaRepo.findByEstadoReservaCompletada();
 		Double ingresos = 0.0;
 		for(Reserva r:reservas) {
 			if(r.getFechaSalida().after(fecha1) && r.getFechaSalida().before(fecha2)) {
@@ -326,6 +326,11 @@ public class ReservaService {
 	public Iterable<Reserva> findPeticionesReserva() throws DataAccessException {
 		 return reservaRepo.findPeticionesReserva();
 		
+	}
+	
+	@Transactional
+	public Collection<Reserva> findReservasAceptadasByTrabajadorId(int id){
+		return reservaRepo.findReservasAceptadasByTrabajadorId(id);
 	}
 
 	@Transactional
@@ -385,7 +390,6 @@ public class ReservaService {
 	@Transactional
 	public Iterable<Reserva> findReservasByUsername(String username) throws DataAccessException {
 		 return reservaRepo.findReservasByUsername(username);
-		
 	}
 	
 //	@Transactional
@@ -416,7 +420,7 @@ public class ReservaService {
 	
 	
 	@Transactional
-    public void cancelarReserva(Reserva reserva) throws DataAccessException, ReservaYaRechazada, CancelacionViajeAntelacionException {
+    public Reserva cancelarReserva(Reserva reserva) throws DataAccessException, ReservaYaRechazada, CancelacionViajeAntelacionException {
 	
 		Date today = new Date();
 
@@ -432,7 +436,7 @@ public class ReservaService {
         	
             reserva.setEstadoReserva(estadoService.findEstadoById(3).get());
             reservaRepo.save(reserva);
-            log.info("La Reserva ha sido cancelada correctamente");
+            return reserva;
         }
 
     }
@@ -440,8 +444,10 @@ public class ReservaService {
 	@Transactional(readOnly = true)
 	public Reserva findResById(int id) throws DataAccessException { //Método CRUD REPOSITORY
 		return reservaRepo.findResById(id);
-	}
+	}	
 	
-
-	
+	@Transactional(readOnly = true)
+	public Collection<Reserva> findByEstadoReservaCompletada() throws DataAccessException { 
+		return reservaRepo.findByEstadoReservaCompletada();
+	}	
 }

@@ -53,6 +53,11 @@ public class ServicioService {
 		 return servicioRepository.findAll();
 	}
 	
+	@Transactional
+	public Collection<Servicio> findAllServicios(){
+		 return servicioRepository.findAllServicios();
+	}
+	
 	@Transactional(readOnly = true)
 	public Servicio findServicioById(int id) throws DataAccessException {
 		return servicioRepository.findById(id);

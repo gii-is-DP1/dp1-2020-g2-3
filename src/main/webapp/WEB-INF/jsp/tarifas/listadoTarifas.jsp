@@ -62,7 +62,10 @@
                 </spring:url>
 				<a class="deleteTarifa" href="${fn:escapeXml(tarifaDeleteUrl)}"> <img alt="" id="delete" src="/resources/images/delete.png" style="width: 45px"></a>
 				<td>
-				<a href="" class="btn  btn-success"><span class="glyphicon glyphicon-star" aria-hidden="true"></span>Activar esta tarifa<span class="glyphicon glyphicon-star" aria-hidden="true"></span></a>
+				<spring:url value="/tarifas/activar/{tarifaId}" var="tarifaActivarUrl">
+                <spring:param name="tarifaId" value="${tarifa.id}"/>
+                </spring:url>
+				<a href="${fn:escapeXml(tarifaActivarUrl)}" class="btn  btn-success"><span class="glyphicon glyphicon-star" aria-hidden="true"></span>Activar esta tarifa<span class="glyphicon glyphicon-star" aria-hidden="true"></span></a>
               </tr>
         </c:forEach>
         </tbody>

@@ -13,13 +13,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -56,13 +59,18 @@ import org.springframework.samples.petclinic.service.TrayectoService;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.samples.petclinic.service.UtilService;
 import org.springframework.samples.petclinic.service.exceptions.AutomovilAsignadoServicioReservaException;
+import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasInsuficientesException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
+import org.springframework.samples.petclinic.service.exceptions.EstadoReservaFacturaException;
+import org.springframework.samples.petclinic.service.exceptions.ExisteViajeEnEsteHorarioException;
 import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.HoraSalidaSinAntelacionException;
+import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.ui.ModelMap;
 
 @WebMvcTest(controllers=ReservaController.class,
 excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurer.class),
@@ -182,6 +190,7 @@ public class ReservaControllerTests {
 				.andExpect(model().attributeHasFieldErrors("reserva", "fechaSalida"))
 				.andExpect(model().attributeHasFieldErrors("reserva", "horaSalida"))
 				.andExpect(model().attributeExists("reserva"))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("paradas",paradas))
 				.andExpect(model().attribute("numCiudadesIntermedias",0))
 				.andExpect(model().attribute("finBucle",-1))
@@ -253,8 +262,10 @@ public class ReservaControllerTests {
 				.param("action", "continuar"))
 				.andExpect(model().attributeExists("reserva"))
 				.andExpect(model().attribute("paradas",paradas))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("numCiudadesIntermedias",0))
 				.andExpect(model().attribute("finBucle",-1))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("error","El origen y destino deben ser diferentes."
 						+ " (Dos paradas consecutivas tampoco pueden ser iguales)"))
 				.andExpect(status().is2xxSuccessful())
@@ -281,6 +292,7 @@ public class ReservaControllerTests {
 				.param("descripcionEquipaje", "Maleta mediana")
 				.param("action", "continuar"))
 				.andExpect(model().attributeExists("reserva"))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("paradas",paradas))
 				.andExpect(model().attribute("numCiudadesIntermedias",0))
 				.andExpect(model().attribute("finBucle",-1))
@@ -309,6 +321,7 @@ public class ReservaControllerTests {
 				.param("descripcionEquipaje", "Maleta mediana")
 				.param("action", "continuar"))
 				.andExpect(model().attributeExists("reserva"))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("paradas",paradas))
 				.andExpect(model().attribute("numCiudadesIntermedias",0))
 				.andExpect(model().attribute("finBucle",-1))
@@ -335,6 +348,7 @@ public class ReservaControllerTests {
 				.param("action", "addParada"))
 				.andExpect(model().attributeExists("reserva"))
 				.andExpect(model().attribute("paradas", paradas))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("numCiudadesIntermedias", 1))
 				.andExpect(model().attribute("finBucle", 0)) //Se elimina el binding result para esta vista, los datos se comprobarán después...
 				.andExpect(model().attributeDoesNotExist("org.springframework.validation.BindingResult.reserva"))
@@ -385,6 +399,7 @@ public class ReservaControllerTests {
 					.andExpect(model().attributeHasErrors("reserva"))
 					.andExpect(model().attributeHasFieldErrors("reserva", "fechaSalida"))
 					.andExpect(model().attributeHasFieldErrors("reserva", "horaSalida"))
+					.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 					.andExpect(model().attributeHasFieldErrors("reserva", "plazas_Ocupadas"))
 					.andExpect(model().attributeExists("reserva"))
 					.andExpect(model().attribute("paradas",this.paradas))
@@ -439,6 +454,7 @@ public class ReservaControllerTests {
 					.param("plazas_Ocupadas", "2")
 					.param("descripcionEquipaje", "Maleta mediana")
 					.param("action", "confirmarReserva"))
+			.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 					.andExpect(status().isOk())
 					.andExpect(model().attribute("error","El origen y destino deben ser diferentes."
 							+ " (Dos paradas consecutivas tampoco pueden ser iguales)"))
@@ -469,6 +485,7 @@ public class ReservaControllerTests {
 					.param("descripcionEquipaje", "Maleta mediana")
 					.param("action", "confirmarReserva"))
 					.andExpect(status().isOk())
+					.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 					.andExpect(model().attribute("error","La fecha y hora de salida no puede ser anterior al instante actual"))
 					.andExpect(model().attributeExists("reserva"))
 					.andExpect(model().attribute("paradas",paradas))
@@ -500,6 +517,7 @@ public class ReservaControllerTests {
 					.andExpect(model().attribute("error","La reserva debe realizarse con un mínimo de 1 hora de antelación"))
 					.andExpect(model().attributeExists("reserva"))
 					.andExpect(model().attribute("paradas",paradas))
+					.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 					.andExpect(model().attribute("numCiudadesIntermedias",0))
 					.andExpect(model().attribute("finBucle",-1))
 					.andExpect(status().isOk())
@@ -524,6 +542,7 @@ public class ReservaControllerTests {
 					.param("action", "atras"))
 					.andExpect(model().attributeExists("reserva"))
 					.andExpect(model().attribute("paradas",paradas))
+					.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 					.andExpect(model().attribute("numCiudadesIntermedias",0))
 					.andExpect(model().attribute("finBucle",-1))
 					.andExpect(status().isOk())
@@ -675,6 +694,7 @@ public class ReservaControllerTests {
 						.andExpect(status().isOk())
 						.andExpect(model().attributeHasFieldErrors("reserva", "fechaSalida"))
 						.andExpect(model().attributeHasFieldErrors("reserva", "horaSalida"))
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(model().attributeHasFieldErrors("reserva", "plazas_Ocupadas"))
 						.andExpect(model().attribute("estadosReserva",estadosReserva))
 						.andExpect(model().attribute("clientes",clientes))
@@ -709,6 +729,7 @@ public class ReservaControllerTests {
 						.andExpect(status().isOk())
 						.andExpect(model().attribute("paradas",paradas))
 						.andExpect(model().attributeExists("reserva"))
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(model().attribute("numCiudadesIntermedias",0))
 						.andExpect(model().attribute("finBucle",-1))
 						.andExpect(view().name("reservas/editRutaForm"));
@@ -733,6 +754,7 @@ public class ReservaControllerTests {
 						.param("descripcionEquipaje", "Maleta mediana")
 						.param("action", "guardarReserva"))
 						.andExpect(status().isOk())
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(model().attribute("reservas",listaReservas))
 						.andExpect(view().name("reservas/reservasList"));
 						
@@ -796,6 +818,7 @@ public class ReservaControllerTests {
 						.andExpect(model().attribute("trabajadores",trabajadores))
 						.andExpect(model().attribute("automoviles",automoviles))
 						.andExpect(model().attributeExists("reserva"))
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(model().attribute("trayectosIntermedios",trayectosIntermedios))
 						.andExpect(model().attribute("horasRutaCliente",1))
 						.andExpect(model().attribute("minutosRutaCliente",12))
@@ -879,6 +902,7 @@ public class ReservaControllerTests {
 						.andExpect(model().attribute("numCiudadesIntermedias", 0))
 						.andExpect(model().attribute("finBucle", -1))
 						.andExpect(model().attributeExists("reserva"))
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(view().name("reservas/editRutaForm"));
 						
 			}
@@ -937,6 +961,7 @@ public class ReservaControllerTests {
 						.andExpect(model().attribute("finBucle",0))
 						.andExpect(model().attribute("paradas",paradas))
 						.andExpect(model().attributeExists("reserva"))
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(view().name("reservas/editRutaForm"));
 						
 			}
@@ -1030,17 +1055,284 @@ public class ReservaControllerTests {
 		@Test
 		void aceptarReservaPostTest() throws Exception {
 		
+			Reserva reserva= new Reserva();
+			Automovil auto= new Automovil();
+			given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+			given(this.autoService.findAutomovilById(Mockito.anyInt())).willReturn(Optional.ofNullable(auto));
+
+			given(this.reservaService.findPeticionesReserva()).willReturn(listaReservas);
+
+				mockMvc.perform(post("/reservas/aceptar/{reservaId}",1)
+						.with(csrf())
+						.param("reservaId", "1")
+						.param("autoId","1"))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("message","Reserva aceptada correctamente"))
+						.andExpect(model().attribute("reservas",listaReservas))
+						.andExpect(view().name("reservas/peticionesReservas"));
+				
+			}
+
+		@WithMockUser(value = "spring")
+		@Test
+		void aceptarReservaPostReservaNoEncontrada() throws Exception {
+		
 			
 			given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(null));
 			given(this.reservaService.findPeticionesReserva()).willReturn(listaReservas);
 
-				mockMvc.perform(get("/reservas/aceptar/{reservaId}",1))
+				mockMvc.perform(post("/reservas/aceptar/{reservaId}",1)
+						.with(csrf())
+						.param("reservaId", "1")
+						.param("autoId","1"))
 						.andExpect(status().isOk())
 						.andExpect(model().attribute("error","Reserva no encontrada"))
 						.andExpect(model().attribute("reservas",listaReservas))
 						.andExpect(view().name("reservas/peticionesReservas"));
 				
 			}
+		
+
+		@WithMockUser(value = "spring")
+		@Test
+		void aceptarReservaPostAutomovilNoEncontrado() throws Exception {
+		
+			Reserva reserva= new Reserva();
+			given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+			given(this.autoService.findAutomovilById(Mockito.anyInt())).willReturn(Optional.ofNullable(null));
+
+			given(this.reservaService.findPeticionesReserva()).willReturn(listaReservas);
+
+				mockMvc.perform(post("/reservas/aceptar/{reservaId}",1)
+						.with(csrf())
+						.param("reservaId", "1")
+						.param("autoId","1"))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("error","El automóvil que se ha intentado asignar no existe"))
+						.andExpect(model().attribute("reservas",listaReservas))
+						.andExpect(view().name("reservas/peticionesReservas"));
+			}
+		
+		@WithMockUser(value = "spring")
+		@Test
+		void aceptarReservaPostParadaYaAceptadaRechazadaException() throws Exception {
+			Reserva reserva= new Reserva();
+			Automovil auto= new Automovil();
+			given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+			given(this.autoService.findAutomovilById(Mockito.anyInt())).willReturn(Optional.ofNullable(auto));
+
+			given(this.reservaService.aceptarReserva(Mockito.any(Reserva.class), Mockito.any(Automovil.class), Mockito.anyString()))
+			.willThrow(ParadaYaAceptadaRechazadaException.class);
+			
+
+			
+			given(this.reservaService.findPeticionesReserva()).willReturn(listaReservas);
+
+				mockMvc.perform(post("/reservas/aceptar/{reservaId}",1)
+						.with(csrf())
+						.param("reservaId", "1")
+						.param("autoId","1"))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("error","La reserva que se intenta aceptar ya ha sido aceptada/rechazada anteriormente"))
+						.andExpect(model().attribute("reservas",listaReservas))
+						.andExpect(view().name("reservas/peticionesReservas"));
+				
+			
+			}
+		@WithMockUser(value = "spring")
+		@Test
+		void aceptarReservaPostAutomovilPlazasInsuficientesException() throws Exception {
+			Reserva reserva= new Reserva();
+			Automovil auto= new Automovil();
+			given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+			given(this.autoService.findAutomovilById(Mockito.anyInt())).willReturn(Optional.ofNullable(auto));
+
+			given(this.reservaService.aceptarReserva(Mockito.any(Reserva.class), Mockito.any(Automovil.class), Mockito.anyString()))
+			.willThrow(AutomovilPlazasInsuficientesException.class);
+			
+
+			
+			given(this.reservaService.findPeticionesReserva()).willReturn(listaReservas);
+
+				mockMvc.perform(post("/reservas/aceptar/{reservaId}",1)
+						.with(csrf())
+						.param("reservaId", "1")
+						.param("autoId","1"))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("error","El automóvil que ha seleccionado no "
+								+ "tiene suficientes plazas para realizar la reserva"))
+						.andExpect(model().attribute("reservas",listaReservas))
+						.andExpect(view().name("reservas/peticionesReservas"));
+				
+			
+			}
+		
+		@WithMockUser(value = "spring")
+		@Test
+		void aceptarReservaPostExisteViajeEnEsteHorarioException() throws Exception {
+			Reserva reserva= new Reserva();
+			Automovil auto= new Automovil();
+			given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+			given(this.autoService.findAutomovilById(Mockito.anyInt())).willReturn(Optional.ofNullable(auto));
+
+			given(this.reservaService.aceptarReserva(Mockito.any(Reserva.class), Mockito.any(Automovil.class), Mockito.anyString()))
+			.willThrow(ExisteViajeEnEsteHorarioException.class);
+			
+
+			
+			given(this.reservaService.findPeticionesReserva()).willReturn(listaReservas);
+
+				mockMvc.perform(post("/reservas/aceptar/{reservaId}",1)
+						.with(csrf())
+						.param("reservaId", "1")
+						.param("autoId","1"))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("error","El taxista ya tiene una reserva aceptada en este periodo de tiempo."))
+						.andExpect(model().attribute("reservas",listaReservas))
+						.andExpect(view().name("reservas/peticionesReservas"));
+				
+			
+			}
+		
+		@WithMockUser(value = "spring")
+		@Test
+		void rechazarReserva() throws Exception {
+			Reserva reserva= new Reserva();
+		
+			given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+	
+			given(this.reservaService.findPeticionesReserva()).willReturn(listaReservas);
+
+				mockMvc.perform(get("/reservas/rechazar/{reservaId}",1))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("message","Reserva rechazada correctamente"))
+						.andExpect(model().attribute("reservas",listaReservas))
+						.andExpect(view().name("reservas/peticionesReservas"));
+				
+			}
+		
+		@WithMockUser(value = "spring")
+		@Test
+		void rechazarReservaNoEncontrada() throws Exception {
+		
+			given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(null));
+	
+			given(this.reservaService.findPeticionesReserva()).willReturn(listaReservas);
+
+				mockMvc.perform(get("/reservas/rechazar/{reservaId}",1))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("error","Reserva no encontrada"))
+						.andExpect(model().attribute("reservas",listaReservas))
+						.andExpect(view().name("reservas/peticionesReservas"));
+				
+			}
+
+		@WithMockUser(value = "spring")
+		@Test
+		void rechazarReservaParadaYaAceptadaRechazadaException() throws Exception {
+			Reserva reserva= new Reserva();
+		
+			given(this.reservaService.rechazarReserva(Mockito.any(Reserva.class))).willThrow(ParadaYaAceptadaRechazadaException.class);
+			given(this.reservaService.findReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+			given(this.reservaService.findPeticionesReserva()).willReturn(listaReservas);
+
+				mockMvc.perform(get("/reservas/rechazar/{reservaId}",1))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("error","La reserva que se intenta rechazar ya "
+								+ "ha sido aceptada/rechazada anteriormente"))
+						.andExpect(model().attribute("reservas",listaReservas))
+						.andExpect(view().name("reservas/peticionesReservas"));
+				
+			}
+		
+		@WithMockUser(value = "spring")
+		@Test
+		void reservaFacturaTest() throws Exception {
+			Reserva reserva= new Reserva();
+			
+			Map<String,Double> facturaMap= new HashMap<String,Double>();
+			given(this.reservaService.calcularFactura(Mockito.anyInt())).willReturn(facturaMap);
+			given(this.reservaService.findFacturaReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+
+				mockMvc.perform(get("/reservas/reservaFactura/{reservaId}",1))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("factura",facturaMap))
+						.andExpect(model().attribute("reserva",reserva))
+						.andExpect(view().name("reservas/reservaFactura"));
+				
+			}
+		@WithMockUser(value = "spring")
+		@Test
+		void reservaFacturaTestReservaNoEncontrada() throws Exception {
+			given(this.reservaService.findAll()).willReturn(listaReservas);
+			given(this.reservaService.findFacturaReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(null));
+
+				mockMvc.perform(get("/reservas/reservaFactura/{reservaId}",1))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("error","No se ha encontrado la factura"))
+						.andExpect(model().attribute("reservas",listaReservas))
+						.andExpect(view().name("reservas/reservasList"));
+				
+			}
+		
+		@WithMockUser(value = "spring")
+		@Test
+		void reservaFacturaTestEstadoReservaFacturaException() throws Exception {
+			given(this.reservaService.findAll()).willReturn(listaReservas);
+			given(this.reservaService.findFacturaReservaById(Mockito.anyInt())).willThrow(EstadoReservaFacturaException.class);
+				mockMvc.perform(get("/reservas/reservaFactura/{reservaId}",1))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("error","Estado de reserva no completado"))
+						.andExpect(model().attribute("reservas",listaReservas))
+						.andExpect(view().name("reservas/reservasList"));
+				
+			}
+		
+		
+		@WithMockUser(value = "spring")
+		@Test
+		void reservaFacturaTestCliente() throws Exception {
+			Reserva reserva= new Reserva();
+			
+			Map<String,Double> facturaMap= new HashMap<String,Double>();
+			given(this.reservaService.calcularFactura(Mockito.anyInt())).willReturn(facturaMap);
+			given(this.reservaService.findFacturaReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(reserva));
+
+				mockMvc.perform(get("/reservas/reservaMiFactura/{reservaId}",1))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("factura",facturaMap))
+						.andExpect(model().attribute("reserva",reserva))
+						.andExpect(view().name("reservas/reservaFactura"));
+				
+			}
+		@WithMockUser(value = "spring")
+		@Test
+		void reservaFacturaTestReservaNoEncontradaCliente() throws Exception {
+			
+			given(this.clienteController.showReservas(Mockito.any(ModelMap.class), Mockito.any(Principal.class)))
+			.willReturn("reservas/misReservas");
+			given(this.reservaService.findFacturaReservaById(Mockito.anyInt())).willReturn(Optional.ofNullable(null));
+
+				mockMvc.perform(get("/reservas/reservaMiFactura/{reservaId}",1))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("error","No se ha encontrado la factura"))
+						.andExpect(view().name("reservas/misReservas"));
+				
+			}
+		
+		@WithMockUser(value = "spring")
+		@Test
+		void reservaFacturaTestEstadoReservaFacturaExceptionCliente() throws Exception {
+			given(this.clienteController.showReservas(Mockito.any(ModelMap.class), Mockito.any(Principal.class)))
+			.willReturn("reservas/misReservas");
+			given(this.reservaService.findFacturaReservaById(Mockito.anyInt())).willThrow(EstadoReservaFacturaException.class);
+				mockMvc.perform(get("/reservas/reservaMiFactura/{reservaId}",1))
+						.andExpect(status().isOk())
+						.andExpect(model().attribute("error","Estado de reserva no completado"))
+						.andExpect(view().name("reservas/misReservas"));
+				
+			}
+		
 		
 	
 		
