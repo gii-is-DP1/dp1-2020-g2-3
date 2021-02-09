@@ -113,9 +113,9 @@ public class ReservaService {
 		Date today = new Date();
 		Date fechaHoraSalida= utilService.unirFechaHora(fechaSalida, horaSalida);
 		
-		fechaHoraSalida = utilService.addFecha(fechaSalida, Calendar.MINUTE, -40);
+		Date fechaHoraSalida40 = utilService.addFecha(fechaHoraSalida, Calendar.MINUTE, -40);
 		
-		if(fechaHoraSalida.compareTo(today)<0) {
+		if(fechaHoraSalida40.compareTo(today)<0) {
 			System.out.println("hora de salida con menos de 40 minutos de antelación, se lanza excepción");
 			throw new HoraSalidaSinAntelacionException();
 		}else {

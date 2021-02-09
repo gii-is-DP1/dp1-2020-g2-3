@@ -12,6 +12,8 @@ import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.service.AutomovilService;
 import org.springframework.samples.petclinic.service.TrabajadorService;
+import org.springframework.samples.petclinic.service.exceptions.AutomovilAsignadoServicioReservaException;
+import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -50,7 +52,7 @@ public class AutomovilController {
 				
 				autoService.delete(automovil.get()); 
 				modelMap.addAttribute("message", "Automóvil borrado correctamente");
-			}catch(DataAccessException exception) {
+			}catch(AutomovilAsignadoServicioReservaException exception) {
 				
 				modelMap.addAttribute("error", "No se puede eliminar un automóvil que haya realizado un servicio o viaje");
 			}
@@ -69,7 +71,7 @@ public class AutomovilController {
 			modelMap.addAttribute("automovil",automovil.get());
 			return "automoviles/updateAutomovilForm";
 		}else {
-			modelMap.addAttribute("message","No se ha encontrado el automóvil a editar");
+			modelMap.addAttribute("error","No se ha encontrado el automóvil a editar");
 			return listadoAutomoviles(modelMap);
 		}
 	} 
