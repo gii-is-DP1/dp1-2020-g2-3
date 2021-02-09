@@ -14,6 +14,7 @@ import java.util.Date;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -159,6 +160,25 @@ public class TrabajadorControllerTests {
 			.andExpect(status().isOk())
 			.andExpect(model().attributeHasErrors("trabajador"))
 			.andExpect(model().attributeHasFieldErrors("trabajador", "telefono"))
+			.andExpect(view().name("trabajadores/updateTrabajadorForm"));
+	}	
+	
+	@WithMockUser(value = "spring")
+    @Test
+    void testSaveNewTrabajadorFechaFinAnteriorInicioException() throws Exception {
+		
+		given(this.trabajadorService.save(Mockito.any(Trabajador.class))).willThrow(FechaFinAnteriorInicioException.class);
+		
+		mockMvc.perform(post("/trabajadores/new")
+						.with(csrf())
+						.param("nombre", "Mike")
+						.param("apellidos", "Bloggs")
+						.param("dni", "42424211L")
+						.param("telefono", "638240587")
+						.param("email", "mike@gmail.com"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("trabajador"))
+			.andExpect(model().attribute("error", "La fecha de fin no puede ser anterior a la de incio"))
 			.andExpect(view().name("trabajadores/updateTrabajadorForm"));
 	}	
 	
