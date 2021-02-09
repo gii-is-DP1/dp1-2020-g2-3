@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,11 +46,15 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Authorities;
 import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Cliente;
+import org.springframework.samples.petclinic.model.Contrato;
 import org.springframework.samples.petclinic.model.User;
 import org.springframework.samples.petclinic.model.EstadoReserva;
 import org.springframework.samples.petclinic.model.Reserva;
 import org.springframework.samples.petclinic.model.Ruta;
 import org.springframework.samples.petclinic.model.Tarifa;
+
+import org.springframework.samples.petclinic.model.TipoTrabajador;
+
 import org.springframework.samples.petclinic.model.Trabajador;
 import org.springframework.samples.petclinic.model.Trayecto;
 import org.springframework.samples.petclinic.repository.ReservaRepository;
@@ -58,10 +63,12 @@ import org.springframework.samples.petclinic.service.exceptions.AutomovilPlazasI
 import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedParadaException;
 import org.springframework.samples.petclinic.service.exceptions.ExisteViajeEnEsteHorarioException;
+import org.springframework.samples.petclinic.service.exceptions.FechaFinAnteriorInicioException;
 import org.springframework.samples.petclinic.service.exceptions.FechaLlegadaAnteriorSalidaException;
 import org.springframework.samples.petclinic.service.exceptions.FechaSalidaAnteriorActualException;
 import org.springframework.samples.petclinic.service.exceptions.HoraSalidaSinAntelacionException;
 import org.springframework.samples.petclinic.service.exceptions.ParadaYaAceptadaRechazadaException;
+
 import org.springframework.samples.petclinic.service.exceptions.ReservaYaRechazada;
 import org.springframework.samples.petclinic.util.EntityUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,6 +100,8 @@ class ReservaServiceMockedTests {
     
     @Mock
     private TrabajadorService trabajadorService;
+    @Mock
+    TipoTrabajadorService tipoTrabajadorService;
     @Mock
     private AuthoritiesService authoService;
     
@@ -743,8 +752,113 @@ class ReservaServiceMockedTests {
     	   		 //ASSERT
     	   		 assertEquals(reservaRechazada.getEstadoReserva().getName(),"Rechazada");
     	   	  }
+    	    
+    	    @Test
+    	    @Transactional
+    	    @DisplayName("Calcula los ingresos en un rango de fechas determinado.")
+    	    void calculaIngresosTest() {
+    	    	
+    	    	//ARRANGE
+    			reservaSinCalcular.setRuta(rutaCalculada);
+    			estadoSolicitada.setName("Completada");
+    			reservaSinCalcular.setEstadoReserva(estadoSolicitada);
+    			reservaSinCalcular.setPrecioTotal(Double.valueOf(100));
+    			
+    			Date fecha1 = new Date();
+    			fecha1.setDate(01);
+    			fecha1.setMonth(01);
+    			fecha1.setYear(2000);
+    			fecha1.setHours(18);
+    			fecha1.setMinutes(0);
+  
+    			Date fechaSalida =utilService.addFecha(fecha1, Calendar.DATE,1);
+    			Date fecha2 = new Date();
+    			fecha2.setDate(01);
+    			fecha2.setMonth(01);
+    			fecha2.setYear(2040);
+    			fecha2.setHours(18);
+    			fecha2.setMinutes(0);
+    			
+    			Date fechaLlegada =utilService.addFecha(fecha2, Calendar.DATE,-1);
+    			reservaSinCalcular.setFechaSalida(fechaSalida);
+    			reservaSinCalcular.setFechaLlegada(fechaLlegada);
+    			
+    			List<Reserva> listaReservas= new ArrayList<Reserva>();
+    			listaReservas.add(reservaSinCalcular);
+    			listaReservas.add(reservaSinCalcular);
+    			
+    			when(reservaRepository.findByEstadoReservaCompletada()).thenReturn(listaReservas);
+    			Double ingresosEsperados= 200.0; //Dos reservas de 100 cada una
+    			    			
+    			//ACT			
+    			Double ingresos = reservaService.calcularIngresos(fecha1, fecha2);
+    			
+    			//ASSERT
+    			System.out.println("DEBUG: "+ ingresos );
+    			assertEquals(ingresosEsperados, ingresos);
+    	    }
+    	    
+    	    @Test
+    	    @Transactional
+    	    @DisplayName("Comprueba que un taxista ya tiene asignado un viaje en ese horario.")
+    	    void taxistaConViajeTest() throws FechaFinAnteriorInicioException {
+    	    	
+    	    	//ARRANGE
+    	    	Trabajador trabajador = new Trabajador();
+    	    	trabajador.setId(1);
+    	    	int trabajadorId = trabajador.getId();
+    	    	trabajadorService.save(trabajador);
+    	    	
+    			reservaSinCalcular.setRuta(rutaCalculada);
+    			estadoSolicitada.setName("Aceptada");
+    			reservaSinCalcular.setEstadoReserva(estadoSolicitada);
+    			reservaSinCalcular.setPrecioTotal(Double.valueOf(100));
+    			reservaSinCalcular.setTrabajador(trabajador);
+    			
+    			Date fecha1 = new Date();
+    			fecha1.setDate(01);
+    			fecha1.setMonth(01);
+    			fecha1.setYear(2000);
+    			fecha1.setHours(18);
+    			fecha1.setMinutes(0);
+  
+    			Date fechaSalida =utilService.addFecha(fecha1, Calendar.DATE,1);
+    			Date fecha2 = new Date();
+    			fecha2.setDate(01);
+    			fecha2.setMonth(01);
+    			fecha2.setYear(2040);
+    			fecha2.setHours(18);
+    			fecha2.setMinutes(0);
+    			
+    			Date horaLlegada = new Date();
+    			horaLlegada.setDate(01);
+    			horaLlegada.setMonth(01);
+    			horaLlegada.setYear(2040);
+    			horaLlegada.setHours(18);
+    			horaLlegada.setMinutes(0);
+    			
+    			Date fechaLlegada =utilService.addFecha(fecha2, Calendar.DATE,-1);
+    			reservaSinCalcular.setFechaSalida(fechaSalida);
+    			reservaSinCalcular.setFechaLlegada(fechaLlegada);
+    			reservaSinCalcular.setHoraLlegada(horaLlegada);
+    			
+    			List<Reserva> listaReservas= new ArrayList<Reserva>();
+    			listaReservas.add(reservaSinCalcular);
+    			listaReservas.add(reservaSinCalcular);
+    			
+    			when(reservaRepository.findReservasAceptadasByTrabajadorId(trabajadorId)).thenReturn(listaReservas);
+    			
+    			    			
+    			//ACT			
+    			Boolean res = reservaService.taxistaConViaje(trabajadorId, reservaSinCalcular);
+    			
+    			//ASSERT
+    			assertEquals(true, res);
+    	    }
     }
+    
    
+    
     
     @Test
 	@Transactional
@@ -811,5 +925,36 @@ class ReservaServiceMockedTests {
   
    
     
+
+//    @Test
+//    @Transactional
+//    @DisplayName("Cancelar una reserva con fecha de salida anterior a la fecha actual")
+//    void cancelarReservaFechaSalidaAnteriorTest() {
+//    }
     
+   
+    
+    @Test
+    @Transactional
+    @DisplayName("Comprueba si hay suficiente antelación en la fecha (40 minutos). Al no cumplirse, lanza la excepcion")
+    void fechaSalidaSinAntelacionTest() {
+    	//ARRANGE
+    	Date today= new Date();
+    	Date horaSalida= utilService.addFecha(today,Calendar.MINUTE,20); //Hora actual restándole 20 min, este método ya está testeado
+	    
+    	//ACT y ASSERT
+    	assertThrows(HoraSalidaSinAntelacionException.class,()->reservaService.fechaSalidaSinAntelacion(today, horaSalida));
+    }
+    
+    @Test
+    @Transactional
+    @DisplayName("Comprueba si hay suficiente antelación en la fecha (40 minutos). Al cumplirse, no lanza la excepcion")
+    void fechaSalidaSinAntelacionNoLanzaExcepcionTest() {
+    	//ARRANGE
+    	Date today= new Date();
+    	Date horaSalida= utilService.addFecha(today,Calendar.HOUR,4); //Hora actual restándole 4 horas, este método ya está testeado
+	    
+    	//ACT y ASSERT
+    	assertDoesNotThrow(()->reservaService.fechaSalidaSinAntelacion(today, horaSalida));
+    }
 }

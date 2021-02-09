@@ -42,20 +42,10 @@ import org.springframework.beans.support.PropertyComparator;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.format.annotation.DateTimeFormat;
 
-/**
- * Simple JavaBean domain object representing an owner.
- *
- * @author Ken Krebs
- * @author Juergen Hoeller
- * @author Sam Brannen
- * @author Michael Isvy
- */
 @Entity
 @Table(name = "servicios")
 
 public class Servicio extends BaseEntity{
-
-
 
 	@Column(name = "fecha")
 	@NotNull
@@ -63,14 +53,12 @@ public class Servicio extends BaseEntity{
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date fecha;
 	
-	
-	
 	@Column(name = "precio")
 	@NotNull
 	private Double precio;
 
 	@ManyToOne
-	@JoinColumn(name = "trabajador_id",referencedColumnName="id") //Cuando la clave primaria de Trabajador sea DNI habrá que referenciarlo aquí en lugar del id como está ahora.
+	@JoinColumn(name = "trabajador_id",referencedColumnName="id") 
 	private Trabajador trabajador;
 	
 	@ManyToOne
@@ -92,7 +80,6 @@ public class Servicio extends BaseEntity{
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date fechaCompletado;
-			
 	
 
 	public Date getFecha() {
@@ -165,9 +152,4 @@ public class Servicio extends BaseEntity{
 				+ automovil + ", taller=" + taller + ", descripcion=" + descripcion + ", completado=" + completado
 				+ ", fechaCompletado=" + fechaCompletado + "]";
 	}
-	
-
-	
-	
-
 }

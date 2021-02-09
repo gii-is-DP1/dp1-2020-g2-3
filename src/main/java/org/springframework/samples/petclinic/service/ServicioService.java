@@ -15,28 +15,19 @@
  */
 package org.springframework.samples.petclinic.service;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+
 import java.util.Collection;
 import java.util.Date;
-import java.util.Optional;
 
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.petclinic.model.Automovil;
+
 import org.springframework.samples.petclinic.model.Servicio;
-import org.springframework.samples.petclinic.model.Trabajador;
-import org.springframework.samples.petclinic.repository.ReservaRepository;
 import org.springframework.samples.petclinic.repository.ServicioRepository;
-import org.springframework.samples.petclinic.service.exceptions.DuplicatedPetNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -60,6 +51,11 @@ public class ServicioService {
 	@Transactional
 	public Iterable<Servicio> findAll(){
 		 return servicioRepository.findAll();
+	}
+	
+	@Transactional
+	public Collection<Servicio> findAllServicios(){
+		 return servicioRepository.findAllServicios();
 	}
 	
 	@Transactional(readOnly = true)

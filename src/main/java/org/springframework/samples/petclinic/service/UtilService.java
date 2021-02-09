@@ -1,5 +1,7 @@
 package org.springframework.samples.petclinic.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
@@ -40,5 +42,10 @@ public class UtilService {
 		fechaHora.setMinutes(hora.getMinutes());
 		return fechaHora;
 	   }
+	
+	@Transactional
+	public Date asDate(LocalDate localDate) { //Convierte LocalDate a Date
+	    return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+	  }
 
 }

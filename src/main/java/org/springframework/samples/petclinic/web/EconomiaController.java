@@ -8,6 +8,7 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.ServicioService;
+import org.springframework.samples.petclinic.service.UtilService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -24,11 +25,13 @@ public class EconomiaController {
 
 	private final ReservaService reservaService;
 	private final ServicioService servicioService;
+	private final UtilService utilService;
 	
 	@Autowired
-	public EconomiaController(ReservaService reservaService, ServicioService servicioService) {
+	public EconomiaController(ReservaService reservaService, ServicioService servicioService, UtilService utilService) {
 		this.reservaService = reservaService;
 		this.servicioService = servicioService;
+		this.utilService = utilService;
 	}
 	
 	@GetMapping(value = "/find")
@@ -52,11 +55,11 @@ public class EconomiaController {
 				log.error("La fecha final no puede ser anterior a la fecha inicial. Fecha inicial: " + fechaInicial + "; Fecha final: " + fechaFin);
 				return "economias/findEconomias";
 			}else {
-				Double ingresos = reservaService.calcularIngresos(asDate(fechaInicial), asDate(fechaFin));
-				Double gastos = servicioService.calcularGastos(asDate(fechaInicial), asDate(fechaFin));
+				Double ingresos = reservaService.calcularIngresos(utilService.asDate(fechaInicial), utilService.asDate(fechaFin));
+				Double gastos = servicioService.calcularGastos(utilService.asDate(fechaInicial), utilService.asDate(fechaFin));
 				model.put("ingresos", ingresos);
 				model.put("gastos", gastos);
-				log.info("Mostrando los ingresos y gastos");
+				log.info("Mostrando los ingresos (" + ingresos + ") y gastos (" + gastos + ")");
 				return "economias/listEconomias";
 			}
 		}else {
@@ -65,14 +68,5 @@ public class EconomiaController {
 			return "economias/findEconomias";
 		}		
 	}
-
-	//Metodos auxiliares
 	
-	public static Date asDate(LocalDate localDate) { //Convierte LocalDate a Date
-	    return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-	  }
-	
-	public static LocalDate asLocalDate(Date date) { //Convierte Date a LocalDate
-	    return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
-	  }
 }
