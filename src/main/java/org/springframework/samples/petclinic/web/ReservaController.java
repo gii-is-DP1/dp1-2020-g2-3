@@ -556,7 +556,7 @@ public class ReservaController {
 			modelMap.addAttribute("reserva",reserva.get());
 			return "reservas/reservaFactura";
 		}else {
-			modelMap.addAttribute("message","No se ha encontrado la factura");
+			modelMap.addAttribute("error","No se ha encontrado la factura");
 			log.error("No se ha encontrado la factura");
 			return listadoReservas(modelMap);
 		}
@@ -580,7 +580,7 @@ public class ReservaController {
 			modelMap.addAttribute("reserva",reserva.get());
 			return "reservas/reservaFactura";
 		}else {
-			modelMap.addAttribute("message","No se ha encontrado la factura");
+			modelMap.addAttribute("error","No se ha encontrado la factura");
 			return clienteController.showReservas(modelMap, p);
 		}
 	
