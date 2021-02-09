@@ -27,6 +27,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.samples.petclinic.service.TarifaService;
+import org.springframework.samples.petclinic.service.exceptions.DobleTarifaActivaException;
 
 
 @WebMvcTest(controllers=TarifaController.class,
@@ -61,7 +62,7 @@ public class TarifaControllerTests {
 		tari2.setPrecioEsperaPorHora(4.0);
 		tari2.setPorcentajeIvaRepercutido(15);
 		tari2.setOriginal(true);
-		tari2.setActivado(false);
+		tari2.setActivado(true);
 		
 		Tarifa tari3 = new Tarifa();
 		tari3.setPrecioPorKm(0.6);
@@ -88,6 +89,27 @@ void testFindListado() throws Exception {
 	mockMvc.perform(get("/tarifas/listado")).andExpect(status().isOk()).andExpect(model().attributeExists("tarifas"))
 			.andExpect(model().attribute("tarifas", is(taris))).andExpect(status().is2xxSuccessful())
 			.andExpect(view().name("tarifas/listadoTarifas"));
+}
+	
+	@WithMockUser(value = "spring")
+    @Test
+void testActivarTarifa() throws Exception {
+	
+	given(this.tarifaService.findTarifaById(1)).willReturn(Optional.ofNullable(taris.get(0)));
+		
+	mockMvc.perform(get("/tarifas/activar/{tarifaId}",1)).andExpect(status().isOk()).andExpect(model().attributeExists("message"))
+	.andExpect(model().attribute("message", is("Tarifa activada correctamente"))).andExpect(status().is2xxSuccessful()).andExpect(view().name("tarifas/listadoTarifas"));
+}
+	
+	@WithMockUser(value = "spring")
+    @Test
+void testActivarTarifaError() throws Exception {
+	
+	given(this.tarifaService.findTarifaById(1)).willReturn(Optional.ofNullable(null));
+		
+	mockMvc.perform(get("/tarifas/activar/{tarifaId}",1)).andExpect(status().isOk()).andExpect(model().attributeExists("error"))
+	.andExpect(model().attribute("error", is("No se ha encontrado la tarifa a activar"))).andExpect(status().is2xxSuccessful())
+	.andExpect(view().name("tarifas/listadoTarifas"));
 }
 
 @WithMockUser(value = "spring")
@@ -117,7 +139,7 @@ void testProcessCreationFormSuccess() throws Exception {
 						.param("precioPorKm", "0.7")
 						.param("porcentajeIvaRepercutido", "10")
 						.param("precioEsperaPorHora", "2.0")
-						.param("activado", "true")
+						.param("activado", "false")
 						.param("original", "true"))
 			.andExpect(status().isOk());
 }
@@ -130,13 +152,31 @@ void testProcessCreationFormHasErrors() throws Exception {
 					.with(csrf())
 					.param("precioPorKm", "0.7")
 					.param("porcentajeIvaRepercutido", "10")
-					.param("activado", "true")
+					.param("activado", "false")
 					.param("original", "true"))
 		.andExpect(status().isOk())
 		.andExpect(model().attributeHasErrors("tarifa"))
 		.andExpect(model().attributeHasFieldErrors("tarifa", "precioEsperaPorHora"))
 		.andExpect(view().name("tarifas/updateTarifaForm"));
 }
+
+//@WithMockUser(value = "spring")
+//@Test
+//void testProcessCreationFormHasErrorsTwoActiveTarifas() throws Exception {
+//	given(this.tarifaService.findByOriginal()).willThrow(DobleTarifaActivaException.class);
+//	mockMvc.perform(post("/tarifas/new")
+//			.with(csrf())
+//			.param("precioPorKm", "0.7")
+//			.param("porcentajeIvaRepercutido", "10")
+//			.param("precioEsperaPorHora", "2.0")
+//			.param("activado", "true")
+//			.param("original", "true"))
+//			.andExpect(status().isOk())
+//			.andExpect(model().attributeExists("error"))
+//			.andExpect(model().attribute("error", is("Solo puede existir una tarifa activa a la vez")))
+//			.andExpect(status().is2xxSuccessful())
+//			.andExpect(view().name("tarifas/updateTarifaForm"));
+//}
 
 @WithMockUser(value = "spring")
 @Test
@@ -147,6 +187,18 @@ void testDeleteTarifa() throws Exception {
 	
 	mockMvc.perform(get("/tarifas/delete/{tarifaId}",1)).andExpect(status().isOk()).andExpect(model().attributeExists("message"))
 			.andExpect(model().attribute("message", is("Tarifa borrada correctamente"))).andExpect(status().is2xxSuccessful()).andExpect(view().name("tarifas/listadoTarifas"));
+}
+
+@WithMockUser(value = "spring")
+@Test
+void testCantDeleteTarifaActivada() throws Exception {
+	
+	given(this.tarifaService.findTarifaById(1)).willReturn(Optional.ofNullable(taris.get(1)));
+
+	
+	mockMvc.perform(get("/tarifas/delete/{tarifaId}",1)).andExpect(status().isOk()).andExpect(model().attributeExists("error"))
+	.andExpect(model().attribute("error", is("No puedes eliminar una tarifa que esté activa"))).andExpect(status().is2xxSuccessful())
+	.andExpect(view().name("tarifas/listadoTarifas"));
 }
 
 @WithMockUser(value = "spring")
