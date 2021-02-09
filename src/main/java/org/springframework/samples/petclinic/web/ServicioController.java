@@ -15,11 +15,6 @@
  */
 package org.springframework.samples.petclinic.web;
 
-import java.util.Collection;
-
-import java.util.Map;
-import java.util.Optional;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
@@ -28,21 +23,14 @@ import org.springframework.samples.petclinic.model.Automovil;
 import org.springframework.samples.petclinic.model.Servicio;
 import org.springframework.samples.petclinic.model.Taller;
 import org.springframework.samples.petclinic.model.Trabajador;
-import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.AutomovilService;
-import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.ServicioService;
 import org.springframework.samples.petclinic.service.TallerService;
 import org.springframework.samples.petclinic.service.TrabajadorService;
-import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
