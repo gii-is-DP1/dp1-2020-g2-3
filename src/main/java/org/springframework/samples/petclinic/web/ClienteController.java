@@ -156,7 +156,7 @@ public class ClienteController {
 	}
 	
 	@GetMapping(value= "/clientes/myReservas/cancelar/{reservaId}")
-	public String cancelarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap, Principal p) throws DataAccessException, ReservaYaRechazada{
+	public String cancelarReserva(@PathVariable("reservaId") int reservaId,ModelMap modelMap, Principal p) throws DataAccessException, ReservaYaRechazada, CancelacionViajeAntelacionException{
 		Optional<Reserva> reservaOptional= reservaService.findReservaById(reservaId);
 		if(!reservaOptional.isPresent()) {
 			modelMap.addAttribute("error", "Reserva no encontrada");
