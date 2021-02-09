@@ -80,10 +80,11 @@ INSERT INTO talleres(id,name,ubicacion,telefono) VALUES (2,'Chapa y pintura Rami
 INSERT INTO servicios(id,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion, completado, fecha_completado) VALUES (1,'2013-01-04', 70.50, 1, 1, 1, 'Revisión periódica aceite y filtros', true, '2013-02-04');
 INSERT INTO servicios(id,fecha,precio,trabajador_id, automovil_id,talleres_id,descripcion, completado) VALUES (2,'2013-01-04', 50.00, 3, 2, 2, 'Arreglar picotazo parabrisas', false);
 
+
 INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (1,0.41,10,4,true,true);
-INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (2,0.5,10,4,false,true);
+INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (2,0.41,10,4,false,false);
 INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (3,0.7,10,6,false,true);
-INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (4,0.9,10,8,false,false);
+INSERT INTO Tarifa(id,precio_Por_Km,porcentaje_Iva_Repercutido,precio_Espera_Por_Hora,activado,original) VALUES (4,0.9,10,8,false,true);
 
 INSERT INTO Estado_Reserva(id,name)VALUES(1,'Solicitada');
 INSERT INTO Estado_Reserva(id,name)VALUES(2,'Aceptada');
@@ -113,7 +114,7 @@ INSERT INTO Ruta(origen_cliente,destino_cliente,num_Km_Totales,horas_Estimadas_C
 INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id,trayectos_order)VALUES(1,1,0);
 INSERT INTO Ruta_Trayectos(ruta_id,trayectos_id,trayectos_order)VALUES(1,2,1);
 
-INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales,tarifa_id)VALUES(1,1,1,'2020-01-12','2020-01-12','17:40','18:40',0.0,4,'Maleta grande',4,59.29,144.6,1);
-INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales,tarifa_id)VALUES(2,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1,59.29,113.7,1);
-INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales,tarifa_id)VALUES(3,5,1,'2020-12-22','2020-12-28','18:00','19:23',0,4, 'Maleta pequeña',2,70.9,150.3,1);
-INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales,tarifa_id)VALUES(4,5,1,'2021-02-10','2020-02-08','20:00','19:23',0,4, 'Maleta grande',2,70.9,150.3,1);
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales,tarifa_id)VALUES(1,1,1,'2020-01-12','2020-01-12','17:40','18:40',0.0,4,'Maleta grande',4,59.29,144.6,2);
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales,tarifa_id)VALUES(2,4,1,'2020-12-16','2020-12-16','17:00','19:23',0,4,'Llevo una maleta pequeña',1,59.29,113.7,2);
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales,tarifa_id)VALUES(3,5,1,'2020-12-22','2020-12-28','18:00','19:23',0,4, 'Maleta pequeña',2,70.9,150.3,2);
+INSERT INTO Reserva(id,cliente_id,ruta_id,fecha_Salida,fecha_Llegada,hora_Salida,hora_Llegada,horas_Espera,plazas_Ocupadas,descripcion_Equipaje,estado_Reserva_id,precio_Total,num_Km_Totales,tarifa_id)VALUES(4,5,1,'2021-02-10','2020-02-08','20:00','19:23',0,4, 'Maleta grande',2,70.9,150.3,2);
