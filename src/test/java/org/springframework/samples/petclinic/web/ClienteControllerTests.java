@@ -19,6 +19,7 @@ import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,6 +35,7 @@ import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.ClienteService;
 import org.springframework.samples.petclinic.service.ReservaService;
 import org.springframework.samples.petclinic.service.UserService;
+import org.springframework.samples.petclinic.service.exceptions.CancelacionViajeAntelacionException;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -157,6 +159,8 @@ public class ClienteControllerTests {
 			.andExpect(model().attributeHasFieldErrors("cliente", "telefono"))
 			.andExpect(view().name("clientes/createOrUpdateClienteForm"));
 	}	
+	
+	
 
 	@WithMockUser(value = "spring")
     @Test
@@ -252,11 +256,40 @@ public class ClienteControllerTests {
 		
 	}
     
+//    @WithMockUser(value = "spring")
+//    @Test
+//    void testCancelarReserva() throws Exception {
+//		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}", 4)).andExpect(status().isOk())
+//		.andExpect(view().name("reservas/misReservas"));
+//		
+//	}
+    
     @WithMockUser(value = "spring")
     @Test
-    void testCancelarReserva() throws Exception {
-		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}", 4)).andExpect(status().isOk())
-		.andExpect(view().name("reservas/misReservas"));
-		
+    void testShowClientes() throws Exception {
+		mockMvc.perform(get("/clientes/listado")).andExpect(status().isOk())
+			.andExpect(view().name("clientes/clientesList"));
 	}
+    
+//    @WithMockUser(value = "spring")
+//    @Test
+//    void testShowOneCliente() throws Exception {
+//    	given(clienteService.findClienteByNombre(lucas.getApellidos())).willReturn(Lists.newArrayList(lucas));
+//    	
+//		mockMvc.perform(get("/clientes").param("lastName", "Perez")).andExpect(status().is3xxRedirection())
+//			.andExpect(view().name("redirect:/clientes/" + TEST_CLIENTE_ID));
+//	}
+    
+//    @WithMockUser(value = "spring")
+//    @Test
+//    void testCancelarReserva() throws Exception {
+//    	given(this.reservaService.cancelarReserva(Mockito.any(Reserva.class))).willThrow(CancelacionViajeAntelacionException.class);
+//    	
+//		mockMvc.perform(get("/clientes/myReservas/cancelar/{reservaId}", TEST_RESERVA_ID)).andExpect(status().isOk())
+//		.andExpect(model().attribute("error", "No puedes cancelar una reserva con una antelación menor a 24 horas a la fecha de salida, ni después de dicha fecha"))
+//		.andExpect(view().name("reservas/misReservas"));
+//		
+//	}
+    
+    
 }
