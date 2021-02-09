@@ -162,8 +162,7 @@ public class TrabajadorControllerTests {
 			.andExpect(model().attributeHasFieldErrors("trabajador", "telefono"))
 			.andExpect(view().name("trabajadores/updateTrabajadorForm"));
 	}	
-	
-	@WithMockUser(value = "spring")
+		@WithMockUser(value = "spring")
     @Test
     void testSaveNewTrabajadorFechaFinAnteriorInicioException() throws Exception {
 		
@@ -182,6 +181,7 @@ public class TrabajadorControllerTests {
 			.andExpect(view().name("trabajadores/updateTrabajadorForm"));
 	}	
 	
+
 	
 	
 	@WithMockUser(value = "spring")
