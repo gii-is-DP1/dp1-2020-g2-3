@@ -875,62 +875,7 @@ class ReservaServiceMockedTests {
 		  //ACT & ASSERT
 		  assertThrows(FechaLlegadaAnteriorSalidaException.class,()->reservaService.guardarReservaEditada(reserva, reserva));
 	  }
-    
-  
-    
-    
-    @Test
-    @Transactional
-	void calcularFactura(){
-    	//ARRANGE
-    	Integer porcentajeIvaRepercutido = 10;
-    	Double precioKm = 0.12;
-    	Double numKmTotales = 120.0;
-    	Double precioEsperaPorHora = 4.5;
-    	Double horasEspera = 0.0;
-    	
-    	Double precioTotal = precioKm * numKmTotales;
-    	
-    	Double ivaRepercutido = porcentajeIvaRepercutido * 0.01 * precioTotal;
-		Double precioDistancia = precioKm * numKmTotales;
-		Double precioExtraEspera = horasEspera * precioEsperaPorHora;
-		Double baseImponible = precioTotal - ivaRepercutido;
-		
-		Map<String, Double> res = new HashMap<String, Double>();
-		res.put("IVA Repercutido", utilService.aproximarNumero(ivaRepercutido));
-		res.put("Precio Distancia", utilService.aproximarNumero(precioDistancia));
-		res.put("Precio Extra Espera", utilService.aproximarNumero(precioExtraEspera));
-        res.put("Base Imponible", utilService.aproximarNumero(baseImponible));
-    
-    /*
-    	Reserva reserva1 = new Reserva();
-    	Tarifa tarifa1 = new Tarifa();
-    	
-    	tarifa1.setPorcentajeIvaRepercutido(porcentajeIvaRepercutido);
-    	tarifa1.setPrecioPorKm(precioKm);
-    	tarifa1.setPrecioEsperaPorHora(precioEsperaPorHora);
-    	
-    	reserva1.setTarifa(tarifa1);
-    	reserva1.setHorasEspera(horasEspera);
-    	reserva1.setPrecioTotal(precioTotal);
-    	*/
-        
-        Reserva reserva1 = reservaService.findReservaById(1).get();
-    	when(reservaRepository.findById(any())).thenReturn(Optional.of(reserva1));
 
-		//ACT & ASSERT
-	assertNotEquals(res, reservaService.calcularFactura(1));
-		
-	}
-  
-   
-    
-
-//    @Test
-//    @Transactional
-//    @DisplayName("Cancelar una reserva con fecha de salida anterior a la fecha actual")
-//    void cancelarReservaFechaSalidaAnteriorTest() {
-//    }
     
    
     
