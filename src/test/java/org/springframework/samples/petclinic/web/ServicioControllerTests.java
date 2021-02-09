@@ -12,6 +12,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,6 +76,8 @@ public class ServicioControllerTests {
 	private Automovil a1;
 	
 	private Taller t1;
+	
+	
 
 	@BeforeEach
 	void setup() {
@@ -92,6 +97,9 @@ public class ServicioControllerTests {
 		s1.setDescripcion("Revisión de GPS");
 		s1.setCompletado(true);
 		s1.setFechaCompletado(Date.valueOf(LocalDate.of(2015, 2, 27)));
+		
+		
+		
 		given(this.servicioService.findServicioById(TEST_SERVICIO_ID)).willReturn(s1);
 
 	}
@@ -172,16 +180,14 @@ public class ServicioControllerTests {
 
 	
 	
-	@Test
+
 	@WithMockUser(value = "spring")
-	public void testDelete() throws Exception{
+    @Test
+    void testDelete() throws Exception {
 		
-		mockMvc.perform(get("servicios/delete/{servicioId}", TEST_SERVICIO_ID))
-			.andExpect(status().isOk()).andExpect(model().attributeExists("servicio"))
-			
-		;
+		mockMvc.perform(get("/servicios/delete/{servicioId}",TEST_SERVICIO_ID)).andExpect(status().isOk()).andExpect(model().attributeExists("message"))
+				.andExpect(model().attribute("message", is("Servicio borrado correctamente"))).andExpect(status().is2xxSuccessful());
 	}
-	
 	
 
 }

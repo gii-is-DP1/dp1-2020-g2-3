@@ -92,8 +92,6 @@ public class ReservaService {
 		res.put("Precio Extra Espera", utilService.aproximarNumero(reserva.getHorasEspera() * reserva.getTarifa().getPrecioEsperaPorHora()));
         res.put("Base Imponible", utilService.aproximarNumero(reserva.getPrecioTotal() - (reserva.getTarifa().getPorcentajeIvaRepercutido() * 0.01 * reserva.getPrecioTotal())));
 		return res;
-		
-		
 	}
 	
 	@Transactional
