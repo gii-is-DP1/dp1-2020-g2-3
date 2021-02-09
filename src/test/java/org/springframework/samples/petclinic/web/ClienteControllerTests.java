@@ -189,6 +189,16 @@ public class ClienteControllerTests {
 				.andExpect(model().attributeHasFieldErrorCode("cliente", "apellidos", "notFound"))
 				.andExpect(view().name("clientes/findClientes"));
     }
+    
+    @WithMockUser(value = "spring")
+    @Test
+    void testListadoClientes() throws Exception {
+    	given(clienteService.findAll()).willReturn(Lists.newArrayList(new Cliente(), new Cliente()));
+    	
+    	mockMvc.perform(get("/clientes/listado")).andExpect(status().isOk())
+				.andExpect(model().attributeExists("selections"))
+				.andExpect(view().name("clientes/clientesList"));
+    }
 
     @WithMockUser(value = "spring")
 @Test

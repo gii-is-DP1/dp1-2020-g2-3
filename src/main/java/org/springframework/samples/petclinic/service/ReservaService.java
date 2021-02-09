@@ -392,7 +392,6 @@ public class ReservaService {
 	@Transactional
 	public Iterable<Reserva> findReservasByUsername(String username) throws DataAccessException {
 		 return reservaRepo.findReservasByUsername(username);
-		
 	}
 	
 //	@Transactional
@@ -446,8 +445,10 @@ public class ReservaService {
 	@Transactional(readOnly = true)
 	public Reserva findResById(int id) throws DataAccessException { //Método CRUD REPOSITORY
 		return reservaRepo.findResById(id);
-	}
+	}	
 	
-
-	
+	@Transactional(readOnly = true)
+	public Collection<Reserva> findByEstadoReservaCompletada() throws DataAccessException { 
+		return reservaRepo.findByEstadoReservaCompletada();
+	}	
 }

@@ -935,7 +935,7 @@ class ReservaServiceMockedTests {
 		Date fecha2 = new Date();
 		fecha2.setDate(01);
 		fecha2.setMonth(01);
-		fecha2.setYear(2010);
+		fecha2.setYear(2040);
 		fecha2.setHours(18);
 		fecha2.setMinutes(0);
 		
@@ -953,7 +953,7 @@ class ReservaServiceMockedTests {
     void fechaSalidaSinAntelacionTest() {
     	//ARRANGE
     	Date today= new Date();
-    	Date horaSalida= utilService.addFecha(today,Calendar.MINUTE,-20); //Hora actual restándole 20 min, este método ya está testeado
+    	Date horaSalida= utilService.addFecha(today,Calendar.MINUTE,20); //Hora actual restándole 20 min, este método ya está testeado
 	    
     	//ACT y ASSERT
     	assertThrows(HoraSalidaSinAntelacionException.class,()->reservaService.fechaSalidaSinAntelacion(today, horaSalida));
@@ -965,93 +965,9 @@ class ReservaServiceMockedTests {
     void fechaSalidaSinAntelacionNoLanzaExcepcionTest() {
     	//ARRANGE
     	Date today= new Date();
-    	Date horaSalida= utilService.addFecha(today,Calendar.HOUR,-4); //Hora actual restándole 4 horas, este método ya está testeado
+    	Date horaSalida= utilService.addFecha(today,Calendar.HOUR,4); //Hora actual restándole 4 horas, este método ya está testeado
 	    
     	//ACT y ASSERT
     	assertDoesNotThrow(()->reservaService.fechaSalidaSinAntelacion(today, horaSalida));
-    }
-    
-    @Test
-    @Transactional
-    @DisplayName("")
-    void findReservasAceptadasByTrabajadorIdTest() throws FechaFinAnteriorInicioException {
-    	//ARRANGE
-    	User user = new User();
-		user.setUsername("Test1");
-		user.setPassword("Test1");
-		user.setEnabled(true);
-		
-		Cliente cliente = new Cliente();
-		cliente.setId(1);
-		cliente.setNombre("Bad");
-		cliente.setApellidos("Bunny");
-		cliente.setTelefono("666999666");
-		cliente.setUser(user);
-	
-		
-		Reserva reserva = new Reserva();
-    	
-    	Date horaSalida= new Date(); 
-    	horaSalida.setHours(18);
-    	horaSalida.setMinutes(0);
-    	
-		Date fechaSalida= new Date();
-		fechaSalida.setDate(15);
-		fechaSalida.setMonth(8);
-		fechaSalida.setYear(2020);
-		fechaSalida.setHours(horaSalida.getHours());
-		fechaSalida.setMinutes(horaSalida.getMinutes());
-    	
-    	EstadoReserva estado = new EstadoReserva();
-    	estado.setId(2);
-    	estado.setName("Aceptada");
-    	
-    	reserva.setId(1);
-    	reserva.setEstadoReserva(estado);
-    	reserva.setFechaSalida(fechaSalida);
-    	reserva.setHoraSalida(horaSalida);
-    	reserva.setPlazas_Ocupadas(2);
-		reserva.setCliente(cliente);
-		reserva.setPrecioTotal(Double.valueOf(100));
-		
-		User  nuevoUser = new User();
-		nuevoUser.setUsername("Trabajador1");
-		nuevoUser.setPassword("Trabajador1");
-		TipoTrabajador   nuevoTipoTrabajador = new TipoTrabajador();
-		nuevoTipoTrabajador.setId(2);
-		nuevoTipoTrabajador.setName("Taxista");
-		tipoTrabajadorService.save(nuevoTipoTrabajador);
-		Contrato nuevoContrato = new Contrato();
-		Date fechaInicio= new Date();
-		fechaInicio.setDate(15);
-		fechaInicio.setMonth(8);
-		fechaInicio.setYear(2015);
-		Date fechaFin= new Date();
-		fechaFin.setDate(15);
-		fechaFin.setMonth(8);
-		fechaFin.setYear(2025);
-		nuevoContrato.setFechaInicio(fechaInicio);
-		nuevoContrato.setFechaFin(fechaFin);
-		nuevoContrato.setSalarioMensual(1200.00);
-		Trabajador nuevoTrabajador= new Trabajador();
-		nuevoTrabajador.setId(1);
-		nuevoTrabajador.setNombre("Sergio");
-		nuevoTrabajador.setApellidos("Canales");
-		nuevoTrabajador.setDni("28555777Q");
-		nuevoTrabajador.setTelefono("954401212");
-		nuevoTrabajador.setTipoTrabajador(nuevoTipoTrabajador);
-		nuevoTrabajador.setUser(nuevoUser);
-		nuevoTrabajador.setContrato(nuevoContrato);
-		trabajadorService.save(nuevoTrabajador);
-		Integer id = nuevoTrabajador.getId();
-		
-		reserva.setTrabajador(nuevoTrabajador);
-		reservaService.save(reserva);
-		
-		//ACT
-		Collection<Reserva> r = reservaService.findReservasAceptadasByTrabajadorId(id);
-		
-		//ASSERT
-		assertEquals(1, r.size());
     }
 }

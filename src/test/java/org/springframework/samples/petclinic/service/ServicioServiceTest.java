@@ -116,5 +116,6 @@ public class ServicioServiceTest {
 		
 		Collection<Servicio> s = servicioService.findAllServicios();
 		assertEquals(3,s.size());
+		assertEquals(true,s.contains(servicio));
 	}
 }

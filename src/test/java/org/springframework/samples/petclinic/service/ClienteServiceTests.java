@@ -35,8 +35,25 @@ public class ClienteServiceTests {
 	
 	@Test
 	public void findByIdTest() {
+		//ARRANGE Y ACT
 		Cliente cliente=clienteService.findClienteById(1);
+		//ASSERT
 		assertEquals(cliente.getId(),1);
+	}
+	
+	@Test
+	public void findByNombreTest() {
+		//ARRANGE
+		Cliente cliente=clienteService.findClienteById(1);
+		String nombre = cliente.getNombre();
+		
+		//ACT
+		Collection<Cliente> c = clienteService.findClienteByNombre(nombre);
+		
+		//ASSERT
+		for(Cliente res: c) {
+			assertEquals(cliente.getNombre(), res.getNombre());
+		}
 	}
 	@Test
 	@Transactional
