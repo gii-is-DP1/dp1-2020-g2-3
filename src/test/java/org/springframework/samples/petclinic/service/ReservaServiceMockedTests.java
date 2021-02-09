@@ -745,8 +745,68 @@ class ReservaServiceMockedTests {
     			System.out.println("DEBUG: "+ ingresos );
     			assertEquals(ingresosEsperados, ingresos);
     	    }
+    	    
+    	    @Test
+    	    @Transactional
+    	    @DisplayName("Comprueba que un taxista ya tiene asignado un viaje en ese horario.")
+    	    void taxistaConViajeTest() throws FechaFinAnteriorInicioException {
+    	    	
+    	    	//ARRANGE
+    	    	Trabajador trabajador = new Trabajador();
+    	    	trabajador.setId(1);
+    	    	int trabajadorId = trabajador.getId();
+    	    	trabajadorService.save(trabajador);
+    	    	
+    			reservaSinCalcular.setRuta(rutaCalculada);
+    			estadoSolicitada.setName("Aceptada");
+    			reservaSinCalcular.setEstadoReserva(estadoSolicitada);
+    			reservaSinCalcular.setPrecioTotal(Double.valueOf(100));
+    			reservaSinCalcular.setTrabajador(trabajador);
+    			
+    			Date fecha1 = new Date();
+    			fecha1.setDate(01);
+    			fecha1.setMonth(01);
+    			fecha1.setYear(2000);
+    			fecha1.setHours(18);
+    			fecha1.setMinutes(0);
+  
+    			Date fechaSalida =utilService.addFecha(fecha1, Calendar.DATE,1);
+    			Date fecha2 = new Date();
+    			fecha2.setDate(01);
+    			fecha2.setMonth(01);
+    			fecha2.setYear(2040);
+    			fecha2.setHours(18);
+    			fecha2.setMinutes(0);
+    			
+    			Date horaLlegada = new Date();
+    			horaLlegada.setDate(01);
+    			horaLlegada.setMonth(01);
+    			horaLlegada.setYear(2040);
+    			horaLlegada.setHours(18);
+    			horaLlegada.setMinutes(0);
+    			
+    			Date fechaLlegada =utilService.addFecha(fecha2, Calendar.DATE,-1);
+    			reservaSinCalcular.setFechaSalida(fechaSalida);
+    			reservaSinCalcular.setFechaLlegada(fechaLlegada);
+    			reservaSinCalcular.setHoraLlegada(horaLlegada);
+    			
+    			List<Reserva> listaReservas= new ArrayList<Reserva>();
+    			listaReservas.add(reservaSinCalcular);
+    			listaReservas.add(reservaSinCalcular);
+    			
+    			when(reservaRepository.findReservasAceptadasByTrabajadorId(trabajadorId)).thenReturn(listaReservas);
+    			
+    			    			
+    			//ACT			
+    			Boolean res = reservaService.taxistaConViaje(trabajadorId, reservaSinCalcular);
+    			
+    			//ASSERT
+    			assertEquals(true, res);
+    	    }
     }
+    
    
+    
     
     @Test
 	@Transactional
