@@ -47,7 +47,7 @@ public class TarifaController {
 				modelMap.addAttribute("message", "Tarifa activada correctamente");
 				return listadoTarifas(modelMap);
 			}else {
-				modelMap.addAttribute("error","No se ha encontrado la tarifa a editar");
+				modelMap.addAttribute("error","No se ha encontrado la tarifa a activar");
 				return listadoTarifas(modelMap);
 			}
 		} 

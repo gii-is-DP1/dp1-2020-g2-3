@@ -31,6 +31,13 @@ public class TarifaService {
 		
 	}
 	
+	@Transactional
+	public Integer numTarifasActivas() {
+		
+		return tariRep.numTarifasActivas();
+		
+	}
+	
 	@Transactional(readOnly = true)
 	public Tarifa activarTarifa(Tarifa tarifa) throws DataAccessException {
 		
