@@ -190,6 +190,7 @@ public class ReservaControllerTests {
 				.andExpect(model().attributeHasFieldErrors("reserva", "fechaSalida"))
 				.andExpect(model().attributeHasFieldErrors("reserva", "horaSalida"))
 				.andExpect(model().attributeExists("reserva"))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("paradas",paradas))
 				.andExpect(model().attribute("numCiudadesIntermedias",0))
 				.andExpect(model().attribute("finBucle",-1))
@@ -261,8 +262,10 @@ public class ReservaControllerTests {
 				.param("action", "continuar"))
 				.andExpect(model().attributeExists("reserva"))
 				.andExpect(model().attribute("paradas",paradas))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("numCiudadesIntermedias",0))
 				.andExpect(model().attribute("finBucle",-1))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("error","El origen y destino deben ser diferentes."
 						+ " (Dos paradas consecutivas tampoco pueden ser iguales)"))
 				.andExpect(status().is2xxSuccessful())
@@ -289,6 +292,7 @@ public class ReservaControllerTests {
 				.param("descripcionEquipaje", "Maleta mediana")
 				.param("action", "continuar"))
 				.andExpect(model().attributeExists("reserva"))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("paradas",paradas))
 				.andExpect(model().attribute("numCiudadesIntermedias",0))
 				.andExpect(model().attribute("finBucle",-1))
@@ -317,6 +321,7 @@ public class ReservaControllerTests {
 				.param("descripcionEquipaje", "Maleta mediana")
 				.param("action", "continuar"))
 				.andExpect(model().attributeExists("reserva"))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("paradas",paradas))
 				.andExpect(model().attribute("numCiudadesIntermedias",0))
 				.andExpect(model().attribute("finBucle",-1))
@@ -343,6 +348,7 @@ public class ReservaControllerTests {
 				.param("action", "addParada"))
 				.andExpect(model().attributeExists("reserva"))
 				.andExpect(model().attribute("paradas", paradas))
+				.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 				.andExpect(model().attribute("numCiudadesIntermedias", 1))
 				.andExpect(model().attribute("finBucle", 0)) //Se elimina el binding result para esta vista, los datos se comprobarán después...
 				.andExpect(model().attributeDoesNotExist("org.springframework.validation.BindingResult.reserva"))
@@ -393,6 +399,7 @@ public class ReservaControllerTests {
 					.andExpect(model().attributeHasErrors("reserva"))
 					.andExpect(model().attributeHasFieldErrors("reserva", "fechaSalida"))
 					.andExpect(model().attributeHasFieldErrors("reserva", "horaSalida"))
+					.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 					.andExpect(model().attributeHasFieldErrors("reserva", "plazas_Ocupadas"))
 					.andExpect(model().attributeExists("reserva"))
 					.andExpect(model().attribute("paradas",this.paradas))
@@ -447,6 +454,7 @@ public class ReservaControllerTests {
 					.param("plazas_Ocupadas", "2")
 					.param("descripcionEquipaje", "Maleta mediana")
 					.param("action", "confirmarReserva"))
+			.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 					.andExpect(status().isOk())
 					.andExpect(model().attribute("error","El origen y destino deben ser diferentes."
 							+ " (Dos paradas consecutivas tampoco pueden ser iguales)"))
@@ -477,6 +485,7 @@ public class ReservaControllerTests {
 					.param("descripcionEquipaje", "Maleta mediana")
 					.param("action", "confirmarReserva"))
 					.andExpect(status().isOk())
+					.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 					.andExpect(model().attribute("error","La fecha y hora de salida no puede ser anterior al instante actual"))
 					.andExpect(model().attributeExists("reserva"))
 					.andExpect(model().attribute("paradas",paradas))
@@ -508,6 +517,7 @@ public class ReservaControllerTests {
 					.andExpect(model().attribute("error","La reserva debe realizarse con un mínimo de 1 hora de antelación"))
 					.andExpect(model().attributeExists("reserva"))
 					.andExpect(model().attribute("paradas",paradas))
+					.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 					.andExpect(model().attribute("numCiudadesIntermedias",0))
 					.andExpect(model().attribute("finBucle",-1))
 					.andExpect(status().isOk())
@@ -532,6 +542,7 @@ public class ReservaControllerTests {
 					.param("action", "atras"))
 					.andExpect(model().attributeExists("reserva"))
 					.andExpect(model().attribute("paradas",paradas))
+					.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 					.andExpect(model().attribute("numCiudadesIntermedias",0))
 					.andExpect(model().attribute("finBucle",-1))
 					.andExpect(status().isOk())
@@ -683,6 +694,7 @@ public class ReservaControllerTests {
 						.andExpect(status().isOk())
 						.andExpect(model().attributeHasFieldErrors("reserva", "fechaSalida"))
 						.andExpect(model().attributeHasFieldErrors("reserva", "horaSalida"))
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(model().attributeHasFieldErrors("reserva", "plazas_Ocupadas"))
 						.andExpect(model().attribute("estadosReserva",estadosReserva))
 						.andExpect(model().attribute("clientes",clientes))
@@ -717,6 +729,7 @@ public class ReservaControllerTests {
 						.andExpect(status().isOk())
 						.andExpect(model().attribute("paradas",paradas))
 						.andExpect(model().attributeExists("reserva"))
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(model().attribute("numCiudadesIntermedias",0))
 						.andExpect(model().attribute("finBucle",-1))
 						.andExpect(view().name("reservas/editRutaForm"));
@@ -741,6 +754,7 @@ public class ReservaControllerTests {
 						.param("descripcionEquipaje", "Maleta mediana")
 						.param("action", "guardarReserva"))
 						.andExpect(status().isOk())
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(model().attribute("reservas",listaReservas))
 						.andExpect(view().name("reservas/reservasList"));
 						
@@ -804,6 +818,7 @@ public class ReservaControllerTests {
 						.andExpect(model().attribute("trabajadores",trabajadores))
 						.andExpect(model().attribute("automoviles",automoviles))
 						.andExpect(model().attributeExists("reserva"))
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(model().attribute("trayectosIntermedios",trayectosIntermedios))
 						.andExpect(model().attribute("horasRutaCliente",1))
 						.andExpect(model().attribute("minutosRutaCliente",12))
@@ -887,6 +902,7 @@ public class ReservaControllerTests {
 						.andExpect(model().attribute("numCiudadesIntermedias", 0))
 						.andExpect(model().attribute("finBucle", -1))
 						.andExpect(model().attributeExists("reserva"))
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(view().name("reservas/editRutaForm"));
 						
 			}
@@ -945,6 +961,7 @@ public class ReservaControllerTests {
 						.andExpect(model().attribute("finBucle",0))
 						.andExpect(model().attribute("paradas",paradas))
 						.andExpect(model().attributeExists("reserva"))
+						.andExpect(model().attribute("reserva", hasProperty("descripcionEquipaje",is("Maleta mediana"))))
 						.andExpect(view().name("reservas/editRutaForm"));
 						
 			}
