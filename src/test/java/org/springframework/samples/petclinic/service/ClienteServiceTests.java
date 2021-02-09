@@ -121,7 +121,7 @@ public class ClienteServiceTests {
 	
 	@Test
 	@Transactional
-	public void findByNombreTest() {
+	public void findByNombreTest1() {
 		//ACT
 		Collection <Cliente> clientes = clienteService.findClienteByNombre("Perez");
 		//ASSERT
