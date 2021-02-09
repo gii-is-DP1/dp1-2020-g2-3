@@ -20,5 +20,6 @@ public interface TarifaRepository extends CrudRepository<Tarifa,Integer>{
 	@Query("SELECT t FROM Tarifa t WHERE t.precioPorKm =?1 AND t.porcentajeIvaRepercutido = ?2 and  t.precioEsperaPorHora =?3 and t.original = false")
 	public Optional<Tarifa> findCopyByTarifa(Double precioPorKm,Integer porcentajeIvaRepercutido,Double precioEsperaPorHora);
 	
-	
+	@Query("SELECT count(t) FROM Tarifa t WHERE t.activado=true")
+	public Integer numTarifasActivas();
 }
